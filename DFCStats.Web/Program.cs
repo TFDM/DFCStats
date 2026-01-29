@@ -30,6 +30,12 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Seed the database with sample data if running in development mode
+if (app.Environment.IsDevelopment())
+{
+    await DFCStats.Data.DbSeeder.SeedAsync(app.Services);
+}
+
 app.UseHttpsRedirection();
 app.UseRouting();
 
