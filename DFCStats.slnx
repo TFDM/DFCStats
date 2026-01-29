@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="DFCStats.Business/DFCStats.Business.csproj" />
+  <Project Path="DFCStats.Data/DFCStats.Data.csproj" />
+  <Project Path="DFCStats.Domain/DFCStats.Domain.csproj" />
+  <Project Path="DFCStats.Web/DFCStats.Web.csproj" />
+</Solution>
