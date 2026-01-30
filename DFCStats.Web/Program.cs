@@ -2,6 +2,7 @@ using DFCStats.Business;
 using DFCStats.Business.Interfaces;
 using DFCStats.Data;
 using DFCStats.Data.Interfaces;
+using DFCStats.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +15,8 @@ builder.Services.AddDbContext<DFCStatsDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-// Register the unit of work
+// Register the repositories and unit of work
+builder.Services.AddScoped<IClubRepository, ClubRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Register the business services

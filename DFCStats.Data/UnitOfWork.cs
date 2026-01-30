@@ -6,14 +6,21 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly DFCStatsDBContext _dbContext;
 
-    public IClubRepository ClubRepository { get; private set; }
+    // Repositories set via dependancy injection
+    public IClubRepository ClubRepository { get; }
 
-    public UnitOfWork(DFCStatsDBContext dbcontext)
+    public UnitOfWork(
+        DFCStatsDBContext dbcontext, 
+        IClubRepository clubRepository)
     {
         _dbContext = dbcontext;
-        ClubRepository = new ClubRepository(_dbContext);
+        ClubRepository = clubRepository;
     }
 
+    /// <summary>
+    /// Commit changes to the database
+    /// </summary>
+    /// <returns></returns>
     public async Task CommitChanges()
     {
         await _dbContext.SaveChangesAsync();
