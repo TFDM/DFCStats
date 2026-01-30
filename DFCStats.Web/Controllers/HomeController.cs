@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using DFCStats.Web.Models;
 using DFCStats.Business.Interfaces;
 using DFCStats.Domain.DTOs;
-using DFCStats.Domain.Entities;
 
 namespace DFCStats.Web.Controllers;
 
