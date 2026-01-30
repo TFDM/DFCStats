@@ -30,6 +30,19 @@ namespace DFCStats.Data
                 await dbContext.Clubs.AddRangeAsync(clubs);
                 await dbContext.SaveChangesAsync();
             }
+
+            // Seeds seasons table with some sample data only if the table is empty
+            if (!await dbContext.Seasons.AnyAsync())
+            {
+                var seasons = new List<Season>
+                {
+                    new Season { Description = "2022/23" },
+                    new Season { Description = "2023/24" }
+                };
+
+                await dbContext.Seasons.AddRangeAsync(seasons);
+                await dbContext.SaveChangesAsync();
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
 using DFCStats.Business;
 using DFCStats.Business.Interfaces;
 using DFCStats.Data;
-using DFCStats.Web.Validation.Clubs;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +22,7 @@ builder.Services.AddDbContext<DFCStatsDBContext>(options =>
 
 // Register the business services
 builder.Services.AddScoped<IClubService, ClubService>();
+builder.Services.AddScoped<ISeasonService, SeasonService>();
 
 var app = builder.Build();
 

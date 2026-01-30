@@ -23,6 +23,19 @@ namespace DFCStats.Data.Migrations
                 {
                     table.PrimaryKey("PK_Clubs", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "Seasons",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Description = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Seasons", x => x.Id);
+                });
         }
 
         /// <inheritdoc />
@@ -30,6 +43,9 @@ namespace DFCStats.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Clubs");
+
+            migrationBuilder.DropTable(
+                name: "Seasons");
         }
     }
 }

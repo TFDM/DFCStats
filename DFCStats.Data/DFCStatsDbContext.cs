@@ -8,6 +8,7 @@ namespace DFCStats.Data
         public DFCStatsDBContext(DbContextOptions<DFCStatsDBContext> options) : base(options) { }
 
         public DbSet<Club> Clubs { get; set; }
+        public DbSet<Season> Seasons { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

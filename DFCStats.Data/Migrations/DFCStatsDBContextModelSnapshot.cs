@@ -21,7 +21,7 @@ namespace DFCStats.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("DFCStats.Domain.Entities.Club", b =>
+            modelBuilder.Entity("DFCStats.Data.Entities.Club", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -37,6 +37,24 @@ namespace DFCStats.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Clubs");
+                });
+
+            modelBuilder.Entity("DFCStats.Data.Entities.Season", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Seasons");
                 });
 #pragma warning restore 612, 618
         }
