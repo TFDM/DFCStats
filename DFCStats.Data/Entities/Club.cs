@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DFCStats.Domain.Entities
+namespace DFCStats.Data.Entities
 {
     public class Club
     {

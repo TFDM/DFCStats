@@ -1,0 +1,33 @@
+@model DFCStats.Web.Models.Clubs.NewClub
+
+@if (TempData["Failure"] != null)
+{
+    <div class="row mb-3">
+        <div class="col-12">
+
+            <div class="alert alert-danger" role="alert">
+                @TempData["Failure"]
+            </div>
+
+        </div>
+    </div>
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="row mb-3">
+        <label asp-for="Name" class="col-2 col-form-label"></label>
+        <div class="col-3">
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-2"></div>
+        <div class="col-10">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</form>

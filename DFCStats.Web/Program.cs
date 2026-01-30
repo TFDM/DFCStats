@@ -1,8 +1,9 @@
 using DFCStats.Business;
 using DFCStats.Business.Interfaces;
 using DFCStats.Data;
-using DFCStats.Data.Interfaces;
-using DFCStats.Data.Repositories;
+using DFCStats.Web.Validation.Clubs;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,14 +11,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Add validation - This scans the assembly where program.cs is defined
+// it will find ever class that inherits from AbstractValidator<T>
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddFluentValidationAutoValidation();
+
 // Add the dbcontext
 builder.Services.AddDbContext<DFCStatsDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
-
-// Register the repositories and unit of work
-builder.Services.AddScoped<IClubRepository, ClubRepository>();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Register the business services
 builder.Services.AddScoped<IClubService, ClubService>();

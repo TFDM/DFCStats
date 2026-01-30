@@ -1,5 +1,5 @@
-using DFCStats.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using DFCStats.Data.Entities;
 
 namespace DFCStats.Data
 {
@@ -7,7 +7,7 @@ namespace DFCStats.Data
     {
         public DFCStatsDBContext(DbContextOptions<DFCStatsDBContext> options) : base(options) { }
 
-        public DbSet<DFCStats.Domain.Entities.Club> Clubs { get; set; }
+        public DbSet<Club> Clubs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
