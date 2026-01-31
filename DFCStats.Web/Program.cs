@@ -17,7 +17,7 @@ builder.Services.AddFluentValidationAutoValidation();
 
 // Add the dbcontext
 builder.Services.AddDbContext<DFCStatsDBContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
 // Register the business services
