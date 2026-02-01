@@ -22,6 +22,7 @@ builder.Services.AddDbContext<DFCStatsDBContext>(options =>
 );
 
 // Register the business services
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IClubService, ClubService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
 builder.Services.AddScoped<IVenueService, VenueService>();
