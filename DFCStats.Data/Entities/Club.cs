@@ -4,7 +4,7 @@ namespace DFCStats.Data.Entities
 {
     public class Club
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         
         [Required]
         [MaxLength(50)]

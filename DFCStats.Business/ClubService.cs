@@ -22,7 +22,7 @@ namespace DFCStats.Business
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public async Task<bool> IsClubNameInUse(string name)
+        private async Task<bool> IsClubNameInUseAsync(string name)
         {
             return await _dfcStatsDbContext.Clubs.AnyAsync(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
         }
@@ -39,7 +39,7 @@ namespace DFCStats.Business
             // Convert the clubs to a list of ClubDTO
             return clubs.Select(c => new ClubDTO
             {
-                Id = c.Id,
+                //Id = c.Id,
                 Name = c.Name
             }).ToList();
         }
@@ -49,20 +49,23 @@ namespace DFCStats.Business
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task AddClub(ClubDTO dto)
+        public async Task<ClubDTO> AddClubAsync(ClubDTO clubDTO)
         {
             // Check to see if the club name is already in use
-            if(await IsClubNameInUse(dto.Name))
-            {
-                throw new DFCStatsException($"{dto.Name} is already in use" );
-            }
+            if(await IsClubNameInUseAsync(clubDTO.Name))
+                throw new DFCStatsException($"{clubDTO.Name} is already in use" );
 
             // Create the club using the dto
-            var club = new Club() { Name = dto.Name };
+            var club = new Club() { Name = clubDTO.Name };
 
             // Add the club to the database and save the changes
             await _dfcStatsDbContext.Clubs.AddAsync(club);
             await _dfcStatsDbContext.SaveChangesAsync();
+
+            // Set the id of the dto to the id of the newly created club
+            clubDTO.Id = club.Id;
+
+            return clubDTO;
         }
     }
 }

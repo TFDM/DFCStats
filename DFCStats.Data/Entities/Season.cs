@@ -5,7 +5,7 @@ namespace DFCStats.Data.Entities
     public class Season
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         [MaxLength(20)]

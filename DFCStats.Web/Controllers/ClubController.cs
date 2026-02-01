@@ -32,24 +32,26 @@ public class ClubController : Controller
         {
             try
             {
-                // Add the new club to the database
-                await _clubService.AddClub(new Domain.DTOs.ClubDTO { Name = newClub.Name});
+                // Convert the NewClub model to a ClubDTO
+                var clubDTO = new Domain.DTOs.ClubDTO { Name = newClub.Name! };
 
+                // Add the new club to the database
+                await _clubService.AddClubAsync(clubDTO);
+
+                // Add a success message to TempData
+                TempData["Success"] = $"{newClub.Name} has been added successfully";
+
+                // Redirect to the index action
+                return RedirectToAction("Index");
             } catch (DFCStatsException ex)
             {
                 // Add a failure message to TempData
                 TempData["Failure"] = ex.Message;
-
-                // Return the view with the model to show the error
-                return View(newClub);
             }
         }
 
-        // Add a success message to TempData
-        TempData["Success"] = $"{newClub.Name} has been added successfully";
-
-        // Redirect to the index action
-        return RedirectToAction("Index");
+        // Return the view with the model to show the error
+        return View(newClub);
     }
 
 }

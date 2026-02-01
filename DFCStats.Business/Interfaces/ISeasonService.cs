@@ -1,13 +1,14 @@
+using DFCStats.Domain.DTOs;
+
 namespace DFCStats.Business.Interfaces
 {
     public interface ISeasonService
     {
         /// <summary>
-        /// Check to see if a season description is already in use 
-        /// Will return true if it is in use otherwise false
+        /// Adds a season to the database
         /// </summary>
-        /// <param name="description"></param>
+        /// <param name="seasonDTO"></param>
         /// <returns></returns>
-        Task<bool> IsSeasonDescriptionInUse(string description);
+        Task<SeasonDTO> AddSeasonAsync(SeasonDTO seasonDTO);
     }
 }

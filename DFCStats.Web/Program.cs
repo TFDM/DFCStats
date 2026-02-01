@@ -14,6 +14,7 @@ builder.Services.AddControllersWithViews();
 // it will find ever class that inherits from AbstractValidator<T>
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
 
 // Add the dbcontext
 builder.Services.AddDbContext<DFCStatsDBContext>(options =>
