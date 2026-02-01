@@ -4,6 +4,7 @@ using DFCStats.Business.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using DFCStats.Domain.DTOs;
 using DFCStats.Domain.Exceptions;
+using DFCStats.Business.MappingExtensions;
 
 namespace DFCStats.Business
 {
@@ -28,6 +29,19 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Returns a list of all the seasons in the database
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<SeasonDTO>> GetAllSeasonsAsync()
+        {
+            // Get all the seasons in the database
+            var seasons = await _dfcStatsDbContext.Seasons.ToListAsync();
+
+            // Map the seasons to SeasonDTOs and return them
+            return seasons.Select(s => s.MapToSeasonDTO()!).ToList();
+        }
+
+        /// <summary>
         /// Adds a season to the database
         /// </summary>
         /// <param name="seasonDTO"></param>
@@ -46,10 +60,8 @@ namespace DFCStats.Business
             await _dfcStatsDbContext.Seasons.AddAsync(season);
             await _dfcStatsDbContext.SaveChangesAsync();
 
-            // Set the id of the dto to the id of the newly created season
-            seasonDTO.Id = season.Id;
-
-            return seasonDTO;
+            // Map the newly created season to a SeasonDTO and return it
+            return season.MapToSeasonDTO()!;
         }
     }
 }
