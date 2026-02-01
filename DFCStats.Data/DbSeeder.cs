@@ -17,6 +17,19 @@ namespace DFCStats.Data
             using var scope = serviceProvider.CreateAsyncScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<DFCStatsDBContext>();
 
+            if (!await dbContext.Venues.AnyAsync())
+            {
+                var venues = new List<Venue>
+                {
+                    new Venue { Id = new Guid("a1b2c3d4-e5f6-4789-9012-34567890abcd"), Description = "Home", ShortDescription = "H", OrderNo = 1 },
+                    new Venue { Id = new Guid("b2c3d4e5-f678-4890-1234-567890abcdef"), Description = "Away", ShortDescription = "A", OrderNo = 2 },
+                    new Venue { Id = new Guid("c3d4e5f6-7890-4901-2345-67890abcdef1"), Description = "Neutral", ShortDescription = "N", OrderNo = 3 }
+                };
+
+                await dbContext.Venues.AddRangeAsync(venues);
+                await dbContext.SaveChangesAsync();
+            }
+
             // Seeds clubs table with some sample data only if the table is empty
             if (!await dbContext.Clubs.AnyAsync())
             {

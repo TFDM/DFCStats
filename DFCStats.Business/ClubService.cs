@@ -4,6 +4,7 @@ using DFCStats.Domain.DTOs;
 using DFCStats.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using DFCStats.Domain.Exceptions;
+using DFCStats.Business.MappingExtensions;
 
 namespace DFCStats.Business
 {
@@ -36,12 +37,8 @@ namespace DFCStats.Business
             // Gets all the clubs
             var clubs = await _dfcStatsDbContext.Clubs.ToListAsync();
 
-            // Convert the clubs to a list of ClubDTO
-            return clubs.Select(c => new ClubDTO
-            {
-                //Id = c.Id,
-                Name = c.Name
-            }).ToList();
+            // Map the clubs to ClubDTOs and return them
+            return clubs.Select(c => c.MapToClubDTO()!).ToList();
         }
 
         /// <summary>
@@ -62,10 +59,8 @@ namespace DFCStats.Business
             await _dfcStatsDbContext.Clubs.AddAsync(club);
             await _dfcStatsDbContext.SaveChangesAsync();
 
-            // Set the id of the dto to the id of the newly created club
-            clubDTO.Id = club.Id;
-
-            return clubDTO;
+            // Map the newly created club to a ClubDTO and return it
+            return club.MapToClubDTO()!;
         }
     }
 }

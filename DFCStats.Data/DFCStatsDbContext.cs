@@ -9,6 +9,7 @@ namespace DFCStats.Data
 
         public DbSet<Club> Clubs { get; set; }
         public DbSet<Season> Seasons { get; set; }
+        public DbSet<Venue> Venues { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
