@@ -9,9 +9,9 @@ public class ClubController : Controller
 {
     private readonly IClubService _clubService;
 
-    public ClubController(IClubService clubSerice)
+    public ClubController(IClubService clubService)
     {
-        _clubService = clubSerice;
+        _clubService = clubService;
     }
 
     public async Task<IActionResult> Index()

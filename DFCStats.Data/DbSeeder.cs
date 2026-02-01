@@ -17,6 +17,24 @@ namespace DFCStats.Data
             using var scope = serviceProvider.CreateAsyncScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<DFCStatsDBContext>();
 
+            // Seeds categories table with some sample data only if the table is empty
+            if (!await dbContext.Categories.AnyAsync())
+            {
+                var categories = new List<Category>
+                {
+                    new Category { Id = new Guid("9F6A2C42-5521-473F-8A86-64192124F4E2"), Description = "Friendly", League = false, Cup = false, FootballLeague = false, NonLeague = false, PlayOff = false, OrderNo = 0 },
+                    new Category { Id = new Guid("123BEE23-6359-415B-AC53-C62C49AD6EE7"), Description = "Football League", League = true, Cup = false, FootballLeague = true, NonLeague = false, PlayOff = false, OrderNo = 1 },
+                    new Category { Id = new Guid("5B456693-82A4-409F-B443-CA0F976273A5"), Description = "Football League Play-Off", League = false, Cup = false, FootballLeague = true, NonLeague = false, PlayOff = true, OrderNo = 2 },
+                    new Category { Id = new Guid("9082A2DF-AF2D-41AB-9AC3-796ED65F5483"), Description = "Non League", League = true, Cup = false, FootballLeague = false, NonLeague = true, PlayOff = false, OrderNo = 3 },
+                    new Category { Id = new Guid("A0C64557-39BD-4418-8F96-83068AA3DCED"), Description = "Non League Play-Off", League = false, Cup = false, FootballLeague = false, NonLeague = true, PlayOff = true, OrderNo = 4 },
+                    new Category { Id = new Guid("F242E648-07C0-46EF-8627-58A15D312850"), Description = "Cup", League = false, Cup = true, FootballLeague = false, NonLeague = false, PlayOff = false, OrderNo = 5 }
+                };
+
+                await dbContext.Categories.AddRangeAsync(categories);
+                await dbContext.SaveChangesAsync();
+            }
+
+            // Seeds venues table with some sample data only if the table is empty
             if (!await dbContext.Venues.AnyAsync())
             {
                 var venues = new List<Venue>

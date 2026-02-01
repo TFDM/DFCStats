@@ -4,8 +4,6 @@ namespace DFCStats.Business.Interfaces
 {
     public interface IClubService
     {
-
-
         /// <summary>
         /// Gets all the clubs from the database
         /// </summary>
