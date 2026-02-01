@@ -2,12 +2,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DFCStats.Data.Entities
 {
-    public class Club
+    public class Season
     {
+        [Key]
         public Guid Id { get; set; }
-        
+
         [Required]
-        [MaxLength(50)]
-        public string Name { get; set; } = string.Empty;
+        [MaxLength(20)]
+        public string Description { get; set; } = string.Empty;
     }
 }

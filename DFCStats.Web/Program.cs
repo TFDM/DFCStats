@@ -1,7 +1,6 @@
 using DFCStats.Business;
 using DFCStats.Business.Interfaces;
 using DFCStats.Data;
-using DFCStats.Web.Validation.Clubs;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
@@ -15,14 +14,16 @@ builder.Services.AddControllersWithViews();
 // it will find ever class that inherits from AbstractValidator<T>
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
 
 // Add the dbcontext
 builder.Services.AddDbContext<DFCStatsDBContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
 // Register the business services
 builder.Services.AddScoped<IClubService, ClubService>();
+builder.Services.AddScoped<ISeasonService, SeasonService>();
 
 var app = builder.Build();
 
