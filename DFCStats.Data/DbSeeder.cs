@@ -17,6 +17,22 @@ namespace DFCStats.Data
             using var scope = serviceProvider.CreateAsyncScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<DFCStatsDBContext>();
 
+            // Seeds nationalities table with some sample data only if the table is empty
+            if (!await dbContext.Nationalities.AnyAsync())
+            {
+                var nationalities = new List<Nationality>
+                {
+                    new Nationality { Id = new Guid("E0522BC6-71B8-4832-AC1F-93E1D1887214"), Name = "English", Country = "England", Icon = "gb-eng.png" },
+                    new Nationality { Id = new Guid("014280D7-ACAF-41E6-8DC2-0611EC9FAE64"), Name = "Scottish", Country = "Scotland", Icon = "gb-sct.png" },
+                    new Nationality { Id = new Guid("9FB81610-36E3-4E9F-BB35-7DEA180196B7"), Name = "Welsh", Country = "Wales", Icon = "gb-wls.png" },
+                    new Nationality { Id = new Guid("83CFA950-9855-4182-A072-4E3395B30F44"), Name = "Northern Irish", Country = "Northern Ireland", Icon = "gb-nir.png" },
+                    new Nationality { Id = new Guid("4C184BA7-6612-46E2-BACB-39F30763B1BB"), Name = "Irish", Country = "Ireland", Icon = "ie.png" }
+                };
+
+                await dbContext.Nationalities.AddRangeAsync(nationalities);
+                await dbContext.SaveChangesAsync();
+            }
+
             // Seeds categories table with some sample data only if the table is empty
             if (!await dbContext.Categories.AnyAsync())
             {
