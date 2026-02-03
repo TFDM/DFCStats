@@ -1,9 +1,9 @@
-namespace DFCStats.Domain.DTOs
+namespace DFCStats.Web.Models.Nationalities
 {
-    public class NationalityDTO
+    public class Nationalities
     {
         public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
+        public string Nationality { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
         public string? Icon { get; set; }
     }

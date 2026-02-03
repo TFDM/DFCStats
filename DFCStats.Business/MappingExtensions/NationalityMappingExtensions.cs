@@ -20,8 +20,7 @@ namespace DFCStats.Business.MappingExtensions
                 Id = nationality.Id,
                 Name = nationality.Name,
                 Country = nationality.Country,
-                Icon = nationality.Icon,
-                IconImage = (nationality.Icon != null) ? $"<img src=\"/images/Flags/{nationality.Icon}\" />" : null
+                Icon = nationality.Icon
             };
         }
     }
