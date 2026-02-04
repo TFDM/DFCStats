@@ -18,7 +18,7 @@ namespace DFCStats.Business.MappingExtensions
             return new NationalityDTO
             {
                 Id = nationality.Id,
-                Name = nationality.Name,
+                Nationality = nationality.Name,
                 Country = nationality.Country,
                 Icon = nationality.Icon
             };

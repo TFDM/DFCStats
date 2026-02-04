@@ -20,5 +20,12 @@ namespace DFCStats.Business.Interfaces
         /// <param name="sort"></param>
         /// <returns></returns>
         Task<(List<NationalityDTO>, int)> SearchForNationalitiesAsync(int page = 1, int pageSize = 1, string? searchCountry = null, string? searchNationality = null, string? sort = null);
+    
+        /// <summary>
+        /// Adds a nationality to the database
+        /// </summary>
+        /// <param name="nationalityDTO"></param>
+        /// <returns></returns>
+        Task<NationalityDTO> AddNationalityAsync(NationalityDTO nationalityDTO);
     }
 }

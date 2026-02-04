@@ -1,8 +1,9 @@
-namespace DFCStats.Domain.DTOs
+using System.ComponentModel.DataAnnotations;
+
+namespace DFCStats.Web.Models.Nationalities
 {
-    public class NationalityDTO
+    public class NewNationality
     {
-        public Guid Id { get; set; }
         public string Nationality { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
         public string? Icon { get; set; }

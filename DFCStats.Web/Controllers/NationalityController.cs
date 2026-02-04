@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DFCStats.Business.Interfaces;
 using DFCStats.Web.Models.Nationalities;
+using DFCStats.Domain.Exceptions;
 using X.PagedList;
 
 namespace DFCStats.Web.Controllers;
@@ -32,7 +33,7 @@ public class NationalityController : Controller
         var listOfNationalities = nationalities.Select(dto => new Nationalities
         {
             Id = dto.Id,
-            Nationality = dto.Name,
+            Nationality = dto.Nationality,
             Country = dto.Country,
             Icon = dto.Icon
         }).ToList();
@@ -55,5 +56,42 @@ public class NationalityController : Controller
         };
 
         return View(nationalitiesAsIPagedList);
+    }
+
+    public async Task<IActionResult> New()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> New(NewNationality newNationality)
+    {
+        if(ModelState.IsValid)
+        {
+            try
+            {
+                // Convert the NewNationality model to a NationalityDTO
+                var nationalityDTO = new Domain.DTOs.NationalityDTO{ 
+                    Nationality = newNationality.Nationality,
+                    Country = newNationality.Country,
+                    Icon = newNationality.Icon
+                };
+
+                // Add the nationality to the databaase
+                await _nationalityService.AddNationalityAsync(nationalityDTO);
+
+                // Add a success message to TempData
+                TempData["Success"] = $"{newNationality.Nationality} has been added successfully";
+
+                // Redirect to the index action
+                return RedirectToAction("Index");
+            } catch (DFCStatsException ex)
+            {
+                // Add a failure message to TempData
+                TempData["Failure"] = ex.Message;
+            }
+        }
+
+        return View(newNationality);
     }
 }
