@@ -94,4 +94,65 @@ public class NationalityController : Controller
 
         return View(newNationality);
     }
+
+    public async Task<IActionResult> Edit(string id)
+    {
+        // Validate that the id parameter is a valid GUID format
+        // the nationalityId is set to the guid if the parsing is successful
+        if (!Guid.TryParse(id, out var nationalityId))
+            // If the id is not a valid GUID, return a 400 Bad Request HTTP response
+            return BadRequest("Invalid ID format");
+        
+        // Retrieve the nationality record from the database using the validated GUID
+        var nationality = await _nationalityService.GetNationalityByIdAsync(nationalityId);
+
+        // If the nationality record is not found, return a 404 Not Found HTTP response
+        if (nationality == null)
+            return NotFound("Nationality not found");
+        
+        // Convert the nationalityDTO to an EditNationality model
+        var nationalityToEdit = new EditNationality
+        { 
+            Id = nationality.Id,
+            Nationality = nationality.Nationality,
+            Country = nationality.Country,
+            Icon = nationality.Icon
+        };
+
+        // Return the view with the nationality data (assuming the view will handle displaying it)
+        return View(nationalityToEdit);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Edit (EditNationality editNationality)
+    {
+        if(ModelState.IsValid)
+        {
+            try
+            {
+                // Convert the EditNationality model to a NationalityDTO
+                var nationalityDTO = new Domain.DTOs.NationalityDTO{ 
+                    Id = editNationality.Id,
+                    Nationality = editNationality.Nationality,
+                    Country = editNationality.Country,
+                    Icon = editNationality.Icon
+                };
+
+                // Update the nationality in the database
+                await _nationalityService.UpdateNationalityAsync(nationalityDTO);
+
+                // Add a success message to TempData
+                TempData["Success"] = $"{editNationality.Nationality} has been updated successfully";
+
+                // Redirect to the index action
+                return RedirectToAction("Index");
+            } catch (DFCStatsException ex)
+            {
+                // Add a failure message to TempData
+                TempData["Failure"] = ex.Message;
+            }
+        }
+
+        return View(editNationality);
+    }
 }

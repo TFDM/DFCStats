@@ -18,6 +18,43 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Returns a nationality from the database using the id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="DFCStatsException"></exception>
+        public async Task<NationalityDTO?> GetNationalityByIdAsync(Guid id)
+        {
+            // Get the nationality from the database
+            var nationality = await _dfcStatsDbContext.Nationalities.FirstOrDefaultAsync(n => n.Id == id);
+
+            // If not found, return null
+            if (nationality == null)
+                return null;
+
+            // Map the entity to a DTO and return it
+            return nationality.MapToNationalityDTO();
+        }
+
+        /// <summary>
+        /// Returns a nationality from the database using the name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public async Task<NationalityDTO?> GetNationalityByNameAsync(string name)
+        {
+            // Get the nationality from the database using the name
+            var nationality = await _dfcStatsDbContext.Nationalities.FirstOrDefaultAsync(n => n.Name.ToLower().Trim() == name.ToLower().Trim());
+
+            // If not found, return null
+            if (nationality == null)
+                return null;
+
+            // Map the entity to a DTO and return it
+            return nationality.MapToNationalityDTO();
+        }
+
+        /// <summary>
         /// Gets all the nationalities from the database
         /// </summary>
         /// <returns></returns>
@@ -111,6 +148,40 @@ namespace DFCStats.Business
 
             // Map the newly created nationality to a NationalityDTO and return it
             return nationality.MapToNationalityDTO()!;
+        }
+
+        /// <summary>
+        /// Updates a nationality in the database
+        /// </summary>
+        /// <param name="nationalityDTO"></param>
+        /// <returns></returns>
+        public async Task<NationalityDTO> UpdateNationalityAsync(NationalityDTO nationalityDTO)
+        {
+            // Get any nationality with the same name as the one we are trying to update to check if the name is already in use
+            var existingNationalityWithName = await GetNationalityByNameAsync(nationalityDTO.Nationality);
+
+            // If the name is already in use and it's not the same record as the one we are trying to update then throw an exception as the name is already in use
+            if (existingNationalityWithName != null && existingNationalityWithName.Id != nationalityDTO.Id)
+                 throw new DFCStatsException($"{nationalityDTO.Nationality} is already in use" );
+            
+            // Find the existing nationality in the database
+            var existingNationality = await _dfcStatsDbContext.Nationalities.FirstOrDefaultAsync(n => n.Id == nationalityDTO.Id);
+
+            // Check if the nationality exists in the database
+            if (existingNationality == null)
+                throw new DFCStatsException($"Nationality with id {nationalityDTO.Id} not found");
+
+            // Update the existing nationality with the new values
+            existingNationality.Name = nationalityDTO.Nationality;
+            existingNationality.Country = nationalityDTO.Country;
+            existingNationality.Icon = nationalityDTO.Icon;
+
+            // Update the nationality in the database
+            _dfcStatsDbContext.Nationalities.Update(existingNationality);
+            await _dfcStatsDbContext.SaveChangesAsync();
+
+            // Return the nationalityDTO
+            return existingNationality.MapToNationalityDTO()!;
         }
     }
 }

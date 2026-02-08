@@ -8,7 +8,9 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(
+    // This is required to stop the framework from adding the [Required] attribute to non-nullable reference types
+    options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 
 // Add validation - This scans the assembly where program.cs is defined
 // it will find ever class that inherits from AbstractValidator<T>

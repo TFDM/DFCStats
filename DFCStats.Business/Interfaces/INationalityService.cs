@@ -5,6 +5,20 @@ namespace DFCStats.Business.Interfaces
     public interface INationalityService
     {
         /// <summary>
+        /// Returns a nationality from the database using the id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<NationalityDTO?> GetNationalityByIdAsync(Guid id);
+
+        /// <summary>
+        /// Returns a nationality from the database using the name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        Task<NationalityDTO?> GetNationalityByNameAsync(string name);
+        
+        /// <summary>
         /// Gets all the nationalities from the database
         /// </summary>
         /// <returns></returns>
@@ -27,5 +41,12 @@ namespace DFCStats.Business.Interfaces
         /// <param name="nationalityDTO"></param>
         /// <returns></returns>
         Task<NationalityDTO> AddNationalityAsync(NationalityDTO nationalityDTO);
+    
+        /// <summary>
+        /// Updates a nationality in the database
+        /// </summary>
+        /// <param name="nationalityDTO"></param>
+        /// <returns></returns>
+        Task<NationalityDTO> UpdateNationalityAsync(NationalityDTO nationalityDTO);
     }
 }
