@@ -1,0 +1,91 @@
+@using DFCStats.Web.Models.Nationalities;
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+
+@model IPagedList<Nationalities>
+
+@if (TempData["Success"] != null)
+{
+    <div class="row mb-3">
+        <div class="col-12">
+
+            <div class="alert alert-success" role="alert">
+                @TempData["Success"]
+            </div>
+
+        </div>
+    </div>
+}
+
+<form method="get">
+	<div class="row mb-3">
+
+		<div class="col-12 col-lg-5">
+			<label>Nationality</label>
+			@Html.TextBox("nationality", string.Empty, new { @class = "form-control" })
+		</div>
+		<div class="col-12 col-lg-5">
+			<label>Country</label>
+			@Html.TextBox("country", string.Empty, new { @class = "form-control" })
+		</div>
+		<div class="col-12 col-lg-2">
+			<label>Results to Show</label>
+			@Html.DropDownList("pageSize", new SelectList(ViewBag.pageSize, "Value", "Text"), string.Empty, new { @class = "form-control form-select" })
+		</div>
+
+	</div>
+	<div class="row">
+		<div class="col-12">
+			<button type="submit" class="btn btn-success">Search</button>
+		</div>
+	</div>
+</form>
+
+<div class="row">
+	<div class="col-12">
+
+		<table class="table">
+			<thead>
+				<tr>
+					<th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByNationality" asp-route-Nationality="@Context.Request.Query["nationality"]" asp-route-Country="@Context.Request.Query["country"]" asp-route-pageSize="@Context.Request.Query["pageSize"]">Nationality</a></th>
+					<th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByCountry" asp-route-Nationality="@Context.Request.Query["nationality"]" asp-route-Country="@Context.Request.Query["country"]" asp-route-pageSize="@Context.Request.Query["pageSize"]">Country</a></th>
+					<th class="table-light">Icon / File</th>
+					<th class="table-light"></th>
+				</tr>
+			</thead>
+			<tbody class="table-group-divider">
+				@foreach (Nationalities nationalty in Model)
+				{
+					<tr>
+						<td class="table-light">@nationalty.Nationality</td>
+						<td class="table-light">@nationalty.Country</td>
+						<td class="table-light">@nationalty.Icon</td>
+						<td class="table-light"><a asp-action="Edit" asp-route-id="@nationalty.Id">Edit</a></td>
+					</tr>
+				}
+			</tbody>
+		</table>
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-12">
+
+		@Html.PagedListPager(Model, page => Url.Action("Index", new
+			{
+				page = page,
+				country = Context.Request.Query["country"],
+				nationality = Context.Request.Query["nationality"],
+				pageSize = Context.Request.Query["pageSize"],
+				sort = Context.Request.Query["sort"]
+			}),
+            new X.PagedList.Mvc.Core.PagedListRenderOptions
+		{
+			MaximumPageNumbersToDisplay = 3,
+			LiElementClasses = new string[] { "page-itm" },
+			PageClasses = new string[] { "page-link" }
+		})
+
+	</div>
+</div>

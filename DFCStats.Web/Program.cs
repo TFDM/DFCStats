@@ -8,7 +8,9 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(
+    // This is required to stop the framework from adding the [Required] attribute to non-nullable reference types
+    options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 
 // Add validation - This scans the assembly where program.cs is defined
 // it will find ever class that inherits from AbstractValidator<T>
@@ -24,6 +26,7 @@ builder.Services.AddDbContext<DFCStatsDBContext>(options =>
 // Register the business services
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IClubService, ClubService>();
+builder.Services.AddScoped<INationalityService, NationalityService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
 builder.Services.AddScoped<IVenueService, VenueService>();
 
