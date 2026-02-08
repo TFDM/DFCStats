@@ -33,6 +33,41 @@ namespace DFCStats.Data
                 await dbContext.SaveChangesAsync();
             }
 
+            // Seed the people table with some sample data only if the table is empty
+            if (!await dbContext.People.AnyAsync())
+            {
+                var people = new List<Person>
+                {
+                    new Person { 
+                        Id = new Guid("E7E255F9-91CF-4D8D-B66A-005FD374E68F"), 
+                        FirstName = "Terry", 
+                        LastName = "Galbraith", 
+                        DateOfBirth = new DateTime(1990, 2, 3),
+                        Biography = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc at rhoncus ante.",
+                        NationalityId = new Guid("E0522BC6-71B8-4832-AC1F-93E1D1887214"),
+                        IsManager = false },
+                    new Person { 
+                        Id = new Guid("6D4751AB-2670-4614-B154-06CE96119EBD"), 
+                        FirstName = "Adriano", 
+                        LastName = "Moke", 
+                        DateOfBirth = new DateTime(1990, 1, 11),
+                        Biography = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc at rhoncus ante.",
+                        NationalityId = null,
+                        IsManager = false },
+                    new Person { 
+                        Id = new Guid("12C04291-F947-46A1-8512-DB463726D7B8"), 
+                        FirstName = "Gary", 
+                        LastName = "Brown", 
+                        DateOfBirth = new DateTime(1987, 7, 19),
+                        Biography = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc at rhoncus ante.",
+                        NationalityId = new Guid("E0522BC6-71B8-4832-AC1F-93E1D1887214"),
+                        IsManager = true }
+                };
+
+                await dbContext.People.AddRangeAsync(people);
+                await dbContext.SaveChangesAsync();
+            }
+
             // Seeds categories table with some sample data only if the table is empty
             if (!await dbContext.Categories.AnyAsync())
             {

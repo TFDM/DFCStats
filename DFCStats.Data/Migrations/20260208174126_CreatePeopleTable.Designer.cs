@@ -4,6 +4,7 @@ using DFCStats.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DFCStats.Data.Migrations
 {
     [DbContext(typeof(DFCStatsDBContext))]
-    partial class DFCStatsDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260208174126_CreatePeopleTable")]
+    partial class CreatePeopleTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,12 +126,12 @@ namespace DFCStats.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<Guid?>("NationalityId")
+                    b.Property<Guid?>("NationalityID")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NationalityId");
+                    b.HasIndex("NationalityID");
 
                     b.ToTable("People");
                 });
@@ -177,7 +180,7 @@ namespace DFCStats.Data.Migrations
                 {
                     b.HasOne("DFCStats.Data.Entities.Nationality", "Nationality")
                         .WithMany("People")
-                        .HasForeignKey("NationalityId");
+                        .HasForeignKey("NationalityID");
 
                     b.Navigation("Nationality");
                 });
