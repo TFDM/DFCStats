@@ -3,8 +3,9 @@ using System.ComponentModel;
 
 namespace DFCStats.Web.Models.People
 {
-    public class NewPerson
+    public class EditPerson
     {
+        public Guid Id { get; set; }
         [DisplayName("First Name")]
         public string FirstName { get; set; } = string.Empty;
         [DisplayName("Last Name")]
@@ -16,11 +17,5 @@ namespace DFCStats.Web.Models.People
         public List<Season>? Seasons { get; set; } = new List<Season>();
         public bool IsManager { get; set; }
         public string? Biography { get; set; }
-    }
-
-    public class Season
-    {
-        public Guid SeasonId { get; set; }
-        public string? Description { get; set; }
     }
 }

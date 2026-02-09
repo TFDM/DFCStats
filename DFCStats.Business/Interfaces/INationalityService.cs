@@ -41,13 +41,13 @@ namespace DFCStats.Business.Interfaces
         /// </summary>
         /// <param name="nationalityDTO"></param>
         /// <returns></returns>
-        Task<NationalityDTO> AddNationalityAsync(NationalityDTO nationalityDTO);
+        Task<NationalityDTO> AddNationalityAsync(NewNationalityDTO newNationalityDTO);
     
         /// <summary>
         /// Updates a nationality in the database
         /// </summary>
         /// <param name="nationalityDTO"></param>
         /// <returns></returns>
-        Task<NationalityDTO> UpdateNationalityAsync(NationalityDTO nationalityDTO);
+        Task<NationalityDTO> UpdateNationalityAsync(EditNationalityDTO editNationalityDTO);
     }
 }

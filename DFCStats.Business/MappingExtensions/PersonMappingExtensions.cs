@@ -22,9 +22,17 @@ namespace DFCStats.Business.MappingExtensions
                 LastName = person.LastName,
                 LastNameFirstName = $"{person.LastName}, {person.FirstName}",
                 DateOfBirth = person.DateOfBirth,
-                NationalityID = person.NationalityId,
+                NationalityId = person.NationalityId,
                 Nationality = person.Nationality?.Name,
-                NationalityIcon = person.Nationality?.Icon
+                NationalityIcon = person.Nationality?.Icon,
+                Biography = person.Biography,
+                IsManager = person.IsManager,
+                Seasons = person.PersonSeasons?
+                    .Select(ps => new SeasonDTO
+                    {
+                        Id = ps.SeasonId,
+                        Description = ps.Season?.Description ?? string.Empty
+                    }).ToList()
             };
         }
         

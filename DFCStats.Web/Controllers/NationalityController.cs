@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using DFCStats.Business.Interfaces;
 using DFCStats.Web.Models.Nationalities;
 using DFCStats.Domain.Exceptions;
+using DFCStats.Domain.DTOs;
 using X.PagedList;
 
 namespace DFCStats.Web.Controllers;
@@ -70,15 +71,15 @@ public class NationalityController : Controller
         {
             try
             {
-                // Convert the NewNationality model to a NationalityDTO
-                var nationalityDTO = new Domain.DTOs.NationalityDTO{ 
+                // Convert the NewNationality model to a NewNationalityDTO
+                var newNationalityDTO = new NewNationalityDTO{ 
                     Nationality = newNationality.Nationality,
                     Country = newNationality.Country,
                     Icon = newNationality.Icon
                 };
 
                 // Add the nationality to the databaase
-                await _nationalityService.AddNationalityAsync(nationalityDTO);
+                await _nationalityService.AddNationalityAsync(newNationalityDTO);
 
                 // Add a success message to TempData
                 TempData["Success"] = $"{newNationality.Nationality} has been added successfully";
@@ -131,7 +132,7 @@ public class NationalityController : Controller
             try
             {
                 // Convert the EditNationality model to a NationalityDTO
-                var nationalityDTO = new Domain.DTOs.NationalityDTO{ 
+                var editNationalityDTO = new EditNationalityDTO{ 
                     Id = editNationality.Id,
                     Nationality = editNationality.Nationality,
                     Country = editNationality.Country,
@@ -139,7 +140,7 @@ public class NationalityController : Controller
                 };
 
                 // Update the nationality in the database
-                await _nationalityService.UpdateNationalityAsync(nationalityDTO);
+                await _nationalityService.UpdateNationalityAsync(editNationalityDTO);
 
                 // Add a success message to TempData
                 TempData["Success"] = $"{editNationality.Nationality} has been updated successfully";

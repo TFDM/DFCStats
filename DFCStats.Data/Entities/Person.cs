@@ -18,7 +18,7 @@ namespace DFCStats.Data.Entities
         [Required]
         public bool IsManager { get; set; }
 
-        public List<PersonSeason>? PersonSeasons { get; set; }
+        public List<PersonSeason> PersonSeasons { get; set; } = new List<PersonSeason>();
         public virtual Nationality? Nationality { get; set; }
     }
 }

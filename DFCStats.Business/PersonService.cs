@@ -25,18 +25,23 @@ namespace DFCStats.Business
         /// Returns a person from the database using the id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="includes"></param>
         /// <returns></returns>
-        public async Task<PersonDTO?> GetPersonByIdAsync(Guid id)
+        public async Task<PersonDTO?> GetPersonByIdAsync(Guid id, PersonIncludes includes = PersonIncludes.None)
         {
-            // Get the person from the database
-            var person = await _dfcStatsDbContext.People.Include(p => p.Nationality).FirstOrDefaultAsync(p => p.Id == id);
-
-            // If not found, return null
-            if (person == null)
-                return null;
-
-            // Map the entity to a DTO and return it
-            return person.MapToPersonDTO();
+            var query = _dfcStatsDbContext.People.AsQueryable();
+    
+            // Includes the nationality
+            if (includes.HasFlag(PersonIncludes.Nationality))
+                query = query.Include(p => p.Nationality);
+        
+            // Includes the PersonSeasons - also include the seasons as well so the description is included
+            if (includes.HasFlag(PersonIncludes.Seasons))
+                query = query.Include(p => p.PersonSeasons).ThenInclude(s => s.Season);
+    
+            // Run the query and map the entity to a DTO and return it
+            var person = await query.FirstOrDefaultAsync(p => p.Id == id);
+            return person?.MapToPersonDTO();
         }
 
         /// <summary>
@@ -83,6 +88,61 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Update the person in the database
+        /// </summary>
+        /// <param name="editPersonDTO"></param>
+        /// <returns></returns>
+        /// <exception cref="DFCStatsException"></exception>
+        public async Task<PersonDTO> UpdatePersonAsync(EditPersonDTO editPersonDTO)
+        {
+            // Check the supplied seasons are in the database and haven't been repeated
+            await CheckSeaonsAsync(editPersonDTO.ListOfSeasons);
+
+            // Check the nationality exists in the database
+            await CheckNationalityAsync(editPersonDTO.NationalityId);
+
+            // Get the person from the database
+            var existingPerson = await _dfcStatsDbContext.People
+                .Include(p => p.PersonSeasons)
+                .FirstOrDefaultAsync(p => p.Id == editPersonDTO.Id);
+
+            // Check if the person exists in the database
+            if (existingPerson == null)
+                throw new DFCStatsException($"Person with id {editPersonDTO.Id} not found");
+
+            // Clear existing seasons
+            existingPerson.PersonSeasons.Clear();
+
+            var peopleSeasons = new List<DFCStats.Data.Entities.PersonSeason>();
+
+            if (editPersonDTO.ListOfSeasons != null)
+            {
+                // Create a new list of PersonSeason which can added to the new person
+                peopleSeasons = editPersonDTO.ListOfSeasons.Select(seasonId => new PersonSeason
+                {
+                    Id = Guid.NewGuid(),
+                    SeasonId = seasonId
+                }).ToList();
+            }
+
+            // Update the person
+            existingPerson.FirstName = editPersonDTO.FirstName;
+            existingPerson.LastName = editPersonDTO.LastName;
+            existingPerson.DateOfBirth = editPersonDTO.DateOfBirth;
+            existingPerson.NationalityId = editPersonDTO.NationalityId;
+            existingPerson.Biography = editPersonDTO.Biography;
+            existingPerson.IsManager = editPersonDTO.IsManager;
+            existingPerson.PersonSeasons = peopleSeasons;
+
+            // Update the person in the database
+            _dfcStatsDbContext.People.Update(existingPerson);
+            await _dfcStatsDbContext.SaveChangesAsync();
+
+            // Map the newly created person to a PersonDTO and return it
+            return existingPerson.MapToPersonDTO()!;
+        }
+
+        /// <summary>
         /// Checks the supplied list of guids to see if they exist in the seasons table
         /// </summary>
         /// <param name="listOfSeasons"></param>
@@ -120,7 +180,7 @@ namespace DFCStats.Business
             if (nationalityId != null)
             {
                 //Get the nationality from the database using the id
-                var nationality = _nationalities.GetNationalityByIdAsync((Guid)nationalityId);
+                var nationality = await _nationalities.GetNationalityByIdAsync((Guid)nationalityId);
 
                 //If the nationality wasn't found then throw an error
                 if (nationality == null)

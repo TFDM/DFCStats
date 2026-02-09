@@ -152,14 +152,14 @@ namespace DFCStats.Business
         /// </summary>
         /// <param name="nationalityDTO"></param>
         /// <returns></returns>
-        public async Task<NationalityDTO> AddNationalityAsync(NationalityDTO nationalityDTO)
+        public async Task<NationalityDTO> AddNationalityAsync(NewNationalityDTO newNationalityDTO)
         {
             // Check to see if the nationality name is already in use
-            if(await IsNationalityNameInUseAsync(nationalityDTO.Nationality))
-                throw new DFCStatsException($"{nationalityDTO.Nationality} is already in use" );
+            if(await IsNationalityNameInUseAsync(newNationalityDTO.Nationality))
+                throw new DFCStatsException($"{newNationalityDTO.Nationality} is already in use" );
 
             // Create the nationality using the dto
-            var nationality = new Nationality() { Name = nationalityDTO.Nationality, Country = nationalityDTO.Country, Icon = nationalityDTO.Icon };
+            var nationality = new Nationality() { Name = newNationalityDTO.Nationality, Country = newNationalityDTO.Country, Icon = newNationalityDTO.Icon };
 
             await _dfcStatsDbContext.Nationalities.AddAsync(nationality);
             await _dfcStatsDbContext.SaveChangesAsync();
@@ -173,26 +173,26 @@ namespace DFCStats.Business
         /// </summary>
         /// <param name="nationalityDTO"></param>
         /// <returns></returns>
-        public async Task<NationalityDTO> UpdateNationalityAsync(NationalityDTO nationalityDTO)
+        public async Task<NationalityDTO> UpdateNationalityAsync(EditNationalityDTO editNationalityDTO)
         {
             // Get any nationality with the same name as the one we are trying to update to check if the name is already in use
-            var existingNationalityWithName = await GetNationalityByNameAsync(nationalityDTO.Nationality);
+            var existingNationalityWithName = await GetNationalityByNameAsync(editNationalityDTO.Nationality);
 
             // If the name is already in use and it's not the same record as the one we are trying to update then throw an exception as the name is already in use
-            if (existingNationalityWithName != null && existingNationalityWithName.Id != nationalityDTO.Id)
-                 throw new DFCStatsException($"{nationalityDTO.Nationality} is already in use" );
+            if (existingNationalityWithName != null && existingNationalityWithName.Id != editNationalityDTO.Id)
+                 throw new DFCStatsException($"{editNationalityDTO.Nationality} is already in use" );
             
             // Find the existing nationality in the database
-            var existingNationality = await _dfcStatsDbContext.Nationalities.FirstOrDefaultAsync(n => n.Id == nationalityDTO.Id);
+            var existingNationality = await _dfcStatsDbContext.Nationalities.FirstOrDefaultAsync(n => n.Id == editNationalityDTO.Id);
 
             // Check if the nationality exists in the database
             if (existingNationality == null)
-                throw new DFCStatsException($"Nationality with id {nationalityDTO.Id} not found");
+                throw new DFCStatsException($"Nationality with id {editNationalityDTO.Id} not found");
 
             // Update the existing nationality with the new values
-            existingNationality.Name = nationalityDTO.Nationality;
-            existingNationality.Country = nationalityDTO.Country;
-            existingNationality.Icon = nationalityDTO.Icon;
+            existingNationality.Name = editNationalityDTO.Nationality;
+            existingNationality.Country = editNationalityDTO.Country;
+            existingNationality.Icon = editNationalityDTO.Icon;
 
             // Update the nationality in the database
             _dfcStatsDbContext.Nationalities.Update(existingNationality);
