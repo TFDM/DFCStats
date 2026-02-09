@@ -19,10 +19,11 @@ namespace DFCStats.Business.Interfaces
         Task<NationalityDTO?> GetNationalityByNameAsync(string name);
         
         /// <summary>
-        /// Gets all the nationalities from the database
+        /// Gets all the nationalities from the database with optional sorting
         /// </summary>
+        /// <param name="sort"></param>
         /// <returns></returns>
-        Task<List<NationalityDTO>> GetAllNationalitiesAsync();
+        Task<List<NationalityDTO>> GetAllNationalitiesAsync(string? sort = null);
 
         /// <summary>
         /// Searches for nationalities with optional filtering, sorting, and pagination

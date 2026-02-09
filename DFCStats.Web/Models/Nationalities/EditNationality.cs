@@ -1,6 +1,6 @@
 namespace DFCStats.Web.Models.Nationalities
 {
-    public class EditNationality : INationality
+    public class EditNationality
     {
         public Guid Id { get; set; }
         public string Nationality { get; set; } = string.Empty;

@@ -55,16 +55,34 @@ namespace DFCStats.Business
         }
 
         /// <summary>
-        /// Gets all the nationalities from the database
+        /// Gets all the nationalities from the database with optional sorting
         /// </summary>
+        /// <param name="sort"></param>
         /// <returns></returns>
-        public async Task<List<NationalityDTO>> GetAllNationalitiesAsync()
+        public async Task<List<NationalityDTO>> GetAllNationalitiesAsync(string? sort = null)
         {
             // Gets all the nationalities
-            var nationalities =  await _dfcStatsDbContext.Nationalities.ToListAsync();
+            var nationalities =  _dfcStatsDbContext.Nationalities.AsQueryable();
+
+            // Sort the records based on the sort parameter
+            switch (sort)
+			{
+				case "nationality_desc":
+					nationalities = nationalities.OrderByDescending(n => n.Name);
+					break;
+				case "country_desc":
+					nationalities = nationalities.OrderByDescending(n => n.Country);
+					break;
+				case "country":
+					nationalities = nationalities.OrderBy(n => n.Country);
+					break;
+				default:
+					nationalities = nationalities.OrderBy(n => n.Name);
+					break;
+			}
 
             // Map the nationalities to NationalityDTOs and return them
-            return nationalities.Select(n => n.MapToNationalityDTO()!).ToList();
+            return await nationalities.Select(n => n.MapToNationalityDTO()!).ToListAsync();
         }
 
         /// <summary>

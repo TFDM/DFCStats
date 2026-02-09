@@ -10,5 +10,7 @@ namespace DFCStats.Data.Entities
         [Required]
         [MaxLength(20)]
         public string Description { get; set; } = string.Empty;
+
+        public virtual ICollection<PersonSeason> PersonSeasons { get; set; } = new List<PersonSeason>();
     }
 }

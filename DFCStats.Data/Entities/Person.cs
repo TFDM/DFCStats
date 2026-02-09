@@ -12,12 +12,13 @@ namespace DFCStats.Data.Entities
         [Required]
         [MaxLength(50)]
         public string LastName { get; set; } = string.Empty;
-        public DateTime? DateOfBirth { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
         public Guid? NationalityId { get; set; }
         public string? Biography { get; set; }
         [Required]
         public bool IsManager { get; set; }
 
+        public List<PersonSeason>? PersonSeasons { get; set; }
         public virtual Nationality? Nationality { get; set; }
     }
 }

@@ -27,5 +27,6 @@ namespace DFCStats.Business.MappingExtensions
                 NationalityIcon = person.Nationality?.Icon
             };
         }
+        
     }
 }

@@ -10,5 +10,12 @@ namespace DFCStats.Business.Interfaces
         /// <param name="id"></param>
         /// <returns></returns>
         Task<PersonDTO?> GetPersonByIdAsync(Guid id);
+
+        /// <summary>
+        /// Adds a new person to the database
+        /// </summary>
+        /// <param name="newPersonDTO"></param>
+        /// <returns></returns>
+        Task<PersonDTO> AddPersonAsync(NewPersonDTO newPersonDTO);
     }
 }
