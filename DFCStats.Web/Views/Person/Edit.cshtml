@@ -1,0 +1,188 @@
+@model DFCStats.Web.Models.People.EditPerson
+
+@if (TempData["Failure"] != null)
+{
+    <div class="row mb-3">
+        <div class="col-12">
+
+            <div class="alert alert-danger" role="alert">
+                @TempData["Failure"]
+            </div>
+
+        </div>
+    </div>
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <input asp-for="Id" hidden />
+
+    <div class="row mb-3">
+        <label asp-for="FirstName" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-4">
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="LastName" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-4">
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="DateOfBirth" class="col-2 col-form-label"></label>
+        <div class="col-5 col-lg-2">
+            <input asp-for="DateOfBirth" class="form-control" type="date" />
+            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="NationalityId" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-4">
+            @Html.DropDownList("NationalityId", new SelectList(ViewBag.nationalities, "Id", "Nationality"), string.Empty, new { @class = "form-control form-select" })
+            <span asp-validation-for="NationalityId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-10 offset-sm-2">
+            <p>A person can be attached to a season using the dropdown menu and the 'Add Season' button. If you want to remove a season, just click on it.</p>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label class="col-2 col-form-label">Seasons</label>
+        <div id="seasons-list" class="col-10 col-lg-4">
+            <!-- Dynamic season inputs will be added here -->
+            
+            @if(Model.Seasons != null)
+            {
+                //If the model is not null create a counter variable which can be used to index the season dropdown menus
+                var counter = 0;
+
+                @foreach (var s in Model.Seasons)
+                {
+                    //Loop over each season in the model and create a dropdown menu
+                    //Each season in ViewBag.seasons is then added to the dropdown menu
+                    //If the seasonID matches the Id the current season it gets marked as selected
+                    <div class="season-item">
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <select name="Seasons[@counter].SeasonID" class="form-control form-select">
+                                    @foreach (var season in ViewBag.seasons)
+                                    {
+                                        if (s.SeasonId == season.Id)
+                                        {
+                                            <option value="@season.Id" selected>@season.Description</option>
+                                        } else
+                                        {
+                                            <option value="@season.Id">@season.Description</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-5">
+                                <button type="button" class="btn btn-danger" onclick="removeSeason(this)">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    //Increase the counter by one
+                    counter = counter + 1;
+                }
+            }
+
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="offset-2">
+            <button type="button" class="btn btn-primary" onclick="addSeason()">Add Season</button>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="IsManager" class="col-2 col-form-label"></label>
+        <div class="col-3 col-lg-2">
+            <select asp-for="IsManager" class="form-control form-select">
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+            </select>
+            <span asp-validation-for="IsManager" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="Biography" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-4">
+            <textarea asp-for="Biography" class="form-control" rows="12"></textarea>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-2"></div>
+        <div class="col-10">
+            <button class="btn btn-primary">Save</button>
+        </div>
+    </div>
+
+</form>
+
+@section Scripts
+{
+    <script>
+        //Sets an index
+        // Set seasonIndex based on the number of existing season-item divs
+        let seasonIndex = document.querySelectorAll('#seasons-list .season-item').length;
+
+        //Seasons which have come from the controller
+        const seasonsData = @Html.Raw(ViewBag.seasonsJson);
+
+        function addSeason() {
+            //Creates a div and adds a dropdown menu of seasons and a remove button to the page 
+            const seasonDiv = document.createElement('div');
+            seasonDiv.className = 'season-item';
+            seasonDiv.innerHTML = `
+                        <div class="row mb-3">
+                        <div class="col-6">
+                        <select name="Seasons[${seasonIndex}].SeasonId" class="form-control form-select">
+                            ${seasonsData.map(s => `<option value="${s.Id}">${s.Description}</option>`).join('')}
+                        </select>
+                        </div>
+                        <div class="col-5">
+                        <button type="button" class="btn btn-danger" onclick="removeSeason(this)">Remove</button>
+                        </div>
+                        </div>
+                    `;
+
+            //Adds the div containing the dropdown menu and button to the page
+            document.getElementById('seasons-list').appendChild(seasonDiv);
+            seasonIndex++;
+        }
+
+        function removeSeason(button) {
+            //Remove the div containing the season and reindexes the list
+            //button.parentElement.remove();
+            const seasonItem = button.closest('.season-item');
+            seasonItem.remove();
+
+            reindexSeasons();
+        }
+
+        function reindexSeasons() {
+            //Reindexes the seasons - this ensures if a season in the middle of the list is removed they are all submitted correctly
+            const seasonItems = document.querySelectorAll('#seasons-list .season-item');
+            seasonItems.forEach((item, index) => {
+                const selectElement = item.querySelector('select');
+                selectElement.name = `Seasons[${index}].SeasonId`;
+            });
+            seasonIndex = seasonItems.length;
+        }
+    </script>
+}

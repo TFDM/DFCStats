@@ -27,6 +27,7 @@ builder.Services.AddDbContext<DFCStatsDBContext>(options =>
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IClubService, ClubService>();
 builder.Services.AddScoped<INationalityService, NationalityService>();
+builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
 builder.Services.AddScoped<IVenueService, VenueService>();
 

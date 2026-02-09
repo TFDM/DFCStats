@@ -35,7 +35,9 @@ namespace DFCStats.Business
         public async Task<List<SeasonDTO>> GetAllSeasonsAsync()
         {
             // Get all the seasons in the database
-            var seasons = await _dfcStatsDbContext.Seasons.ToListAsync();
+            var seasons = await _dfcStatsDbContext.Seasons
+                .OrderByDescending(s => s.Description)
+                .ToListAsync();
 
             // Map the seasons to SeasonDTOs and return them
             return seasons.Select(s => s.MapToSeasonDTO()!).ToList();

@@ -4,6 +4,7 @@ using DFCStats.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DFCStats.Data.Migrations
 {
     [DbContext(typeof(DFCStatsDBContext))]
-    partial class DFCStatsDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260208174856_UpdatePeopleTable")]
+    partial class UpdatePeopleTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,8 +110,8 @@ namespace DFCStats.Data.Migrations
                     b.Property<string>("Biography")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateOnly?>("DateOfBirth")
-                        .HasColumnType("date");
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -131,24 +134,6 @@ namespace DFCStats.Data.Migrations
                     b.HasIndex("NationalityId");
 
                     b.ToTable("People");
-                });
-
-            modelBuilder.Entity("DFCStats.Data.Entities.PersonSeason", b =>
-                {
-                    b.Property<Guid>("PersonId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SeasonId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("PersonId", "SeasonId");
-
-                    b.HasIndex("SeasonId");
-
-                    b.ToTable("PeopleSeasons");
                 });
 
             modelBuilder.Entity("DFCStats.Data.Entities.Season", b =>
@@ -200,38 +185,9 @@ namespace DFCStats.Data.Migrations
                     b.Navigation("Nationality");
                 });
 
-            modelBuilder.Entity("DFCStats.Data.Entities.PersonSeason", b =>
-                {
-                    b.HasOne("DFCStats.Data.Entities.Person", "Person")
-                        .WithMany("PersonSeasons")
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DFCStats.Data.Entities.Season", "Season")
-                        .WithMany("PersonSeasons")
-                        .HasForeignKey("SeasonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Person");
-
-                    b.Navigation("Season");
-                });
-
             modelBuilder.Entity("DFCStats.Data.Entities.Nationality", b =>
                 {
                     b.Navigation("People");
-                });
-
-            modelBuilder.Entity("DFCStats.Data.Entities.Person", b =>
-                {
-                    b.Navigation("PersonSeasons");
-                });
-
-            modelBuilder.Entity("DFCStats.Data.Entities.Season", b =>
-                {
-                    b.Navigation("PersonSeasons");
                 });
 #pragma warning restore 612, 618
         }

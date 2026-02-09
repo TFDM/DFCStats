@@ -16,5 +16,7 @@ namespace DFCStats.Data.Entities
         public string Country { get; set; } = string.Empty;
         [MaxLength(10)]
         public string? Icon { get; set; }
+
+        public virtual ICollection<Person> People { get; set; } = new List<Person>();
     }
 }
