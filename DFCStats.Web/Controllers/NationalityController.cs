@@ -19,6 +19,10 @@ public class NationalityController : Controller
 
     public async Task<IActionResult> Index(string country, string nationality, string sort, int page = 1, int pageSize = 50)
     {
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Nationalities";
+		ViewData["Title"] = "Nationalities";
+
         // Ensure the page and page size are above not zero or negative
         page = (page < 1) ? 1 : page;
         pageSize = (pageSize < 1) ? 50 : pageSize;
@@ -61,6 +65,10 @@ public class NationalityController : Controller
 
     public async Task<IActionResult> New()
     {
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Create Nationality";
+		ViewData["Title"] = "Create Nationality";
+
         return View();
     }
 
@@ -93,11 +101,19 @@ public class NationalityController : Controller
             }
         }
 
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Create Nationality";
+		ViewData["Title"] = "Create Nationality";
+
         return View(newNationality);
     }
 
     public async Task<IActionResult> Edit(string id)
     {
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Edit Nationality";
+		ViewData["Title"] = "Edit Nationality";
+
         // Validate that the id parameter is a valid GUID format
         // the nationalityId is set to the guid if the parsing is successful
         if (!Guid.TryParse(id, out var nationalityId))
@@ -153,6 +169,10 @@ public class NationalityController : Controller
                 TempData["Failure"] = ex.Message;
             }
         }
+
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Edit Nationality";
+		ViewData["Title"] = "Edit Nationality";
 
         return View(editNationality);
     }

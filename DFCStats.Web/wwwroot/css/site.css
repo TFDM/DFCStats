@@ -1,31 +1,108 @@
-html {
-  font-size: 14px;
+html, body {
+    height: 100%;
+    font-family: 'Ubuntu', sans-serif;
+    background: #404040;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+#bdSidebar {
+    background: #404040;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+#content {
+    overflow: auto;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+#user-login a {
+    color: #fff;
+    text-decoration: none;
 }
 
-body {
-  margin-bottom: 60px;
+#navbar-modile {
+    background: #404040;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.mynav {
+    color: #fff;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+    .mynav li a {
+        color: #fff;
+        text-decoration: none;
+        width: 100%;
+        display: block;
+        border-radius: 5px;
+        padding: 8px 5px;
+    }
+
+        .mynav li a.active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .mynav li a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .mynav li a i {
+            width: 25px;
+            text-align: center;
+        }
+
+.notification-badge {
+    background-color: rgba(255,255,255,0.7);
+    float: right;
+    color: #222;
+    font-size: 14px;
+    padding: 0px 8px;
+    border-radius: 2px;
+}
+
+.table th, .table td {
+}
+
+label {
+    font-weight: bold;
+}
+
+#selectedSeasons {
+    overflow: hidden;
+    height: 100%;
+}
+
+.remove-season {
+    display: inline;
+    float: left;
+    clear: right;
+    background: #ffffff;
+}
+
+::backdrop {
+    background-color: silver;
+    opacity: 0.75;
+}
+
+.success-dialog {
+    width: 50%;
+    border: solid #badbcc 2px;
+    color: #0f5132;
+    padding: 20px;
+    background: #d1e7dd;
+    text-align: center;
+}
+
+.information-dialog {
+    width: 50%;
+    border: solid #b6d4fe 2px;
+    color: #084298;
+    padding: 20px;
+    background: #cfe2ff;
+    text-align: center;
+}
+
+.danger-dialog {
+    width: 50%;
+    border: solid #f5c2c7 2px;
+    color: #842029;
+    padding: 20px;
+    background: #f8d7da;
+    text-align: center;
 }

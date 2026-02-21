@@ -22,13 +22,17 @@ public class PersonController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var person = await _personService.GetPersonByIdAsync(Guid.Parse("D72DFD1C-2562-43FF-23E3-08DE681912DE"), PersonIncludes.Nationality | PersonIncludes.Seasons);
+        var person = await _personService.GetPersonByIdAsync(Guid.Parse("D72DFD1C-2562-43FF-23E3-08DE681912DE"), PersonIncludes.All);
 
         return View();
     }
 
     public async Task<IActionResult> New()
     {
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Create Person";
+		ViewData["Title"] = "Create Person";
+
         //Gets the nationalities from the database
         ViewBag.nationalities = await _nationalityService.GetAllNationalitiesAsync();
 
@@ -75,6 +79,10 @@ public class PersonController : Controller
             }
         }
 
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Create Person";
+		ViewData["Title"] = "Create Person";
+
         //Gets the nationalities from the database
         ViewBag.nationalities = await _nationalityService.GetAllNationalitiesAsync();
 
@@ -91,6 +99,10 @@ public class PersonController : Controller
 
     public async Task<IActionResult> Edit(string id)
     {
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Edit Person";
+		ViewData["Title"] = "Edit Person";
+
         // Validate that the id parameter is a valid GUID format
         // the personId is set to the guid if the parsing is successful
         if (!Guid.TryParse(id, out var personId))
@@ -135,32 +147,36 @@ public class PersonController : Controller
     public async Task<IActionResult> Edit(EditPerson editPerson)
     {
         try
-            {
-                // Convert the EditPerson model to a PersonDTO
-                var editPersonDTO = new EditPersonDTO{ 
-                    Id = editPerson.Id,
-                    FirstName = editPerson.FirstName,
-                    LastName = editPerson.LastName,
-                    DateOfBirth = editPerson.DateOfBirth,
-                    NationalityId = editPerson.NationalityId,
-                    IsManager = editPerson.IsManager,
-                    Biography = editPerson.Biography,
-                    ListOfSeasons = editPerson.Seasons?.Select(s => s.SeasonId).ToList() ?? new List<Guid>()
-                };
+        {
+            // Convert the EditPerson model to a PersonDTO
+            var editPersonDTO = new EditPersonDTO{ 
+                Id = editPerson.Id,
+                FirstName = editPerson.FirstName,
+                LastName = editPerson.LastName,
+                DateOfBirth = editPerson.DateOfBirth,
+                NationalityId = editPerson.NationalityId,
+                IsManager = editPerson.IsManager,
+                Biography = editPerson.Biography,
+                ListOfSeasons = editPerson.Seasons?.Select(s => s.SeasonId).ToList() ?? new List<Guid>()
+            };
 
-                // Update the nationality in the database
-                await _personService.UpdatePersonAsync(editPersonDTO);
+            // Update the nationality in the database
+            await _personService.UpdatePersonAsync(editPersonDTO);
 
-                // Add a success message to TempData
-                TempData["Success"] = $"{editPerson.FirstName} {editPerson.LastName} has been added successfully";
+            // Add a success message to TempData
+            TempData["Success"] = $"{editPerson.FirstName} {editPerson.LastName} has been added successfully";
 
-                // Redirect to the index action
-                return RedirectToAction("Index");
-            } catch (DFCStatsException ex)
-            {
-                // Add a failure message to TempData
-                TempData["Failure"] = ex.Message;
-            }
+            // Redirect to the index action
+            return RedirectToAction("Index");
+        } catch (DFCStatsException ex)
+        {
+            // Add a failure message to TempData
+            TempData["Failure"] = ex.Message;
+        }
+
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Edit Person";
+		ViewData["Title"] = "Edit Person";
 
         //Gets the nationalities from the database
         ViewBag.nationalities = await _nationalityService.GetAllNationalitiesAsync();
