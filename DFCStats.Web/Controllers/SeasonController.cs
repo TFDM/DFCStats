@@ -16,11 +16,19 @@ public class SeasonController : Controller
 
     public async Task<IActionResult> Index()
     {
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Seasons";
+		ViewData["Title"] = "Seasons";
+
         return View();
     }
 
     public async Task<IActionResult> New()
     {
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Create Season";
+		ViewData["Title"] = "Create Season";
+
         return View();
     }
 
@@ -48,6 +56,10 @@ public class SeasonController : Controller
                 TempData["Failure"] = ex.Message;
             }
         }
+
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Create Season";
+		ViewData["Title"] = "Create Season";
 
         return View(newSeason);
     }

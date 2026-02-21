@@ -22,6 +22,10 @@ public class ClubController : Controller
 
     public async Task<IActionResult> New()
     {
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Create Club";
+		ViewData["Title"] = "Create Club";
+
         return View();
     }
 
@@ -49,6 +53,10 @@ public class ClubController : Controller
                 TempData["Failure"] = ex.Message;
             }
         }
+
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Create Club";
+		ViewData["Title"] = "Create Club";
 
         // Return the view with the model to show the error
         return View(newClub);
