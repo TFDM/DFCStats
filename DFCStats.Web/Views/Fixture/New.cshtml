@@ -1,0 +1,141 @@
+@model DFCStats.Web.Models.Fixtures.NewFixture
+
+@if (TempData["Failure"] != null)
+{
+    <div class="row mb-3">
+        <div class="col-12">
+
+            <div class="alert alert-danger" role="alert">
+                @TempData["Failure"]
+            </div>
+
+        </div>
+    </div>
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="row mb-3">
+        <label asp-for="SeasonId" class="col-2 col-form-label"></label>
+        <div class="col-5 col-lg-2">
+            @Html.DropDownList("SeasonId", new SelectList(ViewBag.seasons, "Id", "Description"), string.Empty, new { @class = "form-control form-select" })
+            <span asp-validation-for="SeasonId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="Date" class="col-2 col-form-label"></label>
+        <div class="col-5 col-lg-2">
+            <input asp-for="Date" class="form-control" type="date" />
+            <span asp-validation-for="Date" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="ClubId" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-4">
+            @Html.DropDownList("ClubId", new SelectList(ViewBag.clubs, "Id", "Name"), string.Empty, new { @class = "form-control form-select" })
+            <span asp-validation-for="ClubId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="CategoryId" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-4">
+            @Html.DropDownList("CategoryId", new SelectList(ViewBag.categories, "Id", "Description"), string.Empty, new { @class = "form-control form-select" })
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="Competition" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-4">
+            <input asp-for="Competition" class="form-control" />
+            <span asp-validation-for="Competition" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="VenueId" class="col-2 col-form-label"></label>
+        <div class="col-5 col-lg-2">
+            @Html.DropDownList("VenueId", new SelectList(ViewBag.venues, "Id", "Description"), string.Empty, new { @class = "form-control form-select" })
+            <span asp-validation-for="VenueId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="DarlingtonScore" class="col-2 col-form-label"></label>
+        <div class="col-3 col-lg-2">
+            <input asp-for="DarlingtonScore" class="form-control" />
+            <span asp-validation-for="DarlingtonScore" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="OppositionScore" class="col-2 col-form-label"></label>
+        <div class="col-3 col-lg-2">
+            <input asp-for="OppositionScore" class="form-control" />
+            <span asp-validation-for="OppositionScore" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="PenaltiesRequired" class="col-2 col-form-label"></label>
+        <div class="col-3 col-lg-2">
+            <select asp-for="PenaltiesRequired" class="form-control form-select" onchange="penaltiesRequired()">
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+            </select>
+            <span asp-validation-for="PenaltiesRequired" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div id="PenaltyFields" style="display:none;">
+
+        <div class="row mb-3">
+            <label asp-for="DarlingtonPenaltyScore" class="col-2 col-form-label"></label>
+            <div class="col-3 col-lg-2">
+                <input asp-for="DarlingtonPenaltyScore" class="form-control" />
+                <span asp-validation-for="DarlingtonPenaltyScore" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label asp-for="OppositionPenaltyScore" class="col-2 col-form-label"></label>
+            <div class="col-3 col-lg-2">
+                <input asp-for="OppositionPenaltyScore" class="form-control" />
+                <span asp-validation-for="OppositionPenaltyScore" class="text-danger"></span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="Attendance" class="col-2 col-form-label"></label>
+        <div class="col-3 col-lg-4">
+            <input asp-for="Attendance" class="form-control" />
+            <span asp-validation-for="Attendance" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="Notes" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-4">
+            <textarea asp-for="Notes" class="form-control" rows="12"></textarea>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-2"></div>
+        <div class="col-10">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+
+</form>
+
+@section Scripts {
+    <!--Loads in the required javascript to make the create / edit fixtures page work-->
+    <script src="~/js/CreateEditFixtures.js" asp-append-version="true"></script>
+}

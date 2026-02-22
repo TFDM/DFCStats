@@ -38,7 +38,7 @@ public class PersonController : Controller
 
         //Gets the seasons from the database
         //The seasons are also serialized into a json list so they can be used by javascript in a dropdown menu
-        var seasons = await _seasonService.GetAllSeasonsAsync();
+        var seasons = await _seasonService.GetAllSeasonsAsync("description_desc");
         var seasonsJson = JsonSerializer.Serialize(seasons.Select(s => new { s.Id, s.Description }));
         ViewBag.seasonsJson = seasonsJson;
         ViewBag.seasons = seasons;
@@ -88,7 +88,7 @@ public class PersonController : Controller
 
         //Gets the seasons from the database
         //The seasons are also serialized into a json list so they can be used by javascript in a dropdown menu
-        var seasons = await _seasonService.GetAllSeasonsAsync();
+        var seasons = await _seasonService.GetAllSeasonsAsync("description_desc");
         var seasonsJson = JsonSerializer.Serialize(seasons.Select(s => new { s.Id, s.Description }));
         ViewBag.seasonsJson = seasonsJson;
         ViewBag.seasons = seasons;
@@ -134,7 +134,7 @@ public class PersonController : Controller
 
         //Gets the seasons from the database
         //The seasons are also serialized into a json list so they can be used by javascript in a dropdown menu
-        var seasons = await _seasonService.GetAllSeasonsAsync();
+        var seasons = await _seasonService.GetAllSeasonsAsync("description_desc");
         var seasonsJson = JsonSerializer.Serialize(seasons.Select(s => new { s.Id, s.Description }));
         ViewBag.seasonsJson = seasonsJson;
         ViewBag.seasons = seasons;
@@ -146,32 +146,35 @@ public class PersonController : Controller
     [HttpPost]
     public async Task<IActionResult> Edit(EditPerson editPerson)
     {
-        try
+        if (ModelState.IsValid)
         {
-            // Convert the EditPerson model to a PersonDTO
-            var editPersonDTO = new EditPersonDTO{ 
-                Id = editPerson.Id,
-                FirstName = editPerson.FirstName,
-                LastName = editPerson.LastName,
-                DateOfBirth = editPerson.DateOfBirth,
-                NationalityId = editPerson.NationalityId,
-                IsManager = editPerson.IsManager,
-                Biography = editPerson.Biography,
-                ListOfSeasons = editPerson.Seasons?.Select(s => s.SeasonId).ToList() ?? new List<Guid>()
-            };
+            try
+            {
+                // Convert the EditPerson model to a PersonDTO
+                var editPersonDTO = new EditPersonDTO{ 
+                    Id = editPerson.Id,
+                    FirstName = editPerson.FirstName,
+                    LastName = editPerson.LastName,
+                    DateOfBirth = editPerson.DateOfBirth,
+                    NationalityId = editPerson.NationalityId,
+                    IsManager = editPerson.IsManager,
+                    Biography = editPerson.Biography,
+                    ListOfSeasons = editPerson.Seasons?.Select(s => s.SeasonId).ToList() ?? new List<Guid>()
+                };
 
-            // Update the nationality in the database
-            await _personService.UpdatePersonAsync(editPersonDTO);
+                // Update the nationality in the database
+                await _personService.UpdatePersonAsync(editPersonDTO);
 
-            // Add a success message to TempData
-            TempData["Success"] = $"{editPerson.FirstName} {editPerson.LastName} has been added successfully";
+                // Add a success message to TempData
+                TempData["Success"] = $"{editPerson.FirstName} {editPerson.LastName} has been added successfully";
 
-            // Redirect to the index action
-            return RedirectToAction("Index");
-        } catch (DFCStatsException ex)
-        {
-            // Add a failure message to TempData
-            TempData["Failure"] = ex.Message;
+                // Redirect to the index action
+                return RedirectToAction("Index");
+            } catch (DFCStatsException ex)
+            {
+                // Add a failure message to TempData
+                TempData["Failure"] = ex.Message;
+            }
         }
 
         //Set the page heading and the page title
@@ -183,7 +186,7 @@ public class PersonController : Controller
 
         //Gets the seasons from the database
         //The seasons are also serialized into a json list so they can be used by javascript in a dropdown menu
-        var seasons = await _seasonService.GetAllSeasonsAsync();
+        var seasons = await _seasonService.GetAllSeasonsAsync("description_desc");
         var seasonsJson = JsonSerializer.Serialize(seasons.Select(s => new { s.Id, s.Description }));
         ViewBag.seasonsJson = seasonsJson;
         ViewBag.seasons = seasons;
