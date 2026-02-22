@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using DFCStats.Business.Interfaces;
 using DFCStats.Web.Models.Nationalities;
 using DFCStats.Domain.Exceptions;
-using DFCStats.Domain.DTOs;
+using DFCStats.Domain.DTOs.Nationalities;
 using X.PagedList;
 
 namespace DFCStats.Web.Controllers;

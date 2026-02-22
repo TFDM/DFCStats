@@ -2,6 +2,7 @@ using DFCStats.Business.Interfaces;
 using DFCStats.Web.Models.Seasons;
 using Microsoft.AspNetCore.Mvc;
 using DFCStats.Domain.Exceptions;
+using DFCStats.Domain.DTOs.Seasons;
 
 namespace DFCStats.Web.Controllers;
 
@@ -40,7 +41,7 @@ public class SeasonController : Controller
             try
             {
                 // Convert the NewSeason model to a SeasonDTO
-                var seasonDTO = new Domain.DTOs.SeasonDTO { Description = newSeason.Description! };
+                var seasonDTO = new SeasonDTO { Description = newSeason.Description! };
 
                 // Add the new season to the database
                 await _seasonService.AddSeasonAsync(seasonDTO);

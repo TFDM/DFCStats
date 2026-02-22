@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using DFCStats.Business.Interfaces;
 using DFCStats.Web.Models.Fixtures;
-using DFCStats.Domain.DTOs;
+using DFCStats.Domain.DTOs.Fixtures;
 
 namespace DFCStats.Web.Controllers;
 

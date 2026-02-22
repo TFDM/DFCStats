@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using DFCStats.Business.Interfaces;
 using System.Text.Json;
 using DFCStats.Web.Models.People;
-using DFCStats.Domain.DTOs;
+using DFCStats.Domain.DTOs.People;
 using DFCStats.Domain.Exceptions;
 
 namespace DFCStats.Web.Controllers;
@@ -22,7 +22,7 @@ public class PersonController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var person = await _personService.GetPersonByIdAsync(Guid.Parse("D72DFD1C-2562-43FF-23E3-08DE681912DE"), PersonIncludes.All);
+        var person = await _personService.GetPersonByIdAsync(Guid.Parse("D72DFD1C-2562-43FF-23E3-08DE681912DE"), PersonIncludes.Seasons | PersonIncludes.Nationality);
 
         return View();
     }
@@ -126,7 +126,7 @@ public class PersonController : Controller
             NationalityId = person.NationalityId,
             Biography = person.Biography,
             IsManager = person.IsManager,
-            Seasons = person.Seasons?.Select(ps => new Season { SeasonId = ps.Id, Description = ps.Description }).OrderBy(ps => ps.Description).ToList()
+            Seasons = person.Seasons?.Select(ps => new DFCStats.Web.Models.People.Season { SeasonId = ps.Id, Description = ps.Description }).OrderBy(ps => ps.Description).ToList()
         };
 
         //Gets the nationalities from the database
