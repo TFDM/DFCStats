@@ -1,5 +1,5 @@
 using DFCStats.Data.Entities;
-using DFCStats.Domain.DTOs;
+using DFCStats.Domain.DTOs.Seasons;
 
 namespace DFCStats.Business.MappingExtensions
 {
@@ -18,7 +18,16 @@ namespace DFCStats.Business.MappingExtensions
             return new SeasonDTO
             {
                 Id = season.Id,
-                Description = season.Description
+                Description = season.Description,
+                PeopleAttachedToSeason = season.PersonSeasons
+                    .Select(p => new PersonAttachedToSeason
+                    {
+                        Id = p.Id,
+                        PersonId = p.PersonId,
+                        FirstName = p.Person?.FirstName ?? string.Empty,
+                        LastName = p.Person?.LastName ?? string.Empty,
+                        LastNameFirstName = $"{p.Person?.LastName}, {p.Person?.FirstName}"
+                    }).ToList()
             };
         }
     }

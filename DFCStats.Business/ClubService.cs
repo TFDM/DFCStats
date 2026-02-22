@@ -1,6 +1,6 @@
 using DFCStats.Business.Interfaces;
 using DFCStats.Data;
-using DFCStats.Domain.DTOs;
+using DFCStats.Domain.DTOs.Clubs;
 using DFCStats.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using DFCStats.Domain.Exceptions;
@@ -18,6 +18,24 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Gets a club by its id from the database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ClubDTO?> GetClubByIdAsync(Guid id)
+        {
+            // Get the club from the database
+            var club = await _dfcStatsDbContext.Clubs.FirstOrDefaultAsync(c => c.Id == id);
+
+            // If not found, return null
+            if (club == null)
+                return null;
+
+            // Map the entity to a DTO and return it
+            return club.MapToClubDTO();
+        }
+
+        /// <summary>
         /// Check to see if a club name is already in use 
         /// Will return true if it is in use otherwise false
         /// </summary>
@@ -31,14 +49,26 @@ namespace DFCStats.Business
         /// <summary>
         /// Gets all the clubs from the database
         /// </summary>
+        /// <param name="sort"></param>
         /// <returns></returns>
-        public async Task<List<ClubDTO>> GetAllClubsAsync()
+        public async Task<List<ClubDTO>> GetAllClubsAsync(string? sort = null)
         {
             // Gets all the clubs
-            var clubs = await _dfcStatsDbContext.Clubs.ToListAsync();
+            var clubs = _dfcStatsDbContext.Clubs.AsQueryable();
+
+            // Sort the records based on the sort parameter
+            switch (sort)
+            {
+                case "name_desc":
+                    clubs = clubs.OrderByDescending(c => c.Name);
+                    break;
+                case "name":
+                    clubs = clubs.OrderBy(c => c.Name);
+                    break;
+            }
 
             // Map the clubs to ClubDTOs and return them
-            return clubs.Select(c => c.MapToClubDTO()!).ToList();
+            return await clubs.Select(c => c.MapToClubDTO()!).ToListAsync();
         }
 
         /// <summary>

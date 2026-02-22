@@ -2,7 +2,7 @@ using DFCStats.Business.Interfaces;
 using DFCStats.Business.MappingExtensions;
 using DFCStats.Data;
 using DFCStats.Data.Entities;
-using DFCStats.Domain.DTOs;
+using DFCStats.Domain.DTOs.Nationalities;
 using DFCStats.Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
 

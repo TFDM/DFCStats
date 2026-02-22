@@ -1,4 +1,4 @@
-using DFCStats.Domain.DTOs;
+using DFCStats.Domain.DTOs.Venues;
 
 namespace DFCStats.Business.Interfaces
 {
@@ -8,7 +8,7 @@ namespace DFCStats.Business.Interfaces
         /// Gets all the venues in the database
         /// </summary>
         /// <returns></returns>
-        Task<List<VenueDTO>> GetAllVenuesAsync();
+        Task<List<VenueDTO>> GetAllVenuesAsync(string? sort = null);
     }
     
 }

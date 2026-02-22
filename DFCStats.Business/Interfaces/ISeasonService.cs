@@ -1,14 +1,31 @@
-using DFCStats.Domain.DTOs;
+using DFCStats.Domain.DTOs.Seasons;
 
 namespace DFCStats.Business.Interfaces
 {
+    [Flags]
+    public enum SeasonIncludes
+    {
+        // If new flags are required double the previous number
+        None = 0,
+        PeopleAttachedToSeason = 1,
+        All = PeopleAttachedToSeason
+    }
+
     public interface ISeasonService
     {
         /// <summary>
+        /// Returns a season from the database using the id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<SeasonDTO?> GetSeasonByIdAsync(Guid id, SeasonIncludes includes = SeasonIncludes.None);
+
+        /// <summary>
         /// Returns a list of all the seasons in the database
         /// </summary>
+        /// <param name="sort"></param>
         /// <returns></returns>
-        Task<List<SeasonDTO>> GetAllSeasonsAsync();
+        Task<List<SeasonDTO>> GetAllSeasonsAsync(string? sort = null);
 
         /// <summary>
         /// Adds a season to the database

@@ -1,4 +1,4 @@
-namespace DFCStats.Domain.DTOs
+namespace DFCStats.Domain.DTOs.People
 {
     public class PersonDTO
     {
@@ -14,8 +14,14 @@ namespace DFCStats.Domain.DTOs
         public int TotalApps { get; set; }
         public int TotalGoals { get; set; }
         public decimal GoalsPerGame { get; set; }
-        public List<SeasonDTO>? Seasons { get; set; }
+        public List<Season>? Seasons { get; set; }
         public bool IsManager { get; set; }
+    }
+
+    public class Season
+    {
+        public Guid Id { get; set; }
+        public string Description { get; set;} = string.Empty;
     }
 
     public class NewPersonDTO

@@ -1,4 +1,4 @@
-namespace DFCStats.Domain.DTOs
+namespace DFCStats.Domain.DTOs.Categories
 {
     public class CategoryDTO
     {

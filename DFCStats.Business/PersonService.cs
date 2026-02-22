@@ -1,6 +1,6 @@
 using DFCStats.Data;
 using DFCStats.Business.Interfaces;
-using DFCStats.Domain.DTOs;
+using DFCStats.Domain.DTOs.People;
 using Microsoft.EntityFrameworkCore;
 using DFCStats.Business.MappingExtensions;
 using DFCStats.Domain.Exceptions;
