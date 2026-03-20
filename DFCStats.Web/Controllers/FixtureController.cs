@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using DFCStats.Business.Interfaces;
 using DFCStats.Web.Models.Fixtures;
 using DFCStats.Domain.DTOs.Fixtures;
+using DFCStats.Domain.Exceptions;
 
 namespace DFCStats.Web.Controllers;
 
@@ -47,26 +48,39 @@ public class FixtureController : Controller
     {
         if (ModelState.IsValid)
         {
-            // Convert the newFixture model to a DTO
-            var newFixtureDTO = new NewFixtureDTO
+            try
             {
-                SeasonId = newFixture.SeasonId,
-                Date = newFixture.Date,
-                ClubId = newFixture.ClubId,
-                CategoryId = newFixture.CategoryId,
-                Competition = newFixture.Competition,
-                VenueId = newFixture.VenueId,
-                DarlingtonScore = newFixture.DarlingtonScore,
-                OppositionScore = newFixture.OppositionScore,
-                PenaltiesRequired = newFixture.PenaltiesRequired,
-                DarlingtonPenaltyScore = newFixture.DarlingtonPenaltyScore,
-                OppositionPenaltyScore = newFixture.OppositionPenaltyScore,
-                Attendance = newFixture.Attendance,
-                Notes = newFixture.Notes
-            };
+                // Convert the newFixture model to a DTO
+                var newFixtureDTO = new NewFixtureDTO
+                {
+                    SeasonId = newFixture.SeasonId,
+                    Date = newFixture.Date,
+                    ClubId = newFixture.ClubId,
+                    CategoryId = newFixture.CategoryId,
+                    Competition = newFixture.Competition,
+                    VenueId = newFixture.VenueId,
+                    DarlingtonScore = newFixture.DarlingtonScore,
+                    OppositionScore = newFixture.OppositionScore,
+                    PenaltiesRequired = newFixture.PenaltiesRequired,
+                    DarlingtonPenaltyScore = newFixture.DarlingtonPenaltyScore,
+                    OppositionPenaltyScore = newFixture.OppositionPenaltyScore,
+                    Attendance = newFixture.Attendance,
+                    Notes = newFixture.Notes
+                };
 
-            // Adds the new fixture to the database
-            var addedFixture = await _fixtureService.AddFixtureAsync(newFixtureDTO);
+                // Adds the new fixture to the database
+                await _fixtureService.AddFixtureAsync(newFixtureDTO);
+
+                // Add a success message to TempData
+                TempData["Success"] = "Fixture has been added successfully";
+
+                // Redirect to the index action
+                return RedirectToAction("Index");
+            } catch (DFCStatsException ex)
+            {
+                // Add a failure message to TempData
+                TempData["Failure"] = ex.Message;
+            }
         }
 
         //Set the page heading and the page title
@@ -84,6 +98,6 @@ public class FixtureController : Controller
         ViewBag.categories = categories;
         ViewBag.clubs = clubs;
 
-        return View();
+        return View(newFixture);
     }
 }

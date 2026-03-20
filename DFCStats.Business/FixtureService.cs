@@ -4,6 +4,7 @@ using DFCStats.Domain.DTOs.Fixtures;
 using DFCStats.Domain.Exceptions;
 using DFCStats.Data.Entities;
 using DFCStats.Business.MappingExtensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace DFCStats.Business
 {
@@ -22,6 +23,33 @@ namespace DFCStats.Business
             _clubService = clubService;
             _venueService = venueService;
             _categoryService = categoryService;
+        }
+
+        /// <summary>
+        /// Returns a fixture from the database using the id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="includes"></param>
+        /// <returns></returns>
+        public async Task<FixtureDTO?> GetFixtureByIdAsync(Guid id)
+        {
+            var query = _dfcStatsDbContext.Fixtures.AsQueryable();
+    
+            // Includes the season
+            query = query.Include(f => f.Season);
+        
+            // Includes the club
+            query = query.Include(f => f.Club);
+
+            // Includes the category
+            query = query.Include(f => f.Category);
+
+            // Includes the venue
+            query = query.Include(f => f.Venue);
+
+            // Run the query and map the entity to a DTO and return it
+            var fixture = await query.FirstOrDefaultAsync(f => f.Id == id);
+            return fixture?.MapToFixtureDTO();
         }
 
         /// <summary>
