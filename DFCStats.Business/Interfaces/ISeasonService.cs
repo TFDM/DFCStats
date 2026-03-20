@@ -8,7 +8,8 @@ namespace DFCStats.Business.Interfaces
         // If new flags are required double the previous number
         None = 0,
         PeopleAttachedToSeason = 1,
-        All = PeopleAttachedToSeason
+        Fixtures = 2,
+        All = PeopleAttachedToSeason | Fixtures
     }
 
     public interface ISeasonService

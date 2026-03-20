@@ -16,6 +16,24 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Gets a category by its id from the database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<CategoryDTO?> GetCategoryByIdAsync(Guid id)
+        {
+            // Get the category from the database
+            var category = await _dfcStatsDbContext.Categories.FirstOrDefaultAsync(c => c.Id == id);
+
+            // If not found, return null
+            if (category == null)
+                return null;
+
+            // Map the entity to a DTO and return it
+            return category.MapToCategoryDTO();
+        }
+
+        /// <summary>
         /// Gets all categories from the database
         /// </summary>
         /// <param name="sort"></param>

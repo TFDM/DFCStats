@@ -2,7 +2,9 @@ namespace DFCStats.Domain.DTOs.Fixtures
 {
     public class FixtureDTO
     {
-        
+        public Guid Id { get; set; }
+        public Guid SeasonId { get; set; }
+        public string Season { get; set; } = string.Empty;
     }
 
     public class NewFixtureDTO

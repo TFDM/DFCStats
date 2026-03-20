@@ -16,6 +16,24 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Gets a venue by its Id from the database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<VenueDTO?> GetVenueByIdAsync(Guid id)
+        {
+            // Get the venue from the database
+            var venue = await _dfcStatsDbContext.Venues.FirstOrDefaultAsync(v => v.Id == id);
+
+            // If not found, return null
+            if (venue == null)
+                return null;
+
+            // Map the entity to a DTO and return it
+            return venue.MapToVenueDTO();
+        }
+
+        /// <summary>
         /// Gets all the venues in the database
         /// </summary>
         /// <returns></returns>

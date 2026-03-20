@@ -14,5 +14,7 @@ namespace DFCStats.Data.Entities
         public string ShortDescription { get; set; } = string.Empty;
         [Required]
         public int OrderNo { get; set; }
+
+        public virtual ICollection<Fixture> Fixtures { get; set; } = new List<Fixture>();
     }
 }

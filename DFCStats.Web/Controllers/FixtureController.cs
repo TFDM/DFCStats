@@ -66,7 +66,7 @@ public class FixtureController : Controller
             };
 
             // Adds the new fixture to the database
-            await _fixtureService.AddFixtureAsync(newFixtureDTO);
+            var addedFixture = await _fixtureService.AddFixtureAsync(newFixtureDTO);
         }
 
         //Set the page heading and the page title

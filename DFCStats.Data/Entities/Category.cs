@@ -21,6 +21,8 @@ namespace DFCStats.Data.Entities
         public bool PlayOff { get; set; }
         [Required]
         public int OrderNo { get; set; }
+
+        public virtual ICollection<Fixture> Fixtures { get; set; } = new List<Fixture>();
     }
 }
 

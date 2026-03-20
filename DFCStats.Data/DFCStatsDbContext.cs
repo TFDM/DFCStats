@@ -9,6 +9,7 @@ namespace DFCStats.Data
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<Club> Clubs { get; set; }
+        public DbSet<Fixture> Fixtures { get; set; }
         public DbSet<Nationality> Nationalities { get; set; }
         public DbSet<Person> People { get; set; }
         public DbSet<PersonSeason> PeopleSeasons { get; set; }

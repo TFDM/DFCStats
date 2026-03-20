@@ -12,5 +12,6 @@ namespace DFCStats.Data.Entities
         public string Description { get; set; } = string.Empty;
 
         public virtual ICollection<PersonSeason> PersonSeasons { get; set; } = new List<PersonSeason>();
+        public virtual ICollection<Fixture> Fixtures { get; set; } = new List<Fixture>();
     }
 }

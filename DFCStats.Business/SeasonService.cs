@@ -29,6 +29,9 @@ namespace DFCStats.Business
             // Includes the people attached to the season and then the people themselves
             if (includes.HasFlag(SeasonIncludes.PeopleAttachedToSeason))
                 query = query.Include(s => s.PersonSeasons).ThenInclude(ps => ps.Person);
+
+            if (includes.HasFlag(SeasonIncludes.Fixtures))
+                query = query.Include(s => s.Fixtures);
         
             // Run the query and map the entity to a DTO and return it
             var season = await query.FirstOrDefaultAsync(s => s.Id == id);
