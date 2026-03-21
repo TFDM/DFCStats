@@ -11,6 +11,7 @@ namespace DFCStats.Data
         public DbSet<Club> Clubs { get; set; }
         public DbSet<Fixture> Fixtures { get; set; }
         public DbSet<Nationality> Nationalities { get; set; }
+        public DbSet<Participation> Participants { get; set; }
         public DbSet<Person> People { get; set; }
         public DbSet<PersonSeason> PeopleSeasons { get; set; }
         public DbSet<Season> Seasons { get; set; }
@@ -21,6 +22,16 @@ namespace DFCStats.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<PersonSeason>().HasKey(x => new { x.PersonId, x.SeasonId });
+
+            modelBuilder.Entity<Participation>()
+                .HasOne(x => x.Person)
+                .WithMany(x => x.Participation)
+                .HasForeignKey(x => x.PersonId);
+
+            modelBuilder.Entity<Participation>()
+                .HasOne(x => x.ReplacedByPerson)
+                .WithMany()
+                .HasForeignKey(x => x.ReplacedByPersonId);
         }
     }
 }

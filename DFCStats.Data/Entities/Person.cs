@@ -20,5 +20,6 @@ namespace DFCStats.Data.Entities
 
         public List<PersonSeason> PersonSeasons { get; set; } = new List<PersonSeason>();
         public virtual Nationality? Nationality { get; set; }
+        public virtual ICollection<Participation> Participation { get; set; } = new List<Participation>();
     }
 }

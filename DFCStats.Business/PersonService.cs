@@ -41,6 +41,7 @@ namespace DFCStats.Business
     
             // Run the query and map the entity to a DTO and return it
             var person = await query.FirstOrDefaultAsync(p => p.Id == id);
+
             return person?.MapToPersonDTO();
         }
 
