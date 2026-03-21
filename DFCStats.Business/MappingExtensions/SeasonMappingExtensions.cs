@@ -33,16 +33,16 @@ namespace DFCStats.Business.MappingExtensions
                     {
                         Id = f.Id,
                         SeasonId = f.SeasonId,
-                        Season = f.Season!.Description,
+                        Season = f.Season?.Description,
                         Date = f.Date,
                         ClubId = f.ClubId,
-                        Club = f.Club!.Name,
+                        Club = f.Club?.Name,
                         CategoryId = f.CategoryId,
-                        Category = f.Category!.Description,
+                        Category = f.Category?.Description,
                         Competition = f.Competition,
                         VenueId = f.VenueId,
-                        Venue = f.Venue!.Description,
-                        VenueShort = f.Venue.ShortDescription,
+                        Venue = f.Venue?.Description,
+                        VenueShort = f.Venue?.ShortDescription,
                         Scoreline = f.Scoreline(),
                         Teams = f.Teams(),
                         TeamsAndScores = f.TeamsAndScores(),
@@ -50,7 +50,12 @@ namespace DFCStats.Business.MappingExtensions
                         PenaltyScoreline = f.PenaltyScoreline(),
                         PenaltyScoreWithOutcome = f.PenaltyScoreWithOutomce(),
                         Outcome = f.Outcome,
-                        Attendance = f.Attendance
+                        Attendance = f.Attendance,
+                        DarlingtonScore = f.DarlingtonScore,
+                        OppositionScore = f.OppositionScore,
+                        DarlingtonPenaltyScore = f.DarlingtonPenaltyScore,
+                        OppositionPenaltyScore = f.OppositionPenaltyScore,
+                        Notes = f.Notes
                     }).ToList() ?? new()
             };
         }

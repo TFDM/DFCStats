@@ -23,7 +23,7 @@ namespace DFCStats.Business
         public async Task<VenueDTO?> GetVenueByIdAsync(Guid id)
         {
             // Get the venue from the database
-            var venue = await _dfcStatsDbContext.Venues.FirstOrDefaultAsync(v => v.Id == id);
+            var venue = await _dfcStatsDbContext.Venues.AsNoTracking().FirstOrDefaultAsync(v => v.Id == id);
 
             // If not found, return null
             if (venue == null)
@@ -40,7 +40,7 @@ namespace DFCStats.Business
         public async Task<List<VenueDTO>> GetAllVenuesAsync(string? sort = null)
         {
             // Get all the venues in the database
-            var venues = _dfcStatsDbContext.Venues.AsQueryable();
+            var venues = _dfcStatsDbContext.Venues.AsNoTracking().AsQueryable();
 
             // Sort the records based on the sort parameter
             switch (sort)

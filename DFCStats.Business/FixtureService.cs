@@ -33,18 +33,12 @@ namespace DFCStats.Business
         /// <returns></returns>
         public async Task<FixtureDTO?> GetFixtureByIdAsync(Guid id)
         {
-            var query = _dfcStatsDbContext.Fixtures.AsQueryable();
+            var query = _dfcStatsDbContext.Fixtures.AsNoTracking().AsQueryable();
     
-            // Includes the season
+            // Includes the season, club, category and venue
             query = query.Include(f => f.Season);
-        
-            // Includes the club
             query = query.Include(f => f.Club);
-
-            // Includes the category
             query = query.Include(f => f.Category);
-
-            // Includes the venue
             query = query.Include(f => f.Venue);
 
             // Run the query and map the entity to a DTO and return it
@@ -57,7 +51,7 @@ namespace DFCStats.Business
         /// </summary>
         /// <param name="newFixtureDTO"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <exception cref="DFCStatsException"></exception>
         public async Task<FixtureDTO> AddFixtureAsync(NewFixtureDTO newFixtureDTO)
         {
             // Gets the season, club, venue and category from the database
@@ -108,6 +102,70 @@ namespace DFCStats.Business
 
             // Map the newly created fixture to a FixtureDTO and return it
             return fixture.MapToFixtureDTO()!;
+        }
+
+        /// <summary>
+        /// Updates a fixture in the database
+        /// </summary>
+        /// <param name="editFixtureDTO"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<FixtureDTO> UpdateFixtureAsync(EditFixtureDTO editFixtureDTO)
+        {
+            // Gets the fixture from the database
+            var existingfixture = await _dfcStatsDbContext.Fixtures
+                .FirstOrDefaultAsync(f => f.Id == editFixtureDTO.Id);
+
+            // Check if the fixture exists in the database
+            if (existingfixture == null)
+                throw new DFCStatsException($"Fixture with id {editFixtureDTO.Id} not found");
+
+            // Gets the season, club, venue and category from the database
+            var season = await _seasonService.GetSeasonByIdAsync(editFixtureDTO.SeasonId);
+            var club = await _clubService.GetClubByIdAsync(editFixtureDTO.ClubId);
+            var venue = await _venueService.GetVenueByIdAsync(editFixtureDTO.VenueId);
+            var category = await _categoryService.GetCategoryByIdAsync(editFixtureDTO.CategoryId);
+
+            // Check that the season, club, venue and category all exist in the database, if not throw an exception
+            if (season == null)
+               throw new DFCStatsException("Season wasn't found in the database");
+
+            if (club == null)
+                throw new DFCStatsException("Club wasn't found in the database");
+
+            if (venue == null)
+                throw new DFCStatsException("Venue wasn't found in the database");
+
+            if (category == null)
+                throw new DFCStatsException("Category wasn't found in the database");
+
+            // Sets the penalty scores and the outcome of the fixture
+            (int? darlingtonPenaltyScore, int? oppositionPenaltyScore) = SetPenaltyScores(editFixtureDTO.PenaltiesRequired, editFixtureDTO.DarlingtonPenaltyScore, editFixtureDTO.OppositionPenaltyScore);
+
+            // Sets the outcome based on the scores and whether penalties were required
+            string outcome = SetOutcome(editFixtureDTO.DarlingtonScore, editFixtureDTO.OppositionScore, editFixtureDTO.PenaltiesRequired, darlingtonPenaltyScore, oppositionPenaltyScore);
+
+            // Update the fixture
+            existingfixture.SeasonId = editFixtureDTO.SeasonId;
+            existingfixture.Date = editFixtureDTO.Date;
+            existingfixture.ClubId = editFixtureDTO.ClubId;
+            existingfixture.CategoryId = editFixtureDTO.CategoryId;
+            existingfixture.Competition = editFixtureDTO.Competition;
+            existingfixture.VenueId = editFixtureDTO.VenueId;
+            existingfixture.DarlingtonScore = editFixtureDTO.DarlingtonScore;
+            existingfixture.OppositionScore = editFixtureDTO.OppositionScore;
+            existingfixture.DarlingtonPenaltyScore = darlingtonPenaltyScore;
+            existingfixture.OppositionPenaltyScore = oppositionPenaltyScore;
+            existingfixture.Attendance = editFixtureDTO.Attendance;
+            existingfixture.Outcome = outcome;
+            existingfixture.Notes = editFixtureDTO.Notes;
+
+            // Update the fixture in the database
+            _dfcStatsDbContext.Fixtures.Update(existingfixture);
+            await _dfcStatsDbContext.SaveChangesAsync();
+
+            // Map the updated fixture to a FixtureDTO and return it
+            return existingfixture.MapToFixtureDTO()!;
         }
 
         /// <summary>

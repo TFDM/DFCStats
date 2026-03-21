@@ -25,7 +25,7 @@ namespace DFCStats.Business
         public async Task<ClubDTO?> GetClubByIdAsync(Guid id)
         {
             // Get the club from the database
-            var club = await _dfcStatsDbContext.Clubs.FirstOrDefaultAsync(c => c.Id == id);
+            var club = await _dfcStatsDbContext.Clubs.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
 
             // If not found, return null
             if (club == null)
@@ -43,7 +43,7 @@ namespace DFCStats.Business
         /// <returns></returns>
         private async Task<bool> IsClubNameInUseAsync(string name)
         {
-            return await _dfcStatsDbContext.Clubs.AnyAsync(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
+            return await _dfcStatsDbContext.Clubs.AsNoTracking().AnyAsync(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace DFCStats.Business
         public async Task<List<ClubDTO>> GetAllClubsAsync(string? sort = null)
         {
             // Gets all the clubs
-            var clubs = _dfcStatsDbContext.Clubs.AsQueryable();
+            var clubs = _dfcStatsDbContext.Clubs.AsNoTracking().AsQueryable();
 
             // Sort the records based on the sort parameter
             switch (sort)

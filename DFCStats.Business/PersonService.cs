@@ -29,7 +29,7 @@ namespace DFCStats.Business
         /// <returns></returns>
         public async Task<PersonDTO?> GetPersonByIdAsync(Guid id, PersonIncludes includes = PersonIncludes.None)
         {
-            var query = _dfcStatsDbContext.People.AsQueryable();
+            var query = _dfcStatsDbContext.People.AsNoTracking().AsQueryable();
     
             // Includes the nationality
             if (includes.HasFlag(PersonIncludes.Nationality))
@@ -138,7 +138,7 @@ namespace DFCStats.Business
             _dfcStatsDbContext.People.Update(existingPerson);
             await _dfcStatsDbContext.SaveChangesAsync();
 
-            // Map the newly created person to a PersonDTO and return it
+            // Map the updated person to a PersonDTO and return it
             return existingPerson.MapToPersonDTO()!;
         }
 

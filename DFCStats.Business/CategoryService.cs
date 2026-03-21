@@ -23,7 +23,7 @@ namespace DFCStats.Business
         public async Task<CategoryDTO?> GetCategoryByIdAsync(Guid id)
         {
             // Get the category from the database
-            var category = await _dfcStatsDbContext.Categories.FirstOrDefaultAsync(c => c.Id == id);
+            var category = await _dfcStatsDbContext.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
 
             // If not found, return null
             if (category == null)
@@ -41,7 +41,7 @@ namespace DFCStats.Business
         public async Task<List<CategoryDTO>> GetAllCategoriesAsync(string? sort = null)
         {
             // Get all the categories in the database
-            var categories = _dfcStatsDbContext.Categories.AsQueryable();
+            var categories = _dfcStatsDbContext.Categories.AsNoTracking().AsQueryable();
 
             // Sort the records based on the sort parameter
             switch (sort)

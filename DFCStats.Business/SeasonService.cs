@@ -24,7 +24,8 @@ namespace DFCStats.Business
         /// <returns></returns>
         public async Task<SeasonDTO?> GetSeasonByIdAsync(Guid id, SeasonIncludes includes = SeasonIncludes.None)
         {
-            var query = _dfcStatsDbContext.Seasons.AsQueryable();
+            //var query = _dfcStatsDbContext.Seasons.AsNoTracking().AsQueryable();
+            var query = _dfcStatsDbContext.Seasons.AsNoTracking().AsQueryable();
 
             // Includes the people attached to the season and then the people themselves
             if (includes.HasFlag(SeasonIncludes.PeopleAttachedToSeason))
@@ -52,7 +53,7 @@ namespace DFCStats.Business
         /// <returns></returns>
         private async Task<bool> IsSeasonDescriptionInUseAsync(string description)
         {
-            return await _dfcStatsDbContext.Seasons.AnyAsync(s => s.Description.ToLower().Trim() == description.ToLower().Trim());
+            return await _dfcStatsDbContext.Seasons.AsNoTracking().AnyAsync(s => s.Description.ToLower().Trim() == description.ToLower().Trim());
         }
 
         /// <summary>
@@ -63,7 +64,7 @@ namespace DFCStats.Business
         public async Task<List<SeasonDTO>> GetAllSeasonsAsync(string? sort = null)
         {
             // Get all the seasons in the database
-            var seasons = _dfcStatsDbContext.Seasons.AsQueryable();
+            var seasons = _dfcStatsDbContext.Seasons.AsNoTracking().AsQueryable();
 
             // Sort the records based on the sort parameter
             switch (sort)

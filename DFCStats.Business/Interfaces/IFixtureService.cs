@@ -18,5 +18,12 @@ namespace DFCStats.Business.Interfaces
         /// <param name="newFixtureDTO"></param>
         /// <returns></returns>
         Task<FixtureDTO> AddFixtureAsync(NewFixtureDTO newFixtureDTO);
+
+        /// <summary>
+        /// Updates a fixture in the database
+        /// </summary>
+        /// <param name="editFixtureDTO"></param>
+        /// <returns></returns>
+        Task<FixtureDTO> UpdateFixtureAsync(EditFixtureDTO editFixtureDTO);
     }
 }

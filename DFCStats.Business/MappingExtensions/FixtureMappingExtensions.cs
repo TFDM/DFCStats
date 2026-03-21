@@ -20,16 +20,16 @@ namespace DFCStats.Business.MappingExtensions
             {
                 Id = fixture.Id,
                 SeasonId = fixture.SeasonId,
-                Season = fixture.Season!.Description,
+                Season = fixture.Season?.Description,
                 Date = fixture.Date,
                 ClubId = fixture.ClubId,
-                Club = fixture.Club!.Name,
+                Club = fixture.Club?.Name,
                 CategoryId = fixture.CategoryId,
-                Category = fixture.Category!.Description,
+                Category = fixture.Category?.Description,
                 Competition = fixture.Competition,
                 VenueId = fixture.VenueId,
-                Venue = fixture.Venue!.Description,
-                VenueShort = fixture.Venue.ShortDescription,
+                Venue = fixture.Venue?.Description,
+                VenueShort = fixture.Venue?.ShortDescription,
                 Scoreline = Scoreline(fixture),
                 Teams = Teams(fixture),
                 TeamsAndScores = TeamsAndScores(fixture),
@@ -37,7 +37,12 @@ namespace DFCStats.Business.MappingExtensions
                 PenaltyScoreline = PenaltyScoreline(fixture),
                 PenaltyScoreWithOutcome = PenaltyScoreWithOutomce(fixture),
                 Outcome = fixture.Outcome,
-                Attendance = fixture.Attendance
+                Attendance = fixture.Attendance,
+                DarlingtonScore = fixture.DarlingtonScore,
+                OppositionScore = fixture.OppositionScore,
+                DarlingtonPenaltyScore = fixture.DarlingtonPenaltyScore,
+                OppositionPenaltyScore = fixture.OppositionPenaltyScore,
+                Notes = fixture.Notes
             };
         }
 
@@ -46,8 +51,11 @@ namespace DFCStats.Business.MappingExtensions
         /// </summary>
         /// <param name="fixture"></param>
         /// <returns></returns>
-        public static string Teams(this Fixture fixture)
+        public static string? Teams(this Fixture fixture)
         {
+            if (fixture.Venue == null || fixture.Club == null)
+                return null;
+
             if (fixture.Venue?.ShortDescription == "A")
                 return $"{fixture.Club!.Name} v Darlington";
 
@@ -70,8 +78,11 @@ namespace DFCStats.Business.MappingExtensions
         /// </summary>
         /// <param name="fixture"></param>
         /// <returns></returns>
-        public static string TeamsAndScores(this Fixture fixture)
+        public static string? TeamsAndScores(this Fixture fixture)
         {
+            if (fixture.Venue == null || fixture.Club == null)
+                return null;
+
             if (fixture.Venue?.ShortDescription == "A")
                 return $"{fixture.Club?.Name} {fixture.OppositionScore}-{fixture.DarlingtonScore} Darlington";
 

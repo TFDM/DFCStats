@@ -26,7 +26,7 @@ namespace DFCStats.Business
         public async Task<NationalityDTO?> GetNationalityByIdAsync(Guid id)
         {
             // Get the nationality from the database
-            var nationality = await _dfcStatsDbContext.Nationalities.FirstOrDefaultAsync(n => n.Id == id);
+            var nationality = await _dfcStatsDbContext.Nationalities.AsNoTracking().FirstOrDefaultAsync(n => n.Id == id);
 
             // If not found, return null
             if (nationality == null)
@@ -44,7 +44,7 @@ namespace DFCStats.Business
         public async Task<NationalityDTO?> GetNationalityByNameAsync(string name)
         {
             // Get the nationality from the database using the name
-            var nationality = await _dfcStatsDbContext.Nationalities.FirstOrDefaultAsync(n => n.Name.ToLower().Trim() == name.ToLower().Trim());
+            var nationality = await _dfcStatsDbContext.Nationalities.AsNoTracking().FirstOrDefaultAsync(n => n.Name.ToLower().Trim() == name.ToLower().Trim());
 
             // If not found, return null
             if (nationality == null)
@@ -62,7 +62,7 @@ namespace DFCStats.Business
         public async Task<List<NationalityDTO>> GetAllNationalitiesAsync(string? sort = null)
         {
             // Gets all the nationalities
-            var nationalities =  _dfcStatsDbContext.Nationalities.AsQueryable();
+            var nationalities =  _dfcStatsDbContext.Nationalities.AsNoTracking().AsQueryable();
 
             // Sort the records based on the sort parameter
             switch (sort)
@@ -100,7 +100,7 @@ namespace DFCStats.Business
             page = (page < 1) ? 1 : page;
             pageSize = (pageSize < 1) ? 50 : pageSize;
 
-            var nationalities = _dfcStatsDbContext.Nationalities.AsQueryable();
+            var nationalities = _dfcStatsDbContext.Nationalities.AsNoTracking().AsQueryable();
 
             // Filter the records
             if (searchCountry != null)
@@ -144,7 +144,7 @@ namespace DFCStats.Business
         /// <returns></returns>
         private async Task<bool> IsNationalityNameInUseAsync(string nationality)
         {
-            return await _dfcStatsDbContext.Nationalities.AnyAsync(n => n.Name.ToLower().Trim() == nationality.ToLower().Trim());
+            return await _dfcStatsDbContext.Nationalities.AsNoTracking().AnyAsync(n => n.Name.ToLower().Trim() == nationality.ToLower().Trim());
         }
 
         /// <summary>

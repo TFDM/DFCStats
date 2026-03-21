@@ -150,7 +150,7 @@ public class PersonController : Controller
         {
             try
             {
-                // Convert the EditPerson model to a PersonDTO
+                // Convert the EditPerson model to an EditPersonDTO
                 var editPersonDTO = new EditPersonDTO{ 
                     Id = editPerson.Id,
                     FirstName = editPerson.FirstName,
@@ -162,11 +162,11 @@ public class PersonController : Controller
                     ListOfSeasons = editPerson.Seasons?.Select(s => s.SeasonId).ToList() ?? new List<Guid>()
                 };
 
-                // Update the nationality in the database
+                // Update the person in the database
                 await _personService.UpdatePersonAsync(editPersonDTO);
 
                 // Add a success message to TempData
-                TempData["Success"] = $"{editPerson.FirstName} {editPerson.LastName} has been added successfully";
+                TempData["Success"] = $"{editPerson.FirstName} {editPerson.LastName} has been updated successfully";
 
                 // Redirect to the index action
                 return RedirectToAction("Index");
