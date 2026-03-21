@@ -4,6 +4,7 @@ using DFCStats.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DFCStats.Data.Migrations
 {
     [DbContext(typeof(DFCStatsDBContext))]
-    partial class DFCStatsDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260320192804_CreateFixtureTable")]
+    partial class CreateFixtureTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,8 +101,8 @@ namespace DFCStats.Data.Migrations
                     b.Property<int>("DarlingtonScore")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");

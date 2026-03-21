@@ -2,6 +2,7 @@ using DFCStats.Business.Interfaces;
 using DFCStats.Web.Models.Seasons;
 using Microsoft.AspNetCore.Mvc;
 using DFCStats.Domain.Exceptions;
+using DFCStats.Domain.DTOs.Seasons;
 
 namespace DFCStats.Web.Controllers;
 
@@ -16,6 +17,8 @@ public class SeasonController : Controller
 
     public async Task<IActionResult> Index()
     {
+        var x = await _seasonService.GetSeasonByIdAsync(Guid.Parse("7D58D917-5FBB-46D1-5A83-08DE7239CEE9"), SeasonIncludes.Fixtures);
+
         //Set the page heading and the page title
 		ViewData["PageHeading"] = "Seasons";
 		ViewData["Title"] = "Seasons";
@@ -40,7 +43,7 @@ public class SeasonController : Controller
             try
             {
                 // Convert the NewSeason model to a SeasonDTO
-                var seasonDTO = new Domain.DTOs.SeasonDTO { Description = newSeason.Description! };
+                var seasonDTO = new SeasonDTO { Description = newSeason.Description! };
 
                 // Add the new season to the database
                 await _seasonService.AddSeasonAsync(seasonDTO);

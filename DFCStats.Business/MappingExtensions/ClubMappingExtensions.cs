@@ -1,5 +1,5 @@
 using DFCStats.Data.Entities;
-using DFCStats.Domain.DTOs;
+using DFCStats.Domain.DTOs.Clubs;
 
 namespace DFCStats.Business.MappingExtensions
 {

@@ -1,5 +1,5 @@
 using DFCStats.Data.Entities;
-using DFCStats.Domain.DTOs;
+using DFCStats.Domain.DTOs.People;
 
 namespace DFCStats.Business.MappingExtensions
 {
@@ -27,11 +27,11 @@ namespace DFCStats.Business.MappingExtensions
                 NationalityIcon = person.Nationality?.Icon,
                 Biography = person.Biography,
                 IsManager = person.IsManager,
-                Seasons = person.PersonSeasons?
-                    .Select(ps => new SeasonDTO
+                Seasons = person.PersonSeasons
+                    .Select(ps => new Domain.DTOs.People.Season
                     {
                         Id = ps.SeasonId,
-                        Description = ps.Season?.Description ?? string.Empty
+                        Description = ps.Season?.Description ?? string.Empty,
                     }).ToList()
             };
         }

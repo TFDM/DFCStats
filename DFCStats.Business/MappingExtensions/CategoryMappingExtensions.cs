@@ -1,5 +1,5 @@
 using DFCStats.Data.Entities;
-using DFCStats.Domain.DTOs;
+using DFCStats.Domain.DTOs.Categories;
 
 namespace DFCStats.Business.MappingExtensions
 {

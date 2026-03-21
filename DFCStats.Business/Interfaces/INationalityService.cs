@@ -1,4 +1,4 @@
-using DFCStats.Domain.DTOs;
+using DFCStats.Domain.DTOs.Nationalities;
 
 namespace DFCStats.Business.Interfaces
 {

@@ -125,6 +125,97 @@ namespace DFCStats.Data
                 await dbContext.Seasons.AddRangeAsync(seasons);
                 await dbContext.SaveChangesAsync();
             }
+
+            if (!await dbContext.Fixtures.AnyAsync())
+            {
+                var fixtures = new List<Fixture>
+                {
+                    new Fixture { 
+                        Id = new Guid("8f595a74-f664-4270-be32-3dfaca1a808a"), 
+                        SeasonId = new Guid("1f7b61c7-d523-4888-836f-87f79ab64f95"),
+                        Date = new DateOnly(2022, 08, 06),
+                        ClubId = new Guid("c87dada3-36b9-4d4d-b7ae-57c6820a200d"),  
+                        CategoryId = new Guid("123BEE23-6359-415B-AC53-C62C49AD6EE7"),
+                        Competition = "National League North",
+                        VenueId = new Guid("b2c3d4e5-f678-4890-1234-567890abcdef"),
+                        DarlingtonScore = 1,
+                        OppositionScore = 0,
+                        DarlingtonPenaltyScore = null,
+                        OppositionPenaltyScore = null,
+                        Attendance = 1500,
+                        Outcome = "W",
+                        Notes = null
+                    },
+                    new Fixture { 
+                        Id = new Guid("e48a357d-0dbe-4a32-b206-80877c4a49e5"),
+                        SeasonId = new Guid("1f7b61c7-d523-4888-836f-87f79ab64f95"),
+                        Date = new DateOnly(2022, 08, 13),
+                        ClubId = new Guid("c87dada3-36b9-4d4d-b7ae-57c6820a200d"),
+                        CategoryId = new Guid("123BEE23-6359-415B-AC53-C62C49AD6EE7"),
+                        Competition = "National League North",
+                        VenueId = new Guid("b2c3d4e5-f678-4890-1234-567890abcdef"),
+                        DarlingtonScore = 2,
+                        OppositionScore = 2,
+                        DarlingtonPenaltyScore = null,
+                        OppositionPenaltyScore = null,
+                        Attendance = 1200,
+                        Outcome = "D",
+                        Notes = null
+                    },
+                    new Fixture { 
+                        Id = new Guid("d923839a-0f46-43e1-b76a-49569017307d"),
+                        SeasonId = new Guid("1f7b61c7-d523-4888-836f-87f79ab64f95"),
+                        Date = new DateOnly(2022, 08, 20),
+                        ClubId = new Guid("c299f45c-2faf-4bf0-bfb8-110774261258"),
+                        CategoryId = new Guid("123BEE23-6359-415B-AC53-C62C49AD6EE7"),
+                        Competition = "National League North",
+                        VenueId = new Guid("a1b2c3d4-e5f6-4789-9012-34567890abcd"),
+                        DarlingtonScore = 0,
+                        OppositionScore = 1,
+                        DarlingtonPenaltyScore = null,
+                        OppositionPenaltyScore = null,
+                        Attendance = 1800,
+                        Outcome = "L",
+                        Notes = null
+                    },
+                    new Fixture { 
+                        Id = new Guid("dfa90e90-f7e5-4de0-84c4-05230ced57bc"),
+                        SeasonId = new Guid("ddb2a4f0-5888-4d1c-b9f5-ff3858adba29"),
+                        Date = new DateOnly(2023, 12, 26),
+                        ClubId = new Guid("c87dada3-36b9-4d4d-b7ae-57c6820a200d"),
+                        CategoryId = new Guid("123BEE23-6359-415B-AC53-C62C49AD6EE7"),
+                        Competition = "National League North",
+                        VenueId = new Guid("b2c3d4e5-f678-4890-1234-567890abcdef"),
+                        DarlingtonScore = 3,
+                        OppositionScore = 3,
+                        DarlingtonPenaltyScore = null,
+                        OppositionPenaltyScore = null,
+                        Attendance = 800,
+                        Outcome = "D",
+                        Notes = "Boxing Day fixture"
+                    },
+                    new Fixture { 
+                        Id = new Guid("62f7b930-d171-4064-8864-2c6ed8c93cfe"),
+                        SeasonId = new Guid("ddb2a4f0-5888-4d1c-b9f5-ff3858adba29"),
+                        Date = new DateOnly(2024, 01, 01),
+                        ClubId = new Guid("366fdf1f-5eb6-449b-97ff-412658e718d3"),
+                        CategoryId = new Guid("123BEE23-6359-415B-AC53-C62C49AD6EE7"),
+                        Competition = "National League North",
+                        VenueId = new Guid("a1b2c3d4-e5f6-4789-9012-34567890abcd"),
+                        DarlingtonScore = 1,
+                        OppositionScore = 1,
+                        DarlingtonPenaltyScore = null,
+                        OppositionPenaltyScore = null,
+                        Attendance = 1100,
+                        Outcome = "D",
+                        Notes = "New Year's Day fixture"
+                    }
+                };
+
+                await dbContext.Fixtures.AddRangeAsync(fixtures);
+                await dbContext.SaveChangesAsync();
+
+            }
         }
     }
 }

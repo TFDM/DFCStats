@@ -1,0 +1,138 @@
+@using DFCStats.Web.Models.Fixtures;
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+
+@model IPagedList<Fixtures>
+
+@if (TempData["Success"] != null)
+{
+    <div class="row mb-3">
+        <div class="col-12">
+
+            <div class="alert alert-success" role="alert">
+                @TempData["Success"]
+            </div>
+
+        </div>
+    </div>
+}
+
+<form method="get">
+
+    <div class="row mb-3">
+        <div class="col-12 col-lg-2">
+            <label>Season</label>
+            @Html.DropDownList("season", new SelectList(ViewBag.seasons, "Id", "Description"), string.Empty, new { @class = "form-control form-select" })
+        </div>
+        <div class="col-12 col-lg-3">
+            <label>Opponent</label>
+            @Html.DropDownList("opponent", new SelectList(ViewBag.clubs, "Id", "Name"), string.Empty, new { @class = "form-control form-select" })
+        </div>
+        <div class="col-12 col-lg-3">
+            <label>Category</label>
+            @Html.DropDownList("category", new SelectList(ViewBag.categories, "Id", "Description"), string.Empty, new { @class = "form-control form-select" })
+        </div>
+        <div class="col-12 col-lg-2">
+            <label>Venue</label>
+            @Html.DropDownList("venue", new SelectList(ViewBag.venues, "Id", "Description"), string.Empty, new { @class = "form-control form-select" })
+        </div>
+        <div class="col-12 col-lg-2">
+            <label>Outcome</label>
+            @Html.DropDownList("outcome", new SelectList(ViewBag.outcomes, "Value", "Text"), string.Empty, new { @class = "form-control form-select" })
+        </div>
+    </div>
+    <div class="row mb-3">
+      
+        <div class="col-12 col-lg-5">
+            <label>Competition</label>
+            @Html.TextBox("competition", string.Empty, new { @class = "form-control" })
+        </div>
+        <div class="col-12 col-lg-2">
+            <label>Results to Show</label>
+            @Html.DropDownList("pageSize", new SelectList(ViewBag.pageSize, "Value", "Text"), string.Empty, new { @class = "form-control form-select" })
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <button type="submit" class="btn btn-success">Search</button>
+        </div>
+    </div>
+</form>
+
+<div class="row">
+    <div class="col-12">
+
+        <table class="table">
+			<thead>
+				<tr>
+                    <th colspan="2" class="table-light"></th>
+					<th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortBySeason" asp-route-Season="@Context.Request.Query["season"]" asp-route-Opponent="@Context.Request.Query["opponent"]" asp-route-Competition="@Context.Request.Query["competition"]" asp-route-Venue="@Context.Request.Query["venue"]" asp-route-Outcome="@Context.Request.Query["outcome"]" asp-route-Category="@Context.Request.Query["category"]" asp-route-pageSize="@Context.Request.Query["pageSize"]">Season</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByDate" asp-route-Season="@Context.Request.Query["season"]" asp-route-Opponent="@Context.Request.Query["opponent"]" asp-route-Competition="@Context.Request.Query["competition"]" asp-route-Venue="@Context.Request.Query["venue"]" asp-route-Outcome="@Context.Request.Query["outcome"]" asp-route-Category="@Context.Request.Query["category"]" asp-route-pageSize="@Context.Request.Query["pageSize"]">Date</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByAttendance" asp-route-Season="@Context.Request.Query["season"]" asp-route-Opponent="@Context.Request.Query["opponent"]" asp-route-Competition="@Context.Request.Query["competition"]" asp-route-Venue="@Context.Request.Query["venue"]" asp-route-Outcome="@Context.Request.Query["outcome"]" asp-route-Category="@Context.Request.Query["category"]" asp-route-pageSize="@Context.Request.Query["pageSize"]">Attendance</a></th>
+                    <th class="table-light"></th>
+                    <th class="table-light"></th>
+				</tr>
+			</thead>
+			<tbody class="table-group-divider">
+				@foreach (Fixtures fixture in Model)
+				{
+					<tr>
+                        <td class="text-center align-middle pb-0
+                            @if (fixture.Outcome == "W")
+                            {
+                                @string.Format("{0}", "table-success text-success")
+                            } else if (fixture.Outcome == "D")
+                            {
+                                @string.Format("{0}", "table-warning alert-warning")
+                            } else {
+                                @string.Format("{0}", "table-danger text-danger")
+                            }
+                        ">
+                            <h5>@string.Format("{0} {1}", fixture.Outcome, fixture.Scoreline)</h5>
+                        </td>
+                        <td class="table-light">
+                            <h5>@fixture.Teams</h5>
+                            @fixture.Competition
+                        </td>
+                        <td class="table-light">@fixture.Season</td>
+						<td class="table-light">@fixture.Date</td>
+                        <td class="table-light">@fixture.Attendance</td>
+                        <td class="align-middle table-light">
+                            <a asp-action="Details" asp-route-id="@fixture.Id">Details</a>
+                        </td>
+                        <td class="align-middle table-light">
+                            <a asp-action="Edit" asp-route-id="@fixture.Id">Edit</a>
+                        </td>
+					</tr>
+				}
+			</tbody>
+		</table>
+
+    </div>
+</div>
+
+<div class="row">
+	<div class="col-12">
+
+		@Html.PagedListPager(Model, page => Url.Action("Index", new
+			{
+				page = page,
+				season = Context.Request.Query["season"],
+                opponent = Context.Request.Query["opponent"],
+                competition = Context.Request.Query["competition"],
+                venue = Context.Request.Query["venue"],
+                outcome = Context.Request.Query["outcome"],
+                category = Context.Request.Query["category"],
+                pageSize = Context.Request.Query["pageSize"],
+                sort = Context.Request.Query["sort"]
+			}),
+            new X.PagedList.Mvc.Core.PagedListRenderOptions
+		{
+			MaximumPageNumbersToDisplay = 3,
+			LiElementClasses = new string[] { "page-itm" },
+			PageClasses = new string[] { "page-link" }
+		})
+
+	</div>
+</div>

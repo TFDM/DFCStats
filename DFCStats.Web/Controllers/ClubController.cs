@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using DFCStats.Business.Interfaces;
 using DFCStats.Web.Models.Clubs;
 using DFCStats.Domain.Exceptions;
+using DFCStats.Domain.DTOs.Clubs;
 
 namespace DFCStats.Web.Controllers;
 
@@ -37,7 +38,7 @@ public class ClubController : Controller
             try
             {
                 // Convert the NewClub model to a ClubDTO
-                var clubDTO = new Domain.DTOs.ClubDTO { Name = newClub.Name! };
+                var clubDTO = new ClubDTO { Name = newClub.Name! };
 
                 // Add the new club to the database
                 await _clubService.AddClubAsync(clubDTO);
