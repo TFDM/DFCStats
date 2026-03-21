@@ -26,6 +26,86 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Searches for fixtures with optional filtering, sorting, and pagination
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="searchSeason"></param>
+        /// <param name="searchOpponent"></param>
+        /// <param name="searchCompetition"></param>
+        /// <param name="searchVenue"></param>
+        /// <param name="searchOutcome"></param>
+        /// <param name="searchCategory"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        public async Task<(List<FixtureDTO>, int)> SearchForFixturesAsync(int page = 1, int pageSize = 50, string? searchSeason = null, string? searchOpponent = null, 
+            string? searchCompetition = null, string? searchVenue = null, string? searchOutcome = null, string? searchCategory = null, string? sort = null)
+        {
+            // Ensure the page and page size are above not zero or negative
+            page = (page < 1) ? 1 : page;
+            pageSize = (pageSize < 1) ? 50 : pageSize;
+
+            var fixtures = _dfcStatsDbContext.Fixtures
+                .Include(f => f.Season)
+                .Include(f => f.Club)
+                .Include(f => f.Category)
+                .Include(f => f.Venue)
+                .AsNoTracking().AsQueryable();
+
+            // Filter the records
+            if (searchSeason != null)
+                fixtures = fixtures.Where(f => f.SeasonId == Guid.Parse(searchSeason));
+
+            if (searchOpponent != null)
+                fixtures = fixtures.Where(f => f.ClubId == Guid.Parse(searchOpponent));
+
+            if (searchCompetition != null)
+                fixtures = fixtures.Where(f => f.Competition.Contains(searchCompetition));
+
+            if (searchVenue != null)
+                fixtures = fixtures.Where(f => f.VenueId == Guid.Parse(searchVenue));
+
+            if (searchOutcome != null)
+                fixtures = fixtures.Where(f => f.Outcome == searchOutcome);
+
+            if (searchCategory != null)
+                fixtures = fixtures.Where(f => f.CategoryId == Guid.Parse(searchCategory));
+
+            
+            // Sorts the records
+            switch (sort)
+            {
+                case "date":
+                    fixtures = fixtures.OrderBy(x => x.Date);
+                    break;
+                case "season_desc":
+                    fixtures = fixtures.OrderByDescending(x => x.Season!.Description); //Season should never be null as its required - done to supress warning
+                    break;
+                case "season":
+                    fixtures = fixtures.OrderBy(x => x.Season!.Description); //Season should never be null as its required - done to supress warning
+					break;
+                case "attendance_desc":
+                    fixtures = fixtures.OrderByDescending(x => x.Attendance);
+                    break;
+                case "attendance":
+                    fixtures = fixtures.OrderBy(x => x.Attendance);
+                    break;
+                default:
+                    fixtures = fixtures.OrderByDescending(x => x.Date);
+                    break;
+            }
+
+            // Counts the total number of records before any pagination is applied
+			var totalItemCount = await fixtures.CountAsync();
+
+            // Carries out the query
+			var results = await fixtures.Skip(pageSize * (page - 1)).Take(pageSize).ToListAsync();
+            
+            // Return the fixtures (mapped to FixtureDTO) and the item count
+            return (results.Select(n => n.MapToFixtureDTO()!).ToList(), totalItemCount);
+        }
+
+        /// <summary>
         /// Returns a fixture from the database using the id
         /// </summary>
         /// <param name="id"></param>

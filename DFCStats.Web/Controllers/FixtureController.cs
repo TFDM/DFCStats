@@ -3,6 +3,8 @@ using DFCStats.Business.Interfaces;
 using DFCStats.Web.Models.Fixtures;
 using DFCStats.Domain.DTOs.Fixtures;
 using DFCStats.Domain.Exceptions;
+using X.PagedList;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DFCStats.Web.Controllers;
 
@@ -23,16 +25,83 @@ public class FixtureController : Controller
         _fixtureService = fixtureService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string season, string opponent, string competition, string venue, string outcome, string category, string sort, int page = 1, int pageSize = 50)
     {
-        var x = await _fixtureService.GetFixtureByIdAsync(Guid.Parse("3EBFBBB9-7EBB-40B8-B2B7-08DE86BA5E65"));
+        // Set the page heading and the page title
+		ViewData["PageHeading"] = "Fixtures and Results";
+		ViewData["Title"] = "Fixtures and Results";
 
-        return View();
+        // Ensure the page and page size are above not zero or negative
+        page = (page < 1) ? 1 : page;
+        pageSize = (pageSize < 1) ? 50 : pageSize;
+
+        // Gets all the venues, clubs, seasons and categories and seasons from the database
+        var venues = await _venueService.GetAllVenuesAsync("orderNo");
+        var seasons = await _seasonService.GetAllSeasonsAsync("description");
+        var categories = await _categoryService.GetAllCategoriesAsync("orderNo");
+        var clubs = await _clubService.GetAllClubsAsync("name");
+
+        ViewBag.venues = venues;
+        ViewBag.seasons = seasons;
+        ViewBag.categories = categories;
+        ViewBag.clubs = clubs;
+
+        // Creates a select list from the outcomes
+        ViewBag.outcomes = new List<SelectListItem>()
+        {
+            new SelectListItem() { Text="Win", Value="W" },
+            new SelectListItem() { Text="Loss", Value="L" },
+            new SelectListItem() { Text="Draw", Value="D" }
+        };
+
+        // Creates a select list of page sizes
+        ViewBag.pageSize = new List<SelectListItem>()
+        {
+            new SelectListItem() { Text="25", Value="25" },
+            new SelectListItem() { Text="50", Value="50" },
+            new SelectListItem() { Text="75", Value="75" },
+            new SelectListItem() { Text="100", Value="100" }
+        };
+
+        // Search for fixtures
+        var (fixtures, totalCount) = await _fixtureService.SearchForFixturesAsync(page: page,
+            pageSize: pageSize,
+            searchSeason: season,
+            searchOpponent: opponent,
+            searchCompetition: competition,
+            searchVenue: venue,
+            searchOutcome: outcome,
+            searchCategory: category,
+            sort: sort);
+
+        // Convert the nationalities from a DTO to a model
+        var listOfFixtures = fixtures.Select(dto => new Fixtures
+        {
+            Id = dto.Id,
+            Teams = dto.Teams,
+            Competition = dto.Competition,
+            Outcome = dto.Outcome,
+            Season = dto.Season,
+            Scoreline = dto.Scoreline,
+            Date = dto.Date,
+            Attendance = string.Format("{0:n0}", dto.Attendance)
+        }).ToList();
+        
+        // Convert to a static list
+		var fixturesAsIPagedList = new StaticPagedList<Fixtures>(listOfFixtures, page, pageSize, totalCount);
+
+        // If the sort parameter is null or empty then we are initializing the value as descending  
+        ViewBag.SortByDate = string.IsNullOrEmpty(sort) ? "date" : "";
+        ViewBag.SortBySeason = sort == "season" ? "season_desc" : "season";
+        ViewBag.SortByAttendance = sort == "attendance" ? "attendance_desc" : "attendance";
+        ViewBag.Sort = sort;
+
+        return View(fixturesAsIPagedList);
     }
 
     public async Task<IActionResult> New()
     {
-        //Set the page heading and the page title
+        // Set the page heading and the page title
 		ViewData["PageHeading"] = "Create Fixture";
 		ViewData["Title"] = "Create Fixture";
 
