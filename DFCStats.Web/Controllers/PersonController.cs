@@ -22,7 +22,7 @@ public class PersonController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var person = await _personService.GetPersonByIdAsync(Guid.Parse("D72DFD1C-2562-43FF-23E3-08DE681912DE"), PersonIncludes.Seasons | PersonIncludes.Nationality);
+        var person = await _personService.GetPersonByIdAsync(Guid.Parse("86EB50B8-53E0-4DFD-8EA5-08DE883568A6"));
 
         return View();
     }
@@ -65,7 +65,7 @@ public class PersonController : Controller
                 };
 
                 // Adds the new person to the database
-                await _personService.AddPersonAsync(newPersonDTO);
+                var x = await _personService.AddPersonAsync(newPersonDTO);
 
                 // Add a success message to TempData
                 TempData["Success"] = $"{newPerson.FirstName} {newPerson.LastName} has been added successfully";
@@ -110,7 +110,7 @@ public class PersonController : Controller
             return BadRequest("Invalid ID format");
 
         // Retrieve the person record from the database using the validated GUID
-        var person = await _personService.GetPersonByIdAsync(personId, PersonIncludes.Nationality | PersonIncludes.Seasons);
+        var person = await _personService.GetPersonByIdAsync(personId, PersonIncludes.Nationality | PersonIncludes.Seasons | PersonIncludes.Stats );
 
         // If the person record is not found, return a 404 Not Found HTTP response
         if (person == null)
@@ -163,7 +163,7 @@ public class PersonController : Controller
                 };
 
                 // Update the person in the database
-                await _personService.UpdatePersonAsync(editPersonDTO);
+                var x = await _personService.UpdatePersonAsync(editPersonDTO);
 
                 // Add a success message to TempData
                 TempData["Success"] = $"{editPerson.FirstName} {editPerson.LastName} has been updated successfully";

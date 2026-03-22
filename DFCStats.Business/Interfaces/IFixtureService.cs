@@ -2,6 +2,15 @@ using DFCStats.Domain.DTOs.Fixtures;
 
 namespace DFCStats.Business.Interfaces
 {
+    [Flags]
+    public enum FixtureIncludes
+    {
+        // If new flags are required double the previous number
+        None = 0,
+        Participants = 1,
+        All = Participants
+    }
+
     public interface IFixtureService
     {
         /// <summary>
@@ -26,20 +35,20 @@ namespace DFCStats.Business.Interfaces
         /// <param name="id"></param>
         /// <param name="includes"></param>
         /// <returns></returns>
-        Task<FixtureDTO?> GetFixtureByIdAsync(Guid id);
+        Task<FixtureDTO?> GetFixtureByIdAsync(Guid id, FixtureIncludes includes = FixtureIncludes.None);
 
         /// <summary>
         /// Adds a new fixture to the database
         /// </summary>
         /// <param name="newFixtureDTO"></param>
         /// <returns></returns>
-        Task<FixtureDTO> AddFixtureAsync(NewFixtureDTO newFixtureDTO);
+        Task<FixtureDTO> AddFixtureAsync(FixtureDTO newFixtureDTO);
 
         /// <summary>
         /// Updates a fixture in the database
         /// </summary>
         /// <param name="editFixtureDTO"></param>
         /// <returns></returns>
-        Task<FixtureDTO> UpdateFixtureAsync(EditFixtureDTO editFixtureDTO);
+        Task<FixtureDTO> UpdateFixtureAsync(FixtureDTO editFixtureDTO);
     }
 }

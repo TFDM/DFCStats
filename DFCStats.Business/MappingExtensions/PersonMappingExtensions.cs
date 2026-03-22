@@ -1,5 +1,6 @@
 using DFCStats.Data.Entities;
 using DFCStats.Domain.DTOs.People;
+using DFCStats.Domain.DTOs.Seasons;
 
 namespace DFCStats.Business.MappingExtensions
 {
@@ -27,12 +28,12 @@ namespace DFCStats.Business.MappingExtensions
                 NationalityIcon = person.Nationality?.Icon,
                 Biography = person.Biography,
                 IsManager = person.IsManager,
-                Seasons = person.PersonSeasons
-                    .Select(ps => new Domain.DTOs.People.Season
-                    {
-                        Id = ps.SeasonId,
-                        Description = ps.Season?.Description ?? string.Empty,
-                    }).ToList()
+                Seasons = person.PersonSeasons?
+                    .Select(ps => ps.Season?.MapToSeasonShortDTO())
+                    .OfType<SeasonShortDTO>()
+                    .ToList(),
+                TotalApps = person.Participation?.ToList().TotalAppearances(),
+                TotalGoals = person.Participation?.ToList().TotalGoals()
             };
         }
         

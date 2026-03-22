@@ -17,7 +17,7 @@ public class SeasonController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var x = await _seasonService.GetSeasonByIdAsync(Guid.Parse("7D58D917-5FBB-46D1-5A83-08DE7239CEE9"), SeasonIncludes.Fixtures);
+        var x = await _seasonService.GetSeasonByIdAsync(Guid.Parse("7D58D917-5FBB-46D1-5A83-08DE7239CEE9"), SeasonIncludes.PeopleAttachedToSeason);
 
         //Set the page heading and the page title
 		ViewData["PageHeading"] = "Seasons";

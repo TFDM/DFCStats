@@ -28,6 +28,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IClubService, ClubService>();
 builder.Services.AddScoped<IFixtureService, FixtureService>();
 builder.Services.AddScoped<INationalityService, NationalityService>();
+builder.Services.AddScoped<IParticipationService, ParticipationService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
 builder.Services.AddScoped<IVenueService, VenueService>();

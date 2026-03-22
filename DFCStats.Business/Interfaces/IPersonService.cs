@@ -9,7 +9,8 @@ namespace DFCStats.Business.Interfaces
         None = 0,
         Nationality = 1,
         Seasons = 2,
-        All = Nationality | Seasons
+        Stats = 4,
+        All = Nationality | Seasons | Stats
     }
 
     public interface IPersonService
