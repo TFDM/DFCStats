@@ -33,7 +33,8 @@ namespace DFCStats.Business.MappingExtensions
                     .OfType<SeasonShortDTO>()
                     .ToList(),
                 TotalApps = person.Participation?.ToList().TotalAppearances(),
-                TotalGoals = person.Participation?.ToList().TotalGoals()
+                TotalGoals = person.Participation?.ToList().TotalGoals(),
+                Appearances = person.Participation?.ToList().MapToAppearanceDTO()
             };
         }
         

@@ -1,0 +1,133 @@
+@model DFCStats.Web.Models.Seasons.Seasons
+
+<div class="row">
+	<div class="col-12">
+		<dl class="row">
+			<dt class="col-lg-2">Games Played</dt>
+			<dd class="col-lg-10">@Model.GamesPlayed</dd>
+			<dt class="col-lg-2">Won</dt>
+			<dd class="col-lg-10">@Model.Wins</dd>
+			<dt class="col-lg-2">Drawn</dt>
+			<dd class="col-lg-10">@Model.Draws</dd>
+			<dt class="col-lg-2">Lost</dt>
+			<dd class="col-lg-10">@Model.Loses</dd>
+			<dt class="col-lg-2">Total Players Used</dt>
+			<dd class="col-lg-10">@Model.TotalPlayersUsed</dd>
+			<dt class="col-lg-2">Average Home Attendance</dt>
+			<dd class="col-lg-10">@Model.AverageHomeAttendance</dd>
+			<dt class="col-lg-2">Highest Home Attendance</dt>
+			<dd class="col-lg-10">@Model.HighestHomeAttendance</dd>
+		</dl>
+	</div>
+</div>
+
+<h5>Appearances</h5>
+<p>Click on a player's name to be taken to see more details about them.</p>
+
+<div class="table-responsive">
+	<table class="table">
+		<thead>
+			<tr>
+				<th class="text-center table-light border-end"></th>
+				<th colspan="2" class="text-center table-light border-end border-top">All Games</th>
+				<th colspan="2" class="text-center table-light border-end border-top">League</th>
+				<th colspan="2" class="text-center table-light border-end border-top">Play-Offs</th>
+				<th colspan="2" class="text-center table-light border-end border-top">Cup</th>
+				<th class="text-center table-light"></th>
+			</tr>
+			<tr>
+				<th class="table-light border-end">Name</th>
+				<th class="table-light text-center">Apps</th>
+				<th class="table-light text-center border-end">Goals</th>
+				<th class="table-light text-center">Apps</th>
+				<th class="table-light text-center border-end">Goals</th>
+				<th class="table-light text-center">Apps</th>
+				<th class="table-light text-center border-end">Goals</th>
+				<th class="table-light text-center">Apps</th>
+				<th class="table-light text-center border-end">Goals</th>
+				<th class="table-light text-center">Red Cards</th>
+			</tr>
+		</thead>
+		<tbody class="table-group-divider">
+			@if (Model.Appearances != null && Model.Appearances.Count > 0)
+			{
+				@foreach (var app in Model.Appearances)
+				{
+					<tr>
+						<td class="table-light border-end"><a href="~/People/Details/@app.PersonId">@string.Format("{0}, {1}", app.LastName, app.FirstName)</a></td>
+						<td class="table-light text-center">@string.Format("{0} ({1})", app.Starts, app.Subs)</td>
+						<td class="table-light text-center border-end">@app.Goals</td>
+						<td class="table-light text-center">@string.Format("{0} ({1})", app.LeagueStarts, app.LeagueSubs)</td>
+						<td class="table-light text-center border-end">@app.LeagueGoals</td>
+						<td class="table-light text-center">@string.Format("{0} ({1})", app.PlayOffStarts, app.PlayOffSubs)</td>
+						<td class="table-light text-center border-end">@app.PlayOffGoals</td>
+						<td class="table-light text-center">@string.Format("{0} ({1})", app.CupStarts, app.CupSubs)</td>
+						<td class="table-light text-center border-end">@app.CupGoals</td>
+						<td class="table-light text-center">@app.RedCards</td>
+					</tr>
+				}
+			}
+			else
+			{
+				<tr>
+					<td colspan="10" class="table-warning text-center">No appearances for this season</td>
+				</tr>
+			}
+        </tbody>
+    </table>
+</div>
+
+<h5>Fixtures</h5>
+<p>Fixtures for the season can be seen below.</p>
+
+<div class="table-responsive">
+	<table class="table">
+		<thead>
+			<tr>
+				<th class="table-light">Date</th>
+				<th class="table-light"></th>
+				<th class="table-light">Fixture</th>
+				<th class="table-light">Competition</th>
+				<th class="table-light">Att</th>
+				<th class="table-light"></th>
+			</tr>
+		</thead>
+		<tbody class="table-group-divider">
+			@if (Model.Fixtures != null && Model.Fixtures.Count > 0)
+			{
+				@foreach (var f in Model.Fixtures)
+				{
+					<tr>
+						<td class="table-light">@f.Date.ToString("dd/MM/yyyy")</td>
+
+						<td class="text-center
+							@if (f.Outcome == "W")
+							{
+								@string.Format("{0}", "table-success text-success")
+							} else if (f.Outcome == "D")
+							{
+								@string.Format("{0}", "table-warning alert-warning")
+							} else {
+								@string.Format("{0}", "table-danger text-danger")
+							}
+									">
+							@f.Outcome
+						</td>
+						<td class="table-light">
+							@f.TeamsWithScore
+						</td>
+						<td class="table-light">@f.Competition</td>
+						<td class="table-light">@f.Attendance</td>
+						<td class="table-light"><a href="~/Fixture/Details/@f.Id">Details</a></td>
+					</tr>
+				}
+			}
+			else
+			{
+				<tr>
+					<td colspan="6" class="table-warning text-center">No fixtures for this season</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>

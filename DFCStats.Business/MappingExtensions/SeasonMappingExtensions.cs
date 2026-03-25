@@ -1,4 +1,5 @@
 using DFCStats.Data.Entities;
+using DFCStats.Domain.DTOs.Appearances;
 using DFCStats.Domain.DTOs.Fixtures;
 using DFCStats.Domain.DTOs.People;
 using DFCStats.Domain.DTOs.Seasons;
@@ -28,7 +29,31 @@ namespace DFCStats.Business.MappingExtensions
                 Fixtures = season.Fixtures?
                     .Select(f => f.MapToFixtureDTO())
                     .OfType<FixtureDTO>()
-                    .ToList()
+                    .ToList(),
+                Appearances = season.Fixtures?
+                    .SelectMany(f => f.Participants ?? new List<Participation>())  // Flatten all participations from fixtures
+                    .GroupBy(p => p.PersonId)  // Group by person
+                    .SelectMany(g => g.ToList().MapToAppearanceDTO() ?? new List<SeasonalAppearanceDTO>())  // Map each group and flatten results
+                    .ToList(),
+                GamesPlayed = season.Fixtures?.Count(),
+                GamesWon = season.Fixtures?.Where(f => f.Outcome == "W").Count(),
+                GamesDrawn = season.Fixtures?.Where(f => f.Outcome == "D").Count(),
+                GamesLost = season.Fixtures?.Where(f => f.Outcome == "L").Count(),
+                TotalPlayersUed = season.Fixtures?.Where(f => f.Category?.Description != "Friendly").SelectMany(p => p.Participants.Select(p => p.PersonId)).Distinct().Count(),
+                AverageHomeAttendance = (int)Math.Floor(season.Fixtures?
+                    .Where(f => f.Category?.Description != "Friendly" && 
+                                f.Venue?.ShortDescription == "H" && 
+                                f.Attendance.HasValue)
+                    .Select(f => f.Attendance!.Value)
+                    .DefaultIfEmpty(0)
+                    .Average() ?? 0),
+                HighestHomeAttendance = season.Fixtures?
+                    .Where(f => f.Category?.Description != "Friendly" && 
+                                f.Venue?.ShortDescription == "H" && 
+                                f.Attendance.HasValue)
+                    .Select(f => f.Attendance!.Value)
+                    .DefaultIfEmpty(0)
+                    .Max() ?? 0
             };
         }
 

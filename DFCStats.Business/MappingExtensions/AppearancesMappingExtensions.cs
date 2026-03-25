@@ -1,10 +1,75 @@
+using System.Linq.Expressions;
 using DFCStats.Data.Entities;
+using DFCStats.Domain.DTOs.Appearances;
 
 namespace DFCStats.Business.MappingExtensions
 {
     public static class AppearanceMappingExtensions
     {
-        
+        /// <summary>
+        /// Maps a list of participation entities to a list of SeasonAppearanceDTO
+        /// </summary>
+        /// <param name="participations"></param>
+        /// <returns></returns>
+        public static List<SeasonalAppearanceDTO>? MapToAppearanceDTO(this List<Participation> participations)
+        {
+            if (participations == null)
+                return null;
+
+            List<SeasonalAppearanceDTO> appearances = new List<SeasonalAppearanceDTO>();
+
+            // Loops over each distinct season in the participation records
+            foreach (var season in participations.OrderBy(p => p.Fixture?.Season?.Description).Select(p => p.Fixture!.Season).DistinctBy(s => s?.Id))
+            {
+                // For each season add the SeasonAppearanceDTO 
+                appearances.Add(new SeasonalAppearanceDTO
+                {
+                    PersonId = participations.First().PersonId,
+                    FirstName = participations.First().Person?.FirstName,
+                    LastName = participations.First().Person?.LastName,
+                    SeasonId = season?.Id,
+                    SeasonDescription = season?.Description,
+                    TotalAppearances = participations.Where(p => p.Fixture?.SeasonId == season?.Id).Count(),
+                    Starts = participations.Where(p => p.Fixture?.SeasonId == season?.Id && p.Started == true).Count(),
+                    Subs = participations.Where(p => p.Fixture?.SeasonId == season?.Id && p.Sub == true).Count(),
+                    Goals = participations.Where(p => p.Fixture?.SeasonId == season?.Id).Sum(p => p.Goals),
+                    RedCards = participations.Where(p => p.Fixture?.SeasonId == season?.Id && p.RedCard == true).Count(),
+                    LeagueStarts = participations.Where(p => p.Fixture?.SeasonId == season?.Id
+                        && p.Started == true 
+                        && p.Fixture?.Category?.PlayOff == false 
+                        && (p.Fixture?.Category?.FootballLeague == true 
+                        || p.Fixture?.Category?.NonLeague == true)).Count(),
+                    LeagueSubs = participations.Where(p => p.Fixture?.SeasonId == season?.Id
+                        && p.Sub == true 
+                        && p.Fixture?.Category?.PlayOff == false 
+                        && (p.Fixture?.Category?.FootballLeague == true 
+                        || p.Fixture?.Category?.NonLeague == true)).Count(),
+                    LeagueGoals = participations.Where(p => p.Fixture?.SeasonId == season?.Id
+                        && p.Fixture?.Category?.PlayOff == false
+                        && (p.Fixture?.Category?.FootballLeague == true 
+                        || p.Fixture?.Category?.NonLeague == true)).Sum(p => p.Goals),
+                    CupStarts = participations.Where(p => p.Fixture?.Season?.Id == season?.Id
+                        && p.Started == true
+                        && p.Fixture?.Category?.Cup == true).Count(),
+                    CupSubs = participations.Where(p => p.Fixture?.Season?.Id == season?.Id
+                        && p.Sub == true
+                        && p.Fixture?.Category?.Cup == true).Count(),
+                    CupGoals = participations.Where(p => p.Fixture?.Season?.Id == season?.Id
+                        && p.Fixture?.Category?.Cup == true).Sum(p => p.Goals),
+                    PlayOffStarts = participations.Where(p => p.Fixture?.Season?.Id == season?.Id
+                        && p.Started == true
+                        && p.Fixture?.Category?.PlayOff == true).Count(),
+                    PlayOffSubs = participations.Where(p => p.Fixture?.Season?.Id == season?.Id
+                        && p.Sub == true
+                        && p.Fixture?.Category?.PlayOff == true).Count(),
+                    PlayOffGoals = participations.Where(p => p.Fixture?.Season?.Id == season?.Id
+                        && p.Fixture?.Category?.PlayOff == true).Sum(p => p.Goals)
+                });
+            };
+
+            return appearances;
+        }
+
         /// <summary>
         /// Uses a list of participation records to work out the total appearances
         /// </summary>

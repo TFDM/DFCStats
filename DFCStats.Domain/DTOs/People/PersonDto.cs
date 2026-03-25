@@ -1,4 +1,5 @@
 using DFCStats.Domain.DTOs.Seasons;
+using DFCStats.Domain.DTOs.Appearances;
 
 namespace DFCStats.Domain.DTOs.People
 {
@@ -17,6 +18,7 @@ namespace DFCStats.Domain.DTOs.People
         public int? TotalGoals { get; set; }
         public decimal? GoalsPerGame { get; set; }
         public List<SeasonShortDTO>? Seasons { get; set; }
+        public List<SeasonalAppearanceDTO>? Appearances { get; set; }
         public bool IsManager { get; set; }
     }
 

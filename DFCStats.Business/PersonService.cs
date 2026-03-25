@@ -41,7 +41,8 @@ namespace DFCStats.Business
 
             // Includes the stats - also includes the fixture and the category so the stats can be properly caculated
             if (includes.HasFlag(PersonIncludes.Stats))
-                query = query.Include(p => p.Participation).ThenInclude(f => f.Fixture).ThenInclude(c => c!.Category);
+                query = query.Include(p => p.Participation).ThenInclude(f => f.Fixture).ThenInclude(c => c!.Category)
+                             .Include(p => p.Participation).ThenInclude(f => f.Fixture).ThenInclude(s => s!.Season);
     
             // Run the query and map the entity to a DTO and return it
             var person = await query.FirstOrDefaultAsync(p => p.Id == id);

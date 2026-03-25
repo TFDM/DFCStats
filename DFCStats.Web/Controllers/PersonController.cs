@@ -22,7 +22,7 @@ public class PersonController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var person = await _personService.GetPersonByIdAsync(Guid.Parse("86EB50B8-53E0-4DFD-8EA5-08DE883568A6"));
+        var person = await _personService.GetPersonByIdAsync(Guid.Parse("548aa6a2-c4dd-4511-b466-02056f5b9ef7"), PersonIncludes.All);
 
         return View();
     }
@@ -192,6 +192,13 @@ public class PersonController : Controller
         ViewBag.seasons = seasons;
 
         return View(editPerson);
+    }
+
+    public async Task<IActionResult> Details(string id)
+    {
+        
+
+        return View();
     }
 
 }
