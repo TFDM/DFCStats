@@ -1,0 +1,161 @@
+@using DFCStats.Web.Models.People
+@model DFCStats.Web.Models.People.Person
+
+<div class="row">
+    <div class="col-12">
+
+        <dl class="row">
+            <input asp-for="Id" hidden />
+
+            <dt class="col-lg-2">Date of Birth</dt>
+            <dd class="col-lg-10">
+                @if (Model.DateOfBirth != null)
+                {
+                    @Model.DateOfBirth.Value.ToString("dddd d, MMMM yyyy")
+                }
+            </dd>
+            <dt class="col-lg-2">Nationality</dt>
+            <dd class="col-lg-10">
+                @if (Model.Nationality != null)
+                {
+                    if (Model.NationalityIcon != null)
+                    {
+                        <img src="~/images/Flags/@Model.NationalityIcon" />
+                    }
+                     @Model.Nationality
+                }
+            </dd>
+            <dt class="col-lg-2">Biography</dt>
+            <dd class="col-lg-10">
+                @if (Model.Biography != null)
+                {
+                    {
+                        @Model.Biography
+                    }
+                }
+            </dd>
+        </dl>
+
+    </div>
+</div>
+
+<hr />
+
+@if (Model.AppearancesBySeason != null && Model.AppearancesBySeason.Count > 0)
+{
+    <div class="row">
+        <div class="col-12">
+
+            <h5>Playing Record</h5>
+            <p>Breakdown of overall appearances by season and match types can be seen below.</p>
+
+            <p>Appearances for the most recent season can also be seen below. Click on a season below to view the appearances for that season.</p>
+
+            <div class="table-responsive">
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="text-center table-light border-end"></th>
+                            <th colspan="2" class="text-center table-light border-end border-top">All Games</th>
+                            <th colspan="2" class="text-center table-light border-end border-top">League</th>
+                            <th colspan="2" class="text-center table-light border-end border-top">Play-Offs</th>
+                            <th colspan="2" class="text-center table-light border-end border-top">Cup</th>
+                            <th class="text-center table-light"></th>
+                        </tr>
+                        <tr>
+                            <th class="table-light border-end">Season</th>
+                            <th class="table-light text-center">Apps</th>
+                            <th class="table-light text-center border-end">Goals</th>
+                            <th class="table-light text-center">Apps</th>
+                            <th class="table-light text-center border-end">Goals</th>
+                            <th class="table-light text-center">Apps</th>
+                            <th class="table-light text-center border-end">Goals</th>
+                            <th class="table-light text-center">Apps</th>
+                            <th class="table-light text-center border-end">Goals</th>
+                            <th class="table-light text-center">Red Cards</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        @if (Model.AppearancesBySeason.Count == 0)
+                        {
+                        <td colspan="10" class="table-light text-center">No appearances made</td>
+                        }
+                        else
+                        {
+                            @foreach (var season in Model.AppearancesBySeason)
+                            {
+                            <tr>
+                                <td class="table-light border-end"><a href="#" onclick="changeSeason(event, this)" data-seasonId="@season.SeasonId" data-personId="@Model.Id">@season.SeasonDescription</a></td>
+                                <td class="table-light text-center">@string.Format("{0} ({1})", season.Starts, season.Subs)</td>
+                                <td class="table-light text-center border-end">@season.Goals</td>
+                                <td class="table-light text-center">@string.Format("{0} ({1})", season.LeagueStarts, season.LeagueSubs)</td>
+                                <td class="table-light text-center border-end">@season.LeagueGoals</td>
+                                <td class="table-light text-center">@string.Format("{0} ({1})", season.PlayOffStarts, season.PlayOffSubs)</td>
+                                <td class="table-light text-center border-end">@season.PlayOffGoals</td>
+                                <td class="table-light text-center">@string.Format("{0} ({1})", season.CupStarts, season.CupSubs)</td>
+                                <td class="table-light text-center border-end">@season.CupGoals</td>
+                                <td class="table-light text-center">@season.RedCards</td>
+                            </tr>
+                            }
+                        }
+                    </tbody>
+                    @if (Model.AppearancesBySeason.Count != 0)
+                    {
+                        <tfoot>
+                            <tr>
+                                <td class="table-light border-end"><strong>Totals</strong></td>
+                                <td class="table-light text-center">@string.Format("{0} ({1})", Model.TotalStarts, Model.TotalSubs)</td>
+                                <td class="table-light text-center border-end">@Model.TotalGoals</td>
+                                <td class="table-light text-center">@string.Format("{0} ({1})", Model.TotalLeagueStarts, Model.TotalLeagueSubs)</td>
+                                <td class="table-light text-center border-end">@Model.TotalLeagueGoals</td>
+                                <td class="table-light text-center">@string.Format("{0} ({1})", Model.TotalPlayOffStarts, Model.TotalPlayOffSubs)</td>
+                                <td class="table-light text-center border-end">@Model.TotalPlayOffGoals</td>
+                                <td class="table-light text-center">@string.Format("{0} ({1})", Model.TotalCupStarts, Model.TotalCupSubs)</td>
+                                <td class="table-light text-center border-end">@Model.TotalCupGoals</td>
+                                <td class="table-light text-center">@Model.TotalRedCards</td>
+                            </tr>
+                        </tfoot>
+                    }
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row table-responsive">
+        <div class="col-12">
+            @if (ViewBag.participatedFixturesForFinalSeason != null)
+            {
+                <partial name="Partial_FixtureParticipationForSeason" model="(List<ParticipatedFixtures>)ViewBag.participatedFixturesForFinalSeason" />
+            }
+        </div>
+    </div>
+
+}
+
+@section Scripts
+{
+    <script>
+        function changeSeason(event, link) {
+            event.preventDefault();
+
+            //Gets the person id value from the hidden form field on the page
+            var personId = link.getAttribute('data-personId');
+
+            //Get the value of data-seasonID attribute from the clicked link
+            var seasonId = link.getAttribute('data-seasonId');
+
+            //Refreshes the panel with the person's participation for the selected season in it
+            fetch("/Person/RefreshParticipationForSeason?personId=" + personId + "&seasonId=" + seasonId).then(function (response) {
+                return response.text();
+            }).then(function (html) {
+                //Puts the html returned from the view in the div
+                var x = document.getElementById("ParticipationPanel");
+                x.replaceChildren();
+                x.innerHTML = html;
+            });
+        }
+    </script>
+}

@@ -34,7 +34,19 @@ namespace DFCStats.Business.MappingExtensions
                     .ToList(),
                 TotalApps = person.Participation?.ToList().TotalAppearances(),
                 TotalGoals = person.Participation?.ToList().TotalGoals(),
-                Appearances = person.Participation?.ToList().MapToAppearanceDTO()
+                TotalRedCards = person.Participation?.ToList().TotalRedCards(),
+                TotalStarts = person.Participation?.ToList().TotalStarts(),
+                TotalSubs = person.Participation?.ToList().TotalSubs(),
+                TotalLeagueStarts = person.Participation?.ToList().TotalLeagueStarts(),
+                TotalLeagueSubs = person.Participation?.ToList().TotalLeagueSubs(),
+                TotalLeagueGoals = person.Participation?.ToList().TotalLeagueGoals(),
+                TotalPlayOffStarts = person.Participation?.ToList().TotalPlayOffStarts(),
+                TotalPlayOffSubs = person.Participation?.ToList().TotalPlayOffSubs(),
+                TotalPlayOffGoals = person.Participation?.ToList().TotalPlayOffGoals(),
+                TotalCupStarts = person.Participation?.ToList().TotalCupStarts(),
+                TotalCupSubs = person.Participation?.ToList().TotalCupSubs(),
+                TotalCupGoals = person.Participation?.ToList().TotalPlayOffGoals(),
+                Appearances = person.Participation?.ToList().MapToAppearanceDTO(),
             };
         }
         

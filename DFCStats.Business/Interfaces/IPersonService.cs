@@ -1,4 +1,5 @@
 using DFCStats.Domain.DTOs.People;
+using DFCStats.Domain.DTOs.Fixtures;
 
 namespace DFCStats.Business.Interfaces
 {
@@ -36,5 +37,13 @@ namespace DFCStats.Business.Interfaces
         /// <param name="editPersonDTO"></param>
         /// <returns></returns>
         Task<PersonDTO> UpdatePersonAsync(EditPersonDTO editPersonDTO);
+
+        /// <summary>
+        /// Gets the fixtures a selected person appeared in for a selected season
+        /// </summary>
+        /// <param name="personId"></param>
+        /// <param name="seasonId"></param>
+        /// <returns></returns>
+        Task<List<ParticipationFixtureDTO>> GetParticipatedFixturesAsync(Guid personId, Guid seasonId);
     }
 }

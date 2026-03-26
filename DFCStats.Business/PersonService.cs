@@ -1,6 +1,7 @@
 using DFCStats.Data;
 using DFCStats.Business.Interfaces;
 using DFCStats.Domain.DTOs.People;
+using DFCStats.Domain.DTOs.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using DFCStats.Business.MappingExtensions;
 using DFCStats.Domain.Exceptions;
@@ -91,6 +92,27 @@ namespace DFCStats.Business
 
             // Map the newly created person to a PersonDTO and return it
             return person.MapToPersonDTO()!;
+        }
+
+        /// <summary>
+        /// Gets the fixtures a selected person appeared in for a selected season
+        /// </summary>
+        /// <param name="personId"></param>
+        /// <param name="seasonId"></param>
+        /// <returns></returns>
+        public async Task<List<ParticipationFixtureDTO>> GetParticipatedFixturesAsync(Guid personId, Guid seasonId)
+        {
+            //Gets all the fixtures participated by a person for a given season
+            var fixturesParticipatedIn = await _dfcStatsDbContext.Participants
+                .Include(p => p.Fixture).ThenInclude(f => f!.Season)
+                .Include(p => p.Fixture).ThenInclude(f => f!.Club)
+                .Include(p => p.Fixture).ThenInclude(f => f!.Venue)
+                .Where(p => p.PersonId == personId && p.Fixture!.SeasonId == seasonId)
+                .OrderBy(p => p.Fixture!.Date)
+                .ToListAsync();
+
+            // Map the participation records to ParticipationFixtureDTO and return it
+            return fixturesParticipatedIn.Select(f => f.MapToParticipationFixtureDTO()!).ToList();
         }
 
         /// <summary>

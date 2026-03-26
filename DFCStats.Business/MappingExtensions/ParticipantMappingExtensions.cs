@@ -1,5 +1,6 @@
 using DFCStats.Data.Entities;
 using DFCStats.Domain.DTOs.Participants;
+using DFCStats.Domain.DTOs.Fixtures;
 
 namespace DFCStats.Business.MappingExtensions
 {
@@ -36,6 +37,31 @@ namespace DFCStats.Business.MappingExtensions
                 TeamAndScore = participation.Fixture?.TeamsAndScores(),
                 Season = participation.Fixture?.Season?.Description,
                 Date = participation.Fixture?.Date
+            };
+        }
+
+        /// <summary>
+        /// Maps a Participation entity to a ParticipationFixtureDTO
+        /// </summary>
+        /// <param name="participation"></param>
+        /// <returns></returns>
+        public static ParticipationFixtureDTO? MapToParticipationFixtureDTO(this Participation participation)
+        {
+            if (participation == null)
+                return null;
+
+            return new ParticipationFixtureDTO
+            {
+                ParticipationId = participation.Id,
+                FixtureId = participation.FixtureId,
+                Date = participation.Fixture!.Date,
+                TeamsWithScore = participation.Fixture?.TeamsAndScores(),
+                Competition = participation.Fixture?.Competition,
+                Scoreline = participation.Fixture?.Scoreline(),
+                Outcome = participation.Fixture?.Outcome,
+                Season = participation.Fixture?.Season?.Description,
+                Goals = participation.Goals,
+                Role = (participation.Started) ? "Starting XI": "Substitute"
             };
         }
     }

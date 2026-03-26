@@ -16,6 +16,18 @@ namespace DFCStats.Domain.DTOs.People
         public string? Biography { get; set; }
         public int? TotalApps { get; set; }
         public int? TotalGoals { get; set; }
+        public int? TotalRedCards { get; set; }
+        public int? TotalStarts { get; set; }
+        public int? TotalSubs { get; set; }
+        public int? TotalLeagueStarts { get; set; }
+        public int? TotalLeagueSubs { get; set; }
+        public int? TotalLeagueGoals { get; set; }
+        public int? TotalPlayOffStarts { get; set; }
+        public int? TotalPlayOffSubs { get; set; }
+        public int? TotalPlayOffGoals { get; set; }
+        public int? TotalCupStarts { get; set; }
+        public int? TotalCupSubs { get; set; }
+        public int? TotalCupGoals { get; set; }
         public decimal? GoalsPerGame { get; set; }
         public List<SeasonShortDTO>? Seasons { get; set; }
         public List<SeasonalAppearanceDTO>? Appearances { get; set; }

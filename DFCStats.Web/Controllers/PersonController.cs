@@ -4,6 +4,7 @@ using System.Text.Json;
 using DFCStats.Web.Models.People;
 using DFCStats.Domain.DTOs.People;
 using DFCStats.Domain.Exceptions;
+using DFCStats.Business;
 
 namespace DFCStats.Web.Controllers;
 
@@ -196,9 +197,111 @@ public class PersonController : Controller
 
     public async Task<IActionResult> Details(string id)
     {
-        
+        // Validate that the id parameter is a valid GUID format
+        // the personId is set to the guid if the parsing is successful
+        if (!Guid.TryParse(id, out var personId))
+            // If the id is not a valid GUID, return a 400 Bad Request HTTP response
+            return BadRequest("Invalid ID format");
 
-        return View();
+        // Get the person from the database
+        var person = await _personService.GetPersonByIdAsync(personId, PersonIncludes.Nationality | PersonIncludes.Stats);
+
+        // Check if the person was found
+        if (person == null)
+            return NotFound("Person not found");
+
+        // Set the page heading and the page title
+		ViewData["PageHeading"] = String.Format("{0} {1}", person.FirstName, person.LastName);
+		ViewData["Title"] = "Players and Staff";
+
+        // Map the personDTO to a person model
+        var personToDisplay = new Person
+        {
+            Id = person.Id,
+            DateOfBirth = person.DateOfBirth,
+            Nationality = person.Nationality,
+            NationalityIcon = person.NationalityIcon,
+            Biography = person.Biography,
+            TotalStarts = person.TotalStarts,
+            TotalSubs = person.TotalSubs,
+            TotalGoals = person.TotalGoals,
+            TotalRedCards = person.TotalRedCards,
+            TotalLeagueStarts = person.TotalLeagueStarts,
+            TotalLeagueSubs = person.TotalLeagueSubs,
+            TotalLeagueGoals = person.TotalLeagueGoals,
+            TotalCupStarts = person.TotalCupStarts,
+            TotalCupSubs = person.TotalCupSubs,
+            TotalCupGoals = person.TotalCupGoals,
+            TotalPlayOffStarts = person.TotalPlayOffStarts,
+            TotalPlayOffSubs = person.TotalPlayOffSubs,
+            TotalPlayOffGoals = person.TotalPlayOffGoals,
+            AppearancesBySeason = person.Appearances?.Select(a => new SeasonalAppearances
+            {
+                SeasonId = a.SeasonId,
+                SeasonDescription = a.SeasonDescription,
+                TotalAppearances = a.TotalAppearances,
+                Starts = a.Starts,
+                Subs = a.Subs,
+                Goals = a.Goals,
+                RedCards = a.RedCards,
+                LeagueStarts = a.LeagueStarts,
+                LeagueSubs = a.LeagueSubs,
+                LeagueGoals = a.LeagueGoals,
+                CupStarts = a.CupStarts,
+                CupSubs = a.CupSubs,
+                CupGoals = a.CupGoals,
+                PlayOffStarts = a.PlayOffStarts,
+                PlayOffSubs = a.PlayOffSubs,
+                PlayOffGoals = a.PlayOffGoals
+            }).ToList()
+        };
+
+        // Check has appearances
+        if (person.Appearances?.Count != 0)
+        {
+            // Get the fixtures the person appeared in for the final season we have appearances for them
+            var participatedFixturesForFinalSeason = await _personService.GetParticipatedFixturesAsync(person.Id, (Guid)person.Appearances!.Last().SeasonId!);
+
+            // Map to view model
+            var gamesForFinalSeason = participatedFixturesForFinalSeason.Select(p => new ParticipatedFixtures
+            {
+                ParticipationId = p.ParticipationId,
+                FixtureId = p.FixtureId,
+                Date = p.Date,
+                TeamsWithScore = p.TeamsWithScore,
+                Competition = p.Competition,
+                Scoreline = p.Scoreline,
+                Outcome = p.Outcome,
+                Season = p.Season,
+                Role = p.Role
+            }).ToList();
+
+            ViewBag.participatedFixturesForFinalSeason = gamesForFinalSeason;
+        }
+
+        return View(personToDisplay);
+    }
+
+    public async Task<IActionResult> RefreshParticipationForSeason(string personId, string seasonId)
+    {
+        // Get the fixtures participated in by the person for the selected season
+        var participatedFixturesForFinalSeason = await _personService.GetParticipatedFixturesAsync(Guid.Parse(personId), Guid.Parse(seasonId));
+
+        // Map to view model
+        var gamesForFinalSeason = participatedFixturesForFinalSeason.Select(p => new ParticipatedFixtures
+        {
+            ParticipationId = p.ParticipationId,
+            FixtureId = p.FixtureId,
+            Date = p.Date,
+            TeamsWithScore = p.TeamsWithScore,
+            Competition = p.Competition,
+            Scoreline = p.Scoreline,
+            Outcome = p.Outcome,
+            Season = p.Season,
+            Role = p.Role
+        }).ToList();
+
+        return PartialView("Partial_FixtureParticipationForSeason", gamesForFinalSeason);
     }
 
 }
