@@ -30,6 +30,8 @@ namespace DFCStats.Business
         /// <returns></returns>
         public async Task<PersonDTO?> GetPersonByIdAsync(Guid id, PersonIncludes includes = PersonIncludes.None)
         {
+            var x = _dfcStatsDbContext.View_People.FirstOrDefault(p => p.Id == id);
+
             var query = _dfcStatsDbContext.People.AsNoTracking().AsQueryable();
     
             // Includes the nationality

@@ -17,6 +17,8 @@ namespace DFCStats.Data
         public DbSet<Season> Seasons { get; set; }
         public DbSet<Venue> Venues { get; set; }
 
+        public DbSet<View_People> View_People { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -32,6 +34,9 @@ namespace DFCStats.Data
                 .HasOne(x => x.ReplacedByPerson)
                 .WithMany()
                 .HasForeignKey(x => x.ReplacedByPersonId);
+
+            // Configures SQL views so the entity maps to the actual sql view
+            modelBuilder.Entity<View_People>().ToView("View_People");
         }
     }
 }
