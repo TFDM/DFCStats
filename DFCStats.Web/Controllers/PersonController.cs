@@ -4,7 +4,8 @@ using System.Text.Json;
 using DFCStats.Web.Models.People;
 using DFCStats.Domain.DTOs.People;
 using DFCStats.Domain.Exceptions;
-using DFCStats.Business;
+using X.PagedList;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DFCStats.Web.Controllers;
 
@@ -21,11 +22,65 @@ public class PersonController : Controller
         _seasonService = seasonService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string firstName, string lastName, string nationality, string sort, int page = 1, int pageSize = 50)
     {
-        var person = await _personService.GetPersonByIdAsync(Guid.Parse("548aa6a2-c4dd-4511-b466-02056f5b9ef7"), PersonIncludes.All);
+        // Set the page heading and the page title
+		ViewData["PageHeading"] = "Players and Staff";
+		ViewData["Title"] = "Players and Staff";
 
-        return View();
+        // Ensure the page and page size are above not zero or negative
+        page = (page < 1) ? 1 : page;
+        pageSize = (pageSize < 1) ? 50 : pageSize;
+
+        // Gets all the nationalities from the database and adds them to the viewbag
+        var nationalities = await _nationalityService.GetAllNationalitiesAsync();
+        ViewBag.nationalities = nationalities;
+
+        // Creates a select list of page sizes
+        ViewBag.pageSize = new List<SelectListItem>()
+        {
+            new SelectListItem() { Text="25", Value="25" },
+            new SelectListItem() { Text="50", Value="50" },
+            new SelectListItem() { Text="75", Value="75" },
+            new SelectListItem() { Text="100", Value="100" }
+        };
+
+        // Search for people
+        var (people, totalCount) = await _personService.SearchForPeopleAsync(page: page,
+            pageSize: pageSize,
+            searchFirstName: firstName,
+            searchLastName: lastName,
+            searchNationalityId: nationality,
+            sort: sort);
+
+        // Convert the people from a DTO to a model
+        var listOfPeople = people.Select(dto => new Person
+        {
+            Id = dto.Id,
+            LastName = dto.LastName,
+            FirstName = dto.FirstName,
+            LastNameFirstName = dto.LastNameFirstName,
+            DateOfBirth = dto.DateOfBirth,
+            Nationality = dto.Nationality,
+            NationalityIcon = dto.NationalityIcon,
+            TotalAppearances = dto.TotalApps,
+            TotalGoals = dto.TotalGoals,
+            GoalsPerGame = dto.GoalsPerGame
+        }).ToList();
+        
+        // Convert to a static list
+		var peopleAsIPagedList = new StaticPagedList<Person>(listOfPeople, page, pageSize, totalCount);
+
+        // If the sort parameter is null or empty then we are initializing the value as descending  
+        ViewBag.SortByName = string.IsNullOrEmpty(sort) ? "lastnamefirstname_desc" : "";
+        ViewBag.SortByDateOfBirth = sort == "dateofbirth" ? "dateofbirth_desc" : "dateofbirth";
+        ViewBag.SortByNationality = sort == "nationality" ? "nationality_desc" : "nationality";
+        ViewBag.SortByTotalApps = sort == "totalapps" ? "totalapps_desc" : "totalapps";
+        ViewBag.SortByTotalGoals = sort == "totalgoals" ? "totalgoals_desc" : "totalgoals";
+        ViewBag.SortByGoalsPerGame = sort == "goalsPerGame" ? "goalsPerGame_desc" : "goalsPerGame";
+        ViewBag.Sort = sort;
+
+        return View(peopleAsIPagedList);
     }
 
     public async Task<IActionResult> New()
@@ -235,6 +290,7 @@ public class PersonController : Controller
             TotalPlayOffStarts = person.TotalPlayOffStarts,
             TotalPlayOffSubs = person.TotalPlayOffSubs,
             TotalPlayOffGoals = person.TotalPlayOffGoals,
+            GoalsPerGame = person.GoalsPerGame,
             AppearancesBySeason = person.Appearances?.Select(a => new SeasonalAppearances
             {
                 SeasonId = a.SeasonId,
@@ -252,7 +308,8 @@ public class PersonController : Controller
                 CupGoals = a.CupGoals,
                 PlayOffStarts = a.PlayOffStarts,
                 PlayOffSubs = a.PlayOffSubs,
-                PlayOffGoals = a.PlayOffGoals
+                PlayOffGoals = a.PlayOffGoals,
+                GoalsPerGame = a.GoalsPerGame
             }).ToList()
         };
 

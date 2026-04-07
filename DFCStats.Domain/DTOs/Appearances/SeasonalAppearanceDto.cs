@@ -21,5 +21,6 @@ namespace DFCStats.Domain.DTOs.Appearances
         public int? PlayOffStarts { get; set; }
         public int? PlayOffSubs { get; set; }
         public int? PlayOffGoals { get; set; }
+        public decimal? GoalsPerGame { get; set; }
     }
 }

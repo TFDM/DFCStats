@@ -17,6 +17,19 @@ namespace DFCStats.Business.Interfaces
     public interface IPersonService
     {
         /// <summary>
+        /// Searches for people with optional filtering, sorting, and pagination
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="searchFirstName"></param>
+        /// <param name="searchLastName"></param>
+        /// <param name="searchNationalityId"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        Task<(List<PersonDTO>, int)> SearchForPeopleAsync(int page = 1, int pageSize = 50, string? searchFirstName = null, string? searchLastName = null, 
+            string? searchNationalityId = null, string? sort = null);
+
+        /// <summary>
         /// Returns a person from the database using the id
         /// </summary>
         /// <param name="id"></param>

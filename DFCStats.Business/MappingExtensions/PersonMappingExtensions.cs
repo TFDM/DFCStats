@@ -46,7 +46,38 @@ namespace DFCStats.Business.MappingExtensions
                 TotalCupStarts = person.Participation?.ToList().TotalCupStarts(),
                 TotalCupSubs = person.Participation?.ToList().TotalCupSubs(),
                 TotalCupGoals = person.Participation?.ToList().TotalPlayOffGoals(),
+                GoalsPerGame = person.Participation?.ToList().GoalsPerGame(),
                 Appearances = person.Participation?.ToList().MapToAppearanceDTO(),
+            };
+        }
+
+        /// <summary>
+        /// Maps a View_People entity to a PersonDTO
+        /// </summary>
+        /// <param name="person"></param>
+        /// <returns></returns>
+        public static PersonDTO? MapToPersonDTO(this View_People person)
+        {
+            if (person == null)
+                return null;
+
+            return new PersonDTO
+            {
+                Id = person.Id,
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                LastNameFirstName = $"{person.LastName}, {person.FirstName}",
+                DateOfBirth = person.DateofBirth,
+                NationalityId = person.NationalityID,
+                Nationality = person.Nationality,
+                NationalityIcon = person.Icon,
+                Biography = person.Biography,
+                IsManager = person.IsManager,
+                TotalApps = person.TotalApps,
+                TotalStarts = person.TotalStartApps,
+                TotalSubs = person.TotalSubApps,
+                TotalGoals = person.TotalGoals,
+                GoalsPerGame = person.GoalsPerGame,
             };
         }
         

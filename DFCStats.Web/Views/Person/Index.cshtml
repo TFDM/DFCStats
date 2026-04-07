@@ -1,0 +1,116 @@
+@using DFCStats.Web.Models.People;
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+
+@model IPagedList<Person>
+
+@if (TempData["Success"] != null)
+{
+    <div class="row mb-3">
+        <div class="col-12">
+
+            <div class="alert alert-success" role="alert">
+                @TempData["Success"]
+            </div>
+
+        </div>
+    </div>
+}
+
+<form method="get">
+
+    <div class="row mb-3">
+        <div class="col-12 col-lg-4">
+            <label>First Name</label>
+            @Html.TextBox("firstName", string.Empty, new { @class = "form-control" })
+        </div>
+        <div class="col-12 col-lg-4">
+            <label>Last Name</label>
+            @Html.TextBox("lastName", string.Empty, new { @class = "form-control" })
+        </div>
+        <div class="col-12 col-lg-2">
+            <label>Nationality</label>
+            @Html.DropDownList("nationality", new SelectList(ViewBag.nationalities, "Id", "Nationality"), string.Empty, new { @class = "form-control form-select" })
+        </div>
+        <div class="col-12 col-lg-2">
+            <label>Results to Show</label>
+            @Html.DropDownList("pageSize", new SelectList(ViewBag.pageSize, "Value", "Text"), string.Empty, new { @class = "form-control form-select" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <button type="submit" class="btn btn-success">Search</button>
+        </div>
+    </div>
+</form>
+
+<div class="row">
+    <div class="col-12">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByName" asp-route-FirstName="@Context.Request.Query["firstName"]" asp-route-LastName="@Context.Request.Query["lastName"]" asp-route-Nationality="@Context.Request.Query["nationality"]" asp-route-PageSize="@Context.Request.Query["pageSize"]">Name</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByDateOfBirth" asp-route-FirstName="@Context.Request.Query["firstName"]" asp-route-LastName="@Context.Request.Query["lastName"]" asp-route-Nationality="@Context.Request.Query["nationality"]" asp-route-PageSize="@Context.Request.Query["pageSize"]">Date of Birth</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByNationality" asp-route-FirstName="@Context.Request.Query["firstName"]" asp-route-LastName="@Context.Request.Query["lastName"]" asp-route-Nationality="@Context.Request.Query["nationality"]" asp-route-PageSize="@Context.Request.Query["pageSize"]">Nationality</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByTotalApps" asp-route-FirstName="@Context.Request.Query["firstName"]" asp-route-LastName="@Context.Request.Query["lastName"]" asp-route-Nationality="@Context.Request.Query["nationality"]" asp-route-PageSize="@Context.Request.Query["pageSize"]">Apps</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByTotalGoals" asp-route-FirstName="@Context.Request.Query["firstName"]" asp-route-LastName="@Context.Request.Query["lastName"]" asp-route-Nationality="@Context.Request.Query["nationality"]" asp-route-PageSize="@Context.Request.Query["pageSize"]">Goals</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByGoalsPerGame" asp-route-FirstName="@Context.Request.Query["firstName"]" asp-route-LastName="@Context.Request.Query["lastName"]" asp-route-Nationality="@Context.Request.Query["nationality"]" asp-route-PageSize="@Context.Request.Query["pageSize"]">Goals Per Game</a></th>
+                    <th class="table-light"></th>
+                    <th class="table-light"></th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                @foreach (Person person in Model)
+                {
+                    <tr>
+                        <td class="table-light">@person.LastNameFirstName</td>
+                        <td class="table-light">@(person.DateOfBirth != null ? person.DateOfBirth.Value.ToString("dd/MM/yyyy") : null)</td>
+                        <td class="table-light">
+                            @if (person.Nationality != null)
+                            {
+                                if (person.NationalityIcon != null)
+                                {
+                                    <img src="~/images/Flags/@person.NationalityIcon" />
+                                }
+                                 @person.Nationality
+                            }
+                        </td>
+                        <td class="table-light">@person.TotalAppearances</td>
+                        <td class="table-light">@person.TotalGoals</td>
+                        <td class="table-light">@person.GoalsPerGame</td>
+                        <td class="table-light">
+                            <a asp-action="Details" asp-route-id="@person.Id">Details</a>
+                        </td>
+                        <td class="align-middle table-light">
+                            <a asp-action="Edit" asp-route-id="@person.Id">Edit</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<div class="row">
+	<div class="col-12">
+
+		@Html.PagedListPager(Model, page => Url.Action("Index", new
+			{
+				page = page,
+				firstName = Context.Request.Query["firstName"],
+                lastName = Context.Request.Query["lastName"],
+                nationality = Context.Request.Query["nationality"],
+                pageSize = Context.Request.Query["pageSize"],
+                sort = Context.Request.Query["sort"]
+			}),
+            new X.PagedList.Mvc.Core.PagedListRenderOptions
+		{
+			MaximumPageNumbersToDisplay = 3,
+			LiElementClasses = new string[] { "page-itm" },
+			PageClasses = new string[] { "page-link" }
+		})
+
+	</div>
+</div>

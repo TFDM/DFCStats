@@ -62,6 +62,7 @@
                             <th colspan="2" class="text-center table-light border-end border-top">Play-Offs</th>
                             <th colspan="2" class="text-center table-light border-end border-top">Cup</th>
                             <th class="text-center table-light"></th>
+                            <th class="text-center table-light"></th>
                         </tr>
                         <tr>
                             <th class="table-light border-end">Season</th>
@@ -74,6 +75,7 @@
                             <th class="table-light text-center">Apps</th>
                             <th class="table-light text-center border-end">Goals</th>
                             <th class="table-light text-center">Red Cards</th>
+                            <th class="table-light text-center">Goals Per Game</th>
                         </tr>
                     </thead>
                     <tbody class="table-group-divider">
@@ -96,6 +98,7 @@
                                 <td class="table-light text-center">@string.Format("{0} ({1})", season.CupStarts, season.CupSubs)</td>
                                 <td class="table-light text-center border-end">@season.CupGoals</td>
                                 <td class="table-light text-center">@season.RedCards</td>
+                                <td class="table-light text-center">@season.GoalsPerGame</td>
                             </tr>
                             }
                         }
@@ -114,6 +117,7 @@
                                 <td class="table-light text-center">@string.Format("{0} ({1})", Model.TotalCupStarts, Model.TotalCupSubs)</td>
                                 <td class="table-light text-center border-end">@Model.TotalCupGoals</td>
                                 <td class="table-light text-center">@Model.TotalRedCards</td>
+                                <td class="table-light text-center">@Model.GoalsPerGame</td>
                             </tr>
                         </tfoot>
                     }

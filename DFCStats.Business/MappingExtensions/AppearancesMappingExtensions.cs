@@ -45,7 +45,8 @@ namespace DFCStats.Business.MappingExtensions
                     CupGoals = seasonParticipations.TotalCupGoals(),
                     PlayOffStarts = seasonParticipations.TotalPlayOffStarts(),
                     PlayOffSubs = seasonParticipations.TotalPlayOffSubs(),
-                    PlayOffGoals = seasonParticipations.TotalPlayOffGoals()
+                    PlayOffGoals = seasonParticipations.TotalPlayOffGoals(),
+                    GoalsPerGame = seasonParticipations.GoalsPerGame()
                     // RedCards = participations.Where(p => p.Fixture?.SeasonId == season?.Id && p.RedCard == true).Count(),
                     // TotalAppearances = participations.Where(p => p.Fixture?.SeasonId == season?.Id).Count(),
                     // Starts = participations.Where(p => p.Fixture?.SeasonId == season?.Id && p.Started == true).Count(),
@@ -216,6 +217,33 @@ namespace DFCStats.Business.MappingExtensions
         public static int TotalCupGoals(this List<Participation> participation)
         {
             return participation.Where(p => p.Fixture?.Category?.Cup == true).Sum(p => p.Goals);
+        }
+
+        /// <summary>
+        /// Uses a list of participation records to work out the goals per game ratio
+        /// </summary>
+        /// <param name="participation"></param>
+        /// <returns></returns>
+        public static decimal GoalsPerGame(this List<Participation> participation)
+        {
+            // Get the list of games that count (League, Cup, or Play-offs)
+            var qualifyingGames = participation.Where(p => 
+                p.Fixture?.Category?.League == true || 
+                p.Fixture?.Category?.Cup == true || 
+                p.Fixture?.Category?.PlayOff == true).ToList();
+
+            int totalApps = qualifyingGames.Count;
+
+            // Return 0 if they haven't played any games to avoid DivideByZero
+            if (totalApps == 0) return 0.00m;
+
+            int totalGoals = qualifyingGames.Sum(p => p.Goals);
+
+            // Perform the calculation (Cast to decimal for precision)
+            decimal gpg = (decimal)totalGoals / totalApps;
+
+            // Mimic the SQL CEILING(x * 100) / 100 logic (Round up to 2 decimal places)
+            return Math.Ceiling(gpg * 100) / 100;
         }
 
     }

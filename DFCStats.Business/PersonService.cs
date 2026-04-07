@@ -23,6 +23,92 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Searches for people with optional filtering, sorting, and pagination
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="searchFirstName"></param>
+        /// <param name="searchLastName"></param>
+        /// <param name="searchNationalityId"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        public async Task<(List<PersonDTO>, int)> SearchForPeopleAsync(int page = 1, int pageSize = 50, string? searchFirstName = null, string? searchLastName = null, 
+            string? searchNationalityId = null, string? sort = null)
+        {
+            // Ensure the page and page size are above not zero or negative
+            page = (page < 1) ? 1 : page;
+            pageSize = (pageSize < 1) ? 50 : pageSize;
+
+            var people = _dfcStatsDbContext.View_People
+                .AsNoTracking()
+                .AsQueryable();
+
+            // Filter the records
+            if (searchFirstName != null)
+            {
+                people = people.Where(x => x.FirstName.Contains(searchFirstName));
+            }
+            if (searchLastName != null)
+            {
+                people = people.Where(x => x.LastName.Contains(searchLastName));
+            }
+            if (searchNationalityId != null)
+            {
+                people = people.Where(x => x.NationalityID == Guid.Parse(searchNationalityId));
+            }
+
+            // Sort the records
+            switch (sort)
+            {
+                case "lastnamefirstname_desc":
+                    people = people.OrderByDescending(x => x.LastNameFirstName);
+                    break;
+                case "dateofbirth_desc":
+                    people = people.OrderByDescending(x => x.DateofBirth);
+                    break;
+                case "dateofbirth":
+                    people = people.OrderBy(x => x.DateofBirth);
+                    break;
+                case "nationality_desc":
+                    people = people.OrderByDescending(x => x.Nationality);
+                    break;
+                case "nationality":
+                    people = people.OrderBy(x => x.Nationality);
+                    break;
+                case "totalapps_desc":
+                    people = people.OrderByDescending(x => x.TotalApps);
+                    break;
+                case "totalapps":
+                    people = people.OrderBy(x => x.TotalApps);
+                    break;
+                case "totalgoals_desc":
+                    people = people.OrderByDescending(x => x.TotalGoals);
+                    break;
+                case "totalgoals":
+                    people = people.OrderBy(x => x.TotalGoals);
+                    break;
+                case "goalsPerGame_desc":
+                    people = people.OrderByDescending(x => x.GoalsPerGame);
+                    break;
+                case "goalsPerGame":
+                    people = people.OrderBy(x => x.GoalsPerGame);
+                    break;
+                default:
+                    people = people.OrderBy(x => x.LastNameFirstName);
+                    break;
+            }
+
+            // Counts the total number of records before any pagination is applied
+			var totalItemCount = await people.CountAsync();
+
+            // Carries out the query
+			var results = await people.Skip(pageSize * (page - 1)).Take(pageSize).ToListAsync();
+
+            // Return the people (mapped to PeopleDTO) and the item count
+            return (results.Select(p => p.MapToPersonDTO()!).ToList(), totalItemCount);
+        }
+
+        /// <summary>
         /// Returns a person from the database using the id
         /// </summary>
         /// <param name="id"></param>
@@ -30,8 +116,6 @@ namespace DFCStats.Business
         /// <returns></returns>
         public async Task<PersonDTO?> GetPersonByIdAsync(Guid id, PersonIncludes includes = PersonIncludes.None)
         {
-            var x = _dfcStatsDbContext.View_People.FirstOrDefault(p => p.Id == id);
-
             var query = _dfcStatsDbContext.People.AsNoTracking().AsQueryable();
     
             // Includes the nationality

@@ -3,11 +3,15 @@ namespace DFCStats.Web.Models.People
     public class Person
     {
         public Guid Id { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string LastNameFirstName { get; set; } = string.Empty;
         public DateOnly? DateOfBirth { get; set; } 
         public string? Nationality { get; set; }
         public string? NationalityIcon { get; set; }
         public string? Biography { get; set; }
         public List<SeasonalAppearances>? AppearancesBySeason = null!;
+        public int? TotalAppearances { get; set; }
         public int? TotalStarts { get; set; }
         public int? TotalSubs { get; set; }
         public int? TotalGoals { get; set; }
@@ -21,6 +25,7 @@ namespace DFCStats.Web.Models.People
         public int? TotalPlayOffStarts { get; set; }
         public int? TotalPlayOffSubs { get; set; }
         public int? TotalPlayOffGoals { get; set; }
+        public decimal? GoalsPerGame { get; set; }
     }
 
     public class SeasonalAppearances
@@ -41,6 +46,7 @@ namespace DFCStats.Web.Models.People
         public int? PlayOffStarts { get; set; }
         public int? PlayOffSubs { get; set; }
         public int? PlayOffGoals { get; set; }
+        public decimal? GoalsPerGame { get; set; }
     }
 
 }
