@@ -1,3 +1,5 @@
+using DFCStats.Domain.DTOs.Seasons;
+
 namespace DFCStats.Domain.DTOs.Participants
 {
     public class ParticipationDTO
@@ -5,6 +7,7 @@ namespace DFCStats.Domain.DTOs.Participants
         public Guid Id { get; set; }
         public Guid FixtureId { get; set; }
         public Guid? SeasonId { get; set; }
+        public Guid PersonId { get; set; }
         public int OrderNo { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
@@ -16,7 +19,7 @@ namespace DFCStats.Domain.DTOs.Participants
         public int Goals { get; set; }
         public Guid? ReplacedByPersonId { get; set; }
         public string? ReplacedByFirstName { get; set; }
-        public string? ReplaceByLastName { get; set; }
+        public string? ReplacedByLastName { get; set; }
         public int? ReplacedByTime { get; set; }
         public string? TeamAndScore {get; set;}
         public DateOnly? Date { get; set; }

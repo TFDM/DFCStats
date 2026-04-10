@@ -13,6 +13,15 @@
 </div>
 <hr />
 
+<div class="row mb-3">
+    <div class="col-md-6">
+        <a class="btn btn-primary" asp-controller="Participation" asp-action="Manage" asp-route-id="@Model.Id">Manage Participants</a>
+    </div>
+    <div class="col-md-6">
+        <a class="btn btn-primary" asp-controller="Participation" asp-action="ManageOpposition" asp-route-id="@Model.Id">Manage Opposition Participants</a>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-6 @(Model.Venue == "A" ? "order-2" : "order-1")">
 

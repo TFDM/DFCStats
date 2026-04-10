@@ -149,7 +149,7 @@ public class FixtureController : Controller
                 RedCard = p.RedCard,
                 ReplacedByPersonId = p.ReplacedByPersonId,
                 ReplacedByFirstName = p.ReplacedByFirstName,
-                ReplacedByLastName = p.ReplaceByLastName,
+                ReplacedByLastName = p.ReplacedByLastName,
                 ReplacedByTime = p.ReplacedByTime
             }).ToList()
         };
@@ -344,33 +344,5 @@ public class FixtureController : Controller
         ViewBag.clubs = clubs;
 
         return View(editFixture);
-    }
-
-    public async Task<IActionResult> ManageParticipants(string id)
-    {
-        // Validate that the id parameter is a valid GUID format
-        // the fixtureId is set to the guid if the parsing is successful
-        if (!Guid.TryParse(id, out var fixtureId))
-            // If the id is not a valid GUID, return a 400 Bad Request HTTP response
-            return BadRequest("Invalid ID format");
-
-        // Get the fixture from the database and include the participants
-        var fixture = await _fixtureService.GetFixtureByIdAsync(fixtureId, FixtureIncludes.Participants);
-
-        // Check if the fixture was found
-        if (fixture == null)
-            return NotFound("Fixture not found");
-
-        // Get the season - required in order to get all the people attached to the season
-        var season = await _seasonService.GetSeasonByIdAsync(fixture.SeasonId, SeasonIncludes.PeopleAttachedToSeason);
-
-        
-
-        // Set the page heading and the page title
-		ViewData["PageHeading"] = fixture.TeamsAndScores;
-		ViewData["Title"] = fixture.TeamsAndScores;
-
-
-        return View();
     }
 }

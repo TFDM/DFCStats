@@ -33,6 +33,9 @@ builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
 builder.Services.AddScoped<IVenueService, VenueService>();
 
+// Allows the anti forgery token to be usable in request headers for internal api calls
+builder.Services.AddAntiforgery(options => options.HeaderName = "__RequestVerificationToken");
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

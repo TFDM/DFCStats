@@ -45,6 +45,7 @@ namespace DFCStats.Business.MappingExtensions
                 OppositionPenaltyScore = fixture.OppositionPenaltyScore,
                 Notes = fixture.Notes,
                 Participants = fixture.Participants?
+                    .OrderBy(p => p.OrderNo)
                     .Select(p => p.MapToParticipantsDTO())
                     .OfType<ParticipationDTO>()
                     .ToList()

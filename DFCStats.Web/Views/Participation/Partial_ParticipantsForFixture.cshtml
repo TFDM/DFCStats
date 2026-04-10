@@ -1,0 +1,90 @@
+@model List<DFCStats.Web.Models.Participants.Participant>
+
+<div class="row">
+	<div class="col-12">
+
+		<table class="table">
+			<thead>
+				<tr>
+					<th class="table-light">Name</th>
+					<th class="table-light">Role</th>
+					<th class="table-light">Goals</th>
+					<th class="table-light">Yellow Card</th>
+					<th class="table-light">Red Card</th>
+					<th class="table-light">Replaced By</th>
+					<th class="table-light">Time</th>
+					<th class="table-light" colspan="4"></th>
+				</tr>
+			</thead>
+			<tbody class="table-group-divider">
+
+                @if (Model != null)
+				{
+					if (Model.Count == 0)
+					{
+						<tr>
+							<td colspan="11" class="text-center table-warning text-warning-emphasis">There are no participants for this fixture yet</td>
+						</tr>
+					} else {
+                        @foreach (DFCStats.Web.Models.Participants.Participant p in Model)
+                        {
+                            <tr>
+                                <td class="table-light">@string.Format("{0}, {1}", p.LastName, p.FirstName)</td>
+                                <td class="table-light">@p.RoleInFixture</td>
+                                <td class="table-light">@p.Goals</td>
+                                <td class="table-light">@(p.YellowCard == true ? "Yes" : "No")</td>
+                                <td class="table-light">@(p.RedCard == true ? "Yes" : "No")</td>
+                                <td class="table-light">
+                                    @if (p.ReplacedByPersonId != null)
+                                    {
+                                        @string.Format("{0}, {1}", p.ReplacedByLastName, p.ReplacedByFirstName)
+                                    }
+                                </td>
+                                <td class="table-light">@p.ReplacedTime</td>
+                                <td class="table-light text-end">
+                                    @if (p.Id != Model.First().Id)
+                                    {
+
+                                        <button class="btn btn-primary" onclick="movePerson(@string.Format("'{0}'", p.Id), 'up')"><i class="fa-solid fa-arrow-up"></i></button>
+                                    }
+                                </td>
+                                <td class="table-light text-start">
+                                    @if (p.Id != Model.Last().Id)
+                                    {
+                                        <button class="btn btn-primary" onclick="movePerson(@string.Format("'{0}'", p.Id), 'down')"><i class="fa-solid fa-arrow-down"></i></button>
+                                    }
+                                </td>
+                                <td class="table-light"><button class="btn btn-primary" onclick="editPerson(@string.Format("'{0}'", p.Id))">Edit</button></td>
+                                <td class="table-light"><button class="btn btn-danger" onclick="removePerson(@string.Format("'{0}'", p.Id))">Remove</button></td>
+                            </tr>
+                        }
+                    }
+                } else {
+                    <tr>
+						<td colspan="11" class="text-center table-danger text-danger-emphasis">There was a problem getting the participants for this fixture - please refresh the page</td>
+					</tr>
+                }
+            </tbody>
+		</table>
+
+	</div>
+</div>
+
+@if (Model != null)
+{
+	<div class="row">
+		<div class="col-12">
+
+			<div class="card" style="width: 18rem;">
+				<div class="card-body">
+					<h5 class="card-title">Totals</h5>
+					<p class="card-text">
+						<strong>Starting XI:</strong> @Model.Where(x => x.Started).Count()<br />
+						<strong>Substitute:</strong> @Model.Where(x => x.Substitute).Count()
+					</p>
+				</div>
+			</div>
+
+		</div>
+	</div>
+}
