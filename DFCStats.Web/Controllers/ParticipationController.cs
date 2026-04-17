@@ -68,7 +68,9 @@ public class ParticipationController : Controller
                 ReplacedByFirstName = p.ReplacedByFirstName,
                 ReplacedByLastName = p.ReplacedByLastName,
                 ReplacedTime = p.ReplacedByTime,
-                OrderNumber = p.OrderNo
+                OrderNumber = p.OrderNo,
+                Started = p.Started,
+                Substitute = p.Sub
             }).ToList();
         } 
         
@@ -99,7 +101,7 @@ public class ParticipationController : Controller
             };
 
             // Try to add the person to the fixture
-            var x = await _participationService.AddParticipationAsync(participantToAdd);
+            await _participationService.AddParticipationAsync(participantToAdd);
         } catch (DFCStatsException ex)
         {
             // There was a problem creating the participation record
@@ -168,16 +170,29 @@ public class ParticipationController : Controller
 	[ValidateAntiForgeryToken]
     public async Task <IActionResult> EditParticipant([FromBody] AddEditParticipant participant)
     {
-        // try
-        // {
-        //     //Attempts to update a participant
-        //     _participants.UpdateParticipant(participant.ParticipantID, participant.FixtureID, participant.PersonID, participant.Goals, participant.YellowCard,
-        //     participant.RedCard, participant.RoleInFixture, participant.ReplacedByPersonID, participant.ReplacedTime);
-        // } catch (Exception ex)
-        // {
-        //     //There was a problem updating the record
-        //     return Json(new { success = false, messageToUser = ex.Message });
-        // }
+        try
+        {
+            // Create a new participant dto
+            var participantToAUpdate = new DFCStats.Domain.DTOs.Participants.ParticipationDTO
+            {
+                Id = participant.Id,
+                FixtureId = participant.FixtureId,
+                PersonId = participant.PersonId,
+                Role = participant.RoleInFixture,
+                Goals = participant.Goals,
+                YellowCard = participant.YellowCard,
+                RedCard = participant.RedCard,
+                ReplacedByPersonId = participant.ReplacedByPersonId,
+                ReplacedByTime = participant.ReplacedTime
+            };
+
+            // Try to add the person to the fixture
+            await _participationService.UpdateParticipationAsync(participantToAUpdate);
+        } catch (DFCStatsException ex)
+        {
+            // There was a problem updating the record
+            return Json(new { success = false, messageToUser = ex.Message });
+        }
         
         return Json(new { success = true, messageToUser = "Person updated" });
     }
@@ -186,7 +201,21 @@ public class ParticipationController : Controller
 	[ValidateAntiForgeryToken]
     public async Task<IActionResult> MovePersonUp([FromBody] AddEditParticipant participant)
     {
-        //_participants.Move(participant.ParticipantID, "up");
+        try
+        {
+            // Create a new participant dto
+            var participantToMove = new DFCStats.Domain.DTOs.Participants.ParticipationDTO
+            {
+                Id = participant.Id
+            };
+            
+            // Move the person up in the order
+            await _participationService.Move(participantToMove, "up");
+        } catch (DFCStatsException ex)
+        {
+            //There was a problem moving the record
+            return Json(new { success = false, messageToUser = ex.Message });
+        }
 
         return Json(new { success = true, messageToUser = "Order updated" });
     }
@@ -195,7 +224,21 @@ public class ParticipationController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> MovePersonDown([FromBody] AddEditParticipant participant)
     {
-        //_participants.Move(participant.ParticipantID, "down");
+        try
+        {
+            // Create a new participant dto
+            var participantToMove = new DFCStats.Domain.DTOs.Participants.ParticipationDTO
+            {
+                Id = participant.Id
+            };
+            
+            // Move the person up in the order
+            await _participationService.Move(participantToMove, "down");
+        } catch (DFCStatsException ex)
+        {
+            //There was a problem moving the record
+            return Json(new { success = false, messageToUser = ex.Message });
+        }
 
         return Json(new { success = true, messageToUser = "Order updated" });
     }
@@ -206,8 +249,14 @@ public class ParticipationController : Controller
     {
         try
         {
+            // Create a new participant dto
+            var participantToRemove = new DFCStats.Domain.DTOs.Participants.ParticipationDTO
+            {
+                Id = participant.Id
+            };
+
             //Try to remove the participant from the database
-            //_participants.RemoveParticipant(participant.ParticipantID);
+            await _participationService.RemoveParticipationAsync(participantToRemove);
         } catch (Exception ex)
         {
             //There was a problem removing the record
@@ -244,7 +293,9 @@ public class ParticipationController : Controller
                     ReplacedByFirstName = p.ReplacedByFirstName,
                     ReplacedByLastName = p.ReplacedByLastName,
                     ReplacedTime = p.ReplacedByTime,
-                    OrderNumber = p.OrderNo
+                    OrderNumber = p.OrderNo,
+                    Started = p.Started,
+                    Substitute = p.Sub
                 }).ToList();
 
                 // Returns the participants for the fixture in the partial view
@@ -262,7 +313,16 @@ public class ParticipationController : Controller
         // Get the fixture from the database and include the participants
         var fixture = await _fixtureService.GetFixtureByIdAsync(fixtureId, FixtureIncludes.Participants);
 
+        if (fixture == null)
+            // Return the partial view with null - the view will show an error message
+             return PartialView("Partial_AddParticipant", null);
+
+        // Get the season - required in order to get all the people attached to the season
         var season = await _seasonService.GetSeasonByIdAsync(fixture.SeasonId, SeasonIncludes.PeopleAttachedToSeason);
+
+        if (season == null)
+            // Return the partial view with null - the view will show an error message
+             return PartialView("Partial_AddParticipant", null);
 
         // Convert the people attached to the season to a selectListItem
         ViewBag.people = season.PeopleAttachedToSeason!
@@ -274,24 +334,7 @@ public class ParticipationController : Controller
                 Value = p.Id.ToString()
             }).ToList();
 
-
-
-        // // Check that the fixture was found - fixture should exist if the participant record exists
-        // if (fixture == null)
-        //     // Return the partial view with null - the view will show an error message
-        //     return PartialView("Partial_EditParticipant", null);
-
-        // // Get the season - required in order to get all the people attached to the season
-        // var season = await _seasonService.GetSeasonByIdAsync(fixture.SeasonId, SeasonIncludes.PeopleAttachedToSeason);
-
-        // // Check that the season was found - season should exist if the fixture record exists
-        // if (season == null)
-        //     // Return the partial view with null - the view will show an error message
-        //     return PartialView("Partial_EditParticipant", null);
-
-
-
-        //Returns the user's roles in a partial view
+        // Returns the user's roles in a partial view
         return PartialView("Partial_AddParticipant");
     }
 

@@ -71,6 +71,7 @@ namespace DFCStats.Business
                 PersonId = newParticipationDTO.PersonId,
                 Started = started,
                 Sub = substitute,
+                Goals = newParticipationDTO.Goals,
                 YellowCard = newParticipationDTO.YellowCard,
                 RedCard = newParticipationDTO.RedCard,
                 ReplacedByPersonId = newParticipationDTO.ReplacedByPersonId,
@@ -83,6 +84,159 @@ namespace DFCStats.Business
              await _dfcStatsDbContext.SaveChangesAsync();
 
             return participation.MapToParticipantsDTO()!;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="updatedParticipationDTO"></param>
+        /// <returns></returns>
+        public async Task<ParticipationDTO> UpdateParticipationAsync(ParticipationDTO updatedParticipationDTO)
+        {
+            // Get the exisiting participation record from the database
+            var existingParticipation = await _dfcStatsDbContext.Participants
+                .FirstOrDefaultAsync(p => p.Id == updatedParticipationDTO.Id);
+
+            // Checks the participation record was found in the database
+            if (existingParticipation == null)
+                // Throw an exception as the participation record couldn't be found
+                throw new DFCStatsException("Participation record not found");
+
+            // Sets the values of the started and substitute variables based on the role in the DTO
+			var (started, substitute) = SetRoles(updatedParticipationDTO.Role);
+
+            // Checks the the person isn't replacing themselves
+            CheckPersonIsNotReplacingThemselves(updatedParticipationDTO.PersonId, updatedParticipationDTO.ReplacedByPersonId);
+
+            // If the person started the fixture then check that there aren't already 11 players marked as starting already
+            if (started)
+                await CheckNumberOfStartingPlayers(updatedParticipationDTO.FixtureId, updatedParticipationDTO.Id);
+
+            // Set the order number for the participation record
+            //var orderNumber = await SetOrderNumber(updatedParticipationDTO.FixtureId);
+
+            // Check that the person isn't already involved in the fixture
+            await CheckPersonNotAlreadyInvolvedInFixture(updatedParticipationDTO.FixtureId, updatedParticipationDTO.PersonId, updatedParticipationDTO.Id);
+
+            // Sets the replaced time to null if its zero
+			if (updatedParticipationDTO.ReplacedByTime == 0)
+				updatedParticipationDTO.ReplacedByTime = null;
+
+            // Update the participation record
+            existingParticipation.FixtureId = updatedParticipationDTO.FixtureId;
+            existingParticipation.PersonId = updatedParticipationDTO.PersonId;
+            existingParticipation.Started = started;
+            existingParticipation.Sub = substitute;
+            existingParticipation.Goals = updatedParticipationDTO.Goals;
+            existingParticipation.YellowCard = updatedParticipationDTO.YellowCard;
+            existingParticipation.RedCard = updatedParticipationDTO.RedCard;
+            existingParticipation.ReplacedByPersonId = updatedParticipationDTO.ReplacedByPersonId;
+            existingParticipation.ReplacedTime = updatedParticipationDTO.ReplacedByTime;
+
+            // Save the updated participation record to the database
+            _dfcStatsDbContext.SaveChanges();
+
+            return existingParticipation.MapToParticipantsDTO()!;
+        }
+
+        /// <summary>
+        /// Removes a participation record from the database and reorders the remaining participation records for the fixture
+        /// </summary>
+        /// <param name="participationDTO"></param>
+        /// <returns></returns>
+        public async Task RemoveParticipationAsync(ParticipationDTO participationDTO)
+        {
+            // Get the participation record to be removed from the database
+            var participationToRemove = await _dfcStatsDbContext.Participants
+                .FirstOrDefaultAsync(p => p.Id == participationDTO.Id);
+
+            if (participationToRemove == null)
+                // Throw an exception as the participation record couldn't be found
+                throw new DFCStatsException("Participation record not found");
+
+            // Mark the participation record for deletion
+            _dfcStatsDbContext.Participants.Remove(participationToRemove);
+
+            // Get all the participation records attached to the fixture
+            var participationsForFixture = await _dfcStatsDbContext.Participants
+                .Where(p => p.FixtureId == participationToRemove.FixtureId)
+                .OrderBy(p => p.OrderNo)
+                .ToListAsync();
+
+            // Remove the participation record from the list of participations returned
+            participationsForFixture.Remove(participationToRemove);
+
+            // Loop over the remaining participation records in the list and update their order number to be in order starting from 0
+            foreach (var participation in participationsForFixture)
+            {
+                // Update the order number to be the index of the participation in the list
+                participation.OrderNo = participationsForFixture.IndexOf(participation);
+            }
+
+            // Update the participation records in the database with the new order numbers
+            _dfcStatsDbContext.Participants.UpdateRange(participationsForFixture);
+            await _dfcStatsDbContext.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Moves a participation record up or down by changing the order number relevant to other participation records
+        /// </summary>
+        /// <param name="participationDTO"></param>
+        /// <param name="direction"></param>
+        /// <returns></returns>
+        public async Task Move(ParticipationDTO participationDTO, string direction)
+        {
+            // Check the direction value is valid
+            if (direction != "up" && direction != "down")
+                // Throw an exception as the direction value is invalid
+                throw new DFCStatsException("Direction value is invalid");
+
+            // Get the exisiting participation record from the database
+            var participationToMove = await _dfcStatsDbContext.Participants
+                .FirstOrDefaultAsync(p => p.Id == participationDTO.Id);
+
+            // Check the participation record was found
+            if (participationToMove == null)
+                // Throw an exception as the participation record couldn't be found
+                throw new DFCStatsException("Participation record not found");
+
+            if (direction == "up")
+            {
+                // Get the participant immediately above the current participant in the order
+                var participantAbove = await _dfcStatsDbContext.Participants
+                    .Where(p => p.FixtureId == participationToMove.FixtureId && p.OrderNo < participationToMove.OrderNo)
+                    .OrderByDescending(p => p.OrderNo)
+                    .FirstOrDefaultAsync();
+
+                if (participantAbove == null)
+                    // Throw an exception as there is no participant above the current participant to swap with
+                    throw new DFCStatsException("This participant is already at the top of the order");
+
+                // Update the order numbers to move the current participant up and the participant above, down
+                participantAbove.OrderNo = participationToMove.OrderNo;
+                participationToMove.OrderNo = participantAbove.OrderNo - 1;
+
+                // Save the updated participation records to the database
+                await _dfcStatsDbContext.SaveChangesAsync();
+            } else
+            {
+                // Get the participant immediately below the current participant in the order
+                var participantBelow = await _dfcStatsDbContext.Participants
+                    .Where(p => p.FixtureId == participationToMove.FixtureId && p.OrderNo > participationToMove.OrderNo)
+                    .OrderBy(p => p.OrderNo)
+                    .FirstOrDefaultAsync();
+
+                if (participantBelow == null)
+                    // Throw an exception as there is no participant below the current participant to swap with
+                    throw new DFCStatsException("This participant is already at the bottom of the order");
+
+                // Update the order numbers to move the current participant down and the participant below, up
+                participantBelow.OrderNo = participationToMove.OrderNo;
+                participationToMove.OrderNo = participantBelow.OrderNo + 1;
+
+                // Save the updated participation records to the database
+                await _dfcStatsDbContext.SaveChangesAsync();
+            }
         }
 
         /// <summary>
@@ -203,23 +357,13 @@ namespace DFCStats.Business
                 // Throw an exception as the fixture couldn't be found
                 throw new DFCStatsException("Fixture not found");
 
-            // If a participant Id has been supplied then this is used to exclude the exisiting participant record from the check
-            if (participantId != null)
-			{
-                if (fixture.Participants!.Where(p => p.Id != participantId && p.PersonId == personId).SingleOrDefault() != null)
-                {
-                    // Throw an exception as this person is already involved in the fixture
-                    throw new DFCStatsException("This person is already involved in this fixture");
-                }
-			}
+            // Check if any participant matches the personId but exclude the current participantId if we are editing
+            bool alreadyInvolved = fixture.Participants!
+                .Any(p => p.PersonId == personId && p.Id != participantId);
 
-			if (fixture.Participants!.Where(p => p.PersonId == personId).SingleOrDefault() != null)
-			{
-                // Throw an exception as this person is already involved in the fixture
-				throw new DFCStatsException("This person is already involved in this fixture");
-			}
+            if (alreadyInvolved)
+                // Throw an exception as the person is already involved in the fixture
+                throw new DFCStatsException("This person is already involved in this fixture");
 		}
-
-
     }
 }
