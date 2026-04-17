@@ -10,6 +10,7 @@ namespace DFCStats.Data.Entities
         [MaxLength(50)]
         public string Name { get; set; } = string.Empty;
 
-        public virtual ICollection<Fixture> Fixtures { get; set; } = new List<Fixture>();
+        public virtual ICollection<Fixture> Fixtures { get; set; } = null!;
+        // public virtual ICollection<Fixture> Fixtures { get; set; } = new List<Fixture>();
     }
 }

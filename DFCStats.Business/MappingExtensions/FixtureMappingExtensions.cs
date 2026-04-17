@@ -1,13 +1,14 @@
 using System.Diagnostics;
 using DFCStats.Data.Entities;
 using DFCStats.Domain.DTOs.Fixtures;
+using DFCStats.Domain.DTOs.Participants;
 
 namespace DFCStats.Business.MappingExtensions
 {
     public static class FixtureMappingExtensions
     {
         /// <summary>
-        /// Maps a club entity to a ClubDTO
+        /// Maps a Fixture entity to a FixtureDTO
         /// </summary>
         /// <param name="club"></param>
         /// <returns></returns>
@@ -42,7 +43,12 @@ namespace DFCStats.Business.MappingExtensions
                 OppositionScore = fixture.OppositionScore,
                 DarlingtonPenaltyScore = fixture.DarlingtonPenaltyScore,
                 OppositionPenaltyScore = fixture.OppositionPenaltyScore,
-                Notes = fixture.Notes
+                Notes = fixture.Notes,
+                Participants = fixture.Participants?
+                    .OrderBy(p => p.OrderNo)
+                    .Select(p => p.MapToParticipantsDTO())
+                    .OfType<ParticipationDTO>()
+                    .ToList()
             };
         }
 

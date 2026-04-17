@@ -1,5 +1,6 @@
 using DFCStats.Data.Entities;
 using DFCStats.Domain.DTOs.People;
+using DFCStats.Domain.DTOs.Seasons;
 
 namespace DFCStats.Business.MappingExtensions
 {
@@ -27,12 +28,56 @@ namespace DFCStats.Business.MappingExtensions
                 NationalityIcon = person.Nationality?.Icon,
                 Biography = person.Biography,
                 IsManager = person.IsManager,
-                Seasons = person.PersonSeasons
-                    .Select(ps => new Domain.DTOs.People.Season
-                    {
-                        Id = ps.SeasonId,
-                        Description = ps.Season?.Description ?? string.Empty,
-                    }).ToList()
+                Seasons = person.PersonSeasons?
+                    .Select(ps => ps.Season?.MapToSeasonShortDTO())
+                    .OfType<SeasonShortDTO>()
+                    .ToList(),
+                TotalApps = person.Participation?.ToList().TotalAppearances(),
+                TotalGoals = person.Participation?.ToList().TotalGoals(),
+                TotalRedCards = person.Participation?.ToList().TotalRedCards(),
+                TotalStarts = person.Participation?.ToList().TotalStarts(),
+                TotalSubs = person.Participation?.ToList().TotalSubs(),
+                TotalLeagueStarts = person.Participation?.ToList().TotalLeagueStarts(),
+                TotalLeagueSubs = person.Participation?.ToList().TotalLeagueSubs(),
+                TotalLeagueGoals = person.Participation?.ToList().TotalLeagueGoals(),
+                TotalPlayOffStarts = person.Participation?.ToList().TotalPlayOffStarts(),
+                TotalPlayOffSubs = person.Participation?.ToList().TotalPlayOffSubs(),
+                TotalPlayOffGoals = person.Participation?.ToList().TotalPlayOffGoals(),
+                TotalCupStarts = person.Participation?.ToList().TotalCupStarts(),
+                TotalCupSubs = person.Participation?.ToList().TotalCupSubs(),
+                TotalCupGoals = person.Participation?.ToList().TotalPlayOffGoals(),
+                GoalsPerGame = person.Participation?.ToList().GoalsPerGame(),
+                Appearances = person.Participation?.ToList().MapToAppearanceDTO(),
+            };
+        }
+
+        /// <summary>
+        /// Maps a View_People entity to a PersonDTO
+        /// </summary>
+        /// <param name="person"></param>
+        /// <returns></returns>
+        public static PersonDTO? MapToPersonDTO(this View_People person)
+        {
+            if (person == null)
+                return null;
+
+            return new PersonDTO
+            {
+                Id = person.Id,
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                LastNameFirstName = $"{person.LastName}, {person.FirstName}",
+                DateOfBirth = person.DateofBirth,
+                NationalityId = person.NationalityID,
+                Nationality = person.Nationality,
+                NationalityIcon = person.Icon,
+                Biography = person.Biography,
+                IsManager = person.IsManager,
+                TotalApps = person.TotalApps,
+                TotalStarts = person.TotalStartApps,
+                TotalSubs = person.TotalSubApps,
+                TotalGoals = person.TotalGoals,
+                GoalsPerGame = person.GoalsPerGame,
             };
         }
         

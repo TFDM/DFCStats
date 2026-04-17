@@ -160,6 +160,53 @@ namespace DFCStats.Data.Migrations
                     b.ToTable("Nationalities");
                 });
 
+            modelBuilder.Entity("DFCStats.Data.Entities.Participation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FixtureId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Goals")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderNo")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("RedCard")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ReplacedByPersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("ReplacedTime")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Started")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Sub")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("YellowCard")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FixtureId");
+
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("ReplacedByPersonId");
+
+                    b.ToTable("Participants");
+                });
+
             modelBuilder.Entity("DFCStats.Data.Entities.Person", b =>
                 {
                     b.Property<Guid>("Id")
@@ -288,6 +335,31 @@ namespace DFCStats.Data.Migrations
                     b.Navigation("Venue");
                 });
 
+            modelBuilder.Entity("DFCStats.Data.Entities.Participation", b =>
+                {
+                    b.HasOne("DFCStats.Data.Entities.Fixture", "Fixture")
+                        .WithMany("Participants")
+                        .HasForeignKey("FixtureId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DFCStats.Data.Entities.Person", "Person")
+                        .WithMany("Participation")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DFCStats.Data.Entities.Person", "ReplacedByPerson")
+                        .WithMany()
+                        .HasForeignKey("ReplacedByPersonId");
+
+                    b.Navigation("Fixture");
+
+                    b.Navigation("Person");
+
+                    b.Navigation("ReplacedByPerson");
+                });
+
             modelBuilder.Entity("DFCStats.Data.Entities.Person", b =>
                 {
                     b.HasOne("DFCStats.Data.Entities.Nationality", "Nationality")
@@ -326,6 +398,11 @@ namespace DFCStats.Data.Migrations
                     b.Navigation("Fixtures");
                 });
 
+            modelBuilder.Entity("DFCStats.Data.Entities.Fixture", b =>
+                {
+                    b.Navigation("Participants");
+                });
+
             modelBuilder.Entity("DFCStats.Data.Entities.Nationality", b =>
                 {
                     b.Navigation("People");
@@ -333,6 +410,8 @@ namespace DFCStats.Data.Migrations
 
             modelBuilder.Entity("DFCStats.Data.Entities.Person", b =>
                 {
+                    b.Navigation("Participation");
+
                     b.Navigation("PersonSeasons");
                 });
 

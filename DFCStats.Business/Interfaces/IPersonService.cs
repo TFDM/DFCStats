@@ -1,4 +1,5 @@
 using DFCStats.Domain.DTOs.People;
+using DFCStats.Domain.DTOs.Fixtures;
 
 namespace DFCStats.Business.Interfaces
 {
@@ -9,11 +10,25 @@ namespace DFCStats.Business.Interfaces
         None = 0,
         Nationality = 1,
         Seasons = 2,
-        All = Nationality | Seasons
+        Stats = 4,
+        All = Nationality | Seasons | Stats
     }
 
     public interface IPersonService
     {
+        /// <summary>
+        /// Searches for people with optional filtering, sorting, and pagination
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="searchFirstName"></param>
+        /// <param name="searchLastName"></param>
+        /// <param name="searchNationalityId"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        Task<(List<PersonDTO>, int)> SearchForPeopleAsync(int page = 1, int pageSize = 50, string? searchFirstName = null, string? searchLastName = null, 
+            string? searchNationalityId = null, string? sort = null);
+
         /// <summary>
         /// Returns a person from the database using the id
         /// </summary>
@@ -35,5 +50,13 @@ namespace DFCStats.Business.Interfaces
         /// <param name="editPersonDTO"></param>
         /// <returns></returns>
         Task<PersonDTO> UpdatePersonAsync(EditPersonDTO editPersonDTO);
+
+        /// <summary>
+        /// Gets the fixtures a selected person appeared in for a selected season
+        /// </summary>
+        /// <param name="personId"></param>
+        /// <param name="seasonId"></param>
+        /// <returns></returns>
+        Task<List<ParticipationFixtureDTO>> GetParticipatedFixturesAsync(Guid personId, Guid seasonId);
     }
 }

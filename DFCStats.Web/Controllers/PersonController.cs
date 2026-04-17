@@ -4,6 +4,8 @@ using System.Text.Json;
 using DFCStats.Web.Models.People;
 using DFCStats.Domain.DTOs.People;
 using DFCStats.Domain.Exceptions;
+using X.PagedList;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DFCStats.Web.Controllers;
 
@@ -20,11 +22,65 @@ public class PersonController : Controller
         _seasonService = seasonService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string firstName, string lastName, string nationality, string sort, int page = 1, int pageSize = 50)
     {
-        var person = await _personService.GetPersonByIdAsync(Guid.Parse("D72DFD1C-2562-43FF-23E3-08DE681912DE"), PersonIncludes.Seasons | PersonIncludes.Nationality);
+        // Set the page heading and the page title
+		ViewData["PageHeading"] = "Players and Staff";
+		ViewData["Title"] = "Players and Staff";
 
-        return View();
+        // Ensure the page and page size are above not zero or negative
+        page = (page < 1) ? 1 : page;
+        pageSize = (pageSize < 1) ? 50 : pageSize;
+
+        // Gets all the nationalities from the database and adds them to the viewbag
+        var nationalities = await _nationalityService.GetAllNationalitiesAsync();
+        ViewBag.nationalities = nationalities;
+
+        // Creates a select list of page sizes
+        ViewBag.pageSize = new List<SelectListItem>()
+        {
+            new SelectListItem() { Text="25", Value="25" },
+            new SelectListItem() { Text="50", Value="50" },
+            new SelectListItem() { Text="75", Value="75" },
+            new SelectListItem() { Text="100", Value="100" }
+        };
+
+        // Search for people
+        var (people, totalCount) = await _personService.SearchForPeopleAsync(page: page,
+            pageSize: pageSize,
+            searchFirstName: firstName,
+            searchLastName: lastName,
+            searchNationalityId: nationality,
+            sort: sort);
+
+        // Convert the people from a DTO to a model
+        var listOfPeople = people.Select(dto => new Person
+        {
+            Id = dto.Id,
+            LastName = dto.LastName,
+            FirstName = dto.FirstName,
+            LastNameFirstName = dto.LastNameFirstName,
+            DateOfBirth = dto.DateOfBirth,
+            Nationality = dto.Nationality,
+            NationalityIcon = dto.NationalityIcon,
+            TotalAppearances = dto.TotalApps,
+            TotalGoals = dto.TotalGoals,
+            GoalsPerGame = dto.GoalsPerGame
+        }).ToList();
+        
+        // Convert to a static list
+		var peopleAsIPagedList = new StaticPagedList<Person>(listOfPeople, page, pageSize, totalCount);
+
+        // If the sort parameter is null or empty then we are initializing the value as descending  
+        ViewBag.SortByName = string.IsNullOrEmpty(sort) ? "lastnamefirstname_desc" : "";
+        ViewBag.SortByDateOfBirth = sort == "dateofbirth" ? "dateofbirth_desc" : "dateofbirth";
+        ViewBag.SortByNationality = sort == "nationality" ? "nationality_desc" : "nationality";
+        ViewBag.SortByTotalApps = sort == "totalapps" ? "totalapps_desc" : "totalapps";
+        ViewBag.SortByTotalGoals = sort == "totalgoals" ? "totalgoals_desc" : "totalgoals";
+        ViewBag.SortByGoalsPerGame = sort == "goalsPerGame" ? "goalsPerGame_desc" : "goalsPerGame";
+        ViewBag.Sort = sort;
+
+        return View(peopleAsIPagedList);
     }
 
     public async Task<IActionResult> New()
@@ -65,7 +121,7 @@ public class PersonController : Controller
                 };
 
                 // Adds the new person to the database
-                await _personService.AddPersonAsync(newPersonDTO);
+                var x = await _personService.AddPersonAsync(newPersonDTO);
 
                 // Add a success message to TempData
                 TempData["Success"] = $"{newPerson.FirstName} {newPerson.LastName} has been added successfully";
@@ -110,7 +166,7 @@ public class PersonController : Controller
             return BadRequest("Invalid ID format");
 
         // Retrieve the person record from the database using the validated GUID
-        var person = await _personService.GetPersonByIdAsync(personId, PersonIncludes.Nationality | PersonIncludes.Seasons);
+        var person = await _personService.GetPersonByIdAsync(personId, PersonIncludes.Nationality | PersonIncludes.Seasons | PersonIncludes.Stats );
 
         // If the person record is not found, return a 404 Not Found HTTP response
         if (person == null)
@@ -163,7 +219,7 @@ public class PersonController : Controller
                 };
 
                 // Update the person in the database
-                await _personService.UpdatePersonAsync(editPersonDTO);
+                var x = await _personService.UpdatePersonAsync(editPersonDTO);
 
                 // Add a success message to TempData
                 TempData["Success"] = $"{editPerson.FirstName} {editPerson.LastName} has been updated successfully";
@@ -192,6 +248,117 @@ public class PersonController : Controller
         ViewBag.seasons = seasons;
 
         return View(editPerson);
+    }
+
+    public async Task<IActionResult> Details(string id)
+    {
+        // Validate that the id parameter is a valid GUID format
+        // the personId is set to the guid if the parsing is successful
+        if (!Guid.TryParse(id, out var personId))
+            // If the id is not a valid GUID, return a 400 Bad Request HTTP response
+            return BadRequest("Invalid ID format");
+
+        // Get the person from the database
+        var person = await _personService.GetPersonByIdAsync(personId, PersonIncludes.Nationality | PersonIncludes.Stats);
+
+        // Check if the person was found
+        if (person == null)
+            return NotFound("Person not found");
+
+        // Set the page heading and the page title
+		ViewData["PageHeading"] = String.Format("{0} {1}", person.FirstName, person.LastName);
+		ViewData["Title"] = "Players and Staff";
+
+        // Map the personDTO to a person model
+        var personToDisplay = new Person
+        {
+            Id = person.Id,
+            DateOfBirth = person.DateOfBirth,
+            Nationality = person.Nationality,
+            NationalityIcon = person.NationalityIcon,
+            Biography = person.Biography,
+            TotalStarts = person.TotalStarts,
+            TotalSubs = person.TotalSubs,
+            TotalGoals = person.TotalGoals,
+            TotalRedCards = person.TotalRedCards,
+            TotalLeagueStarts = person.TotalLeagueStarts,
+            TotalLeagueSubs = person.TotalLeagueSubs,
+            TotalLeagueGoals = person.TotalLeagueGoals,
+            TotalCupStarts = person.TotalCupStarts,
+            TotalCupSubs = person.TotalCupSubs,
+            TotalCupGoals = person.TotalCupGoals,
+            TotalPlayOffStarts = person.TotalPlayOffStarts,
+            TotalPlayOffSubs = person.TotalPlayOffSubs,
+            TotalPlayOffGoals = person.TotalPlayOffGoals,
+            GoalsPerGame = person.GoalsPerGame,
+            AppearancesBySeason = person.Appearances?.Select(a => new SeasonalAppearances
+            {
+                SeasonId = a.SeasonId,
+                SeasonDescription = a.SeasonDescription,
+                TotalAppearances = a.TotalAppearances,
+                Starts = a.Starts,
+                Subs = a.Subs,
+                Goals = a.Goals,
+                RedCards = a.RedCards,
+                LeagueStarts = a.LeagueStarts,
+                LeagueSubs = a.LeagueSubs,
+                LeagueGoals = a.LeagueGoals,
+                CupStarts = a.CupStarts,
+                CupSubs = a.CupSubs,
+                CupGoals = a.CupGoals,
+                PlayOffStarts = a.PlayOffStarts,
+                PlayOffSubs = a.PlayOffSubs,
+                PlayOffGoals = a.PlayOffGoals,
+                GoalsPerGame = a.GoalsPerGame
+            }).ToList()
+        };
+
+        // Check has appearances
+        if (person.Appearances?.Count != 0)
+        {
+            // Get the fixtures the person appeared in for the final season we have appearances for them
+            var participatedFixturesForFinalSeason = await _personService.GetParticipatedFixturesAsync(person.Id, (Guid)person.Appearances!.Last().SeasonId!);
+
+            // Map to view model
+            var gamesForFinalSeason = participatedFixturesForFinalSeason.Select(p => new ParticipatedFixtures
+            {
+                ParticipationId = p.ParticipationId,
+                FixtureId = p.FixtureId,
+                Date = p.Date,
+                TeamsWithScore = p.TeamsWithScore,
+                Competition = p.Competition,
+                Scoreline = p.Scoreline,
+                Outcome = p.Outcome,
+                Season = p.Season,
+                Role = p.Role
+            }).ToList();
+
+            ViewBag.participatedFixturesForFinalSeason = gamesForFinalSeason;
+        }
+
+        return View(personToDisplay);
+    }
+
+    public async Task<IActionResult> RefreshParticipationForSeason(string personId, string seasonId)
+    {
+        // Get the fixtures participated in by the person for the selected season
+        var participatedFixturesForFinalSeason = await _personService.GetParticipatedFixturesAsync(Guid.Parse(personId), Guid.Parse(seasonId));
+
+        // Map to view model
+        var gamesForFinalSeason = participatedFixturesForFinalSeason.Select(p => new ParticipatedFixtures
+        {
+            ParticipationId = p.ParticipationId,
+            FixtureId = p.FixtureId,
+            Date = p.Date,
+            TeamsWithScore = p.TeamsWithScore,
+            Competition = p.Competition,
+            Scoreline = p.Scoreline,
+            Outcome = p.Outcome,
+            Season = p.Season,
+            Role = p.Role
+        }).ToList();
+
+        return PartialView("Partial_FixtureParticipationForSeason", gamesForFinalSeason);
     }
 
 }

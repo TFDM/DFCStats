@@ -1,6 +1,7 @@
 using DFCStats.Data;
 using DFCStats.Business.Interfaces;
 using DFCStats.Domain.DTOs.People;
+using DFCStats.Domain.DTOs.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using DFCStats.Business.MappingExtensions;
 using DFCStats.Domain.Exceptions;
@@ -22,6 +23,92 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Searches for people with optional filtering, sorting, and pagination
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="searchFirstName"></param>
+        /// <param name="searchLastName"></param>
+        /// <param name="searchNationalityId"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        public async Task<(List<PersonDTO>, int)> SearchForPeopleAsync(int page = 1, int pageSize = 50, string? searchFirstName = null, string? searchLastName = null, 
+            string? searchNationalityId = null, string? sort = null)
+        {
+            // Ensure the page and page size are above not zero or negative
+            page = (page < 1) ? 1 : page;
+            pageSize = (pageSize < 1) ? 50 : pageSize;
+
+            var people = _dfcStatsDbContext.View_People
+                .AsNoTracking()
+                .AsQueryable();
+
+            // Filter the records
+            if (searchFirstName != null)
+            {
+                people = people.Where(x => x.FirstName.Contains(searchFirstName));
+            }
+            if (searchLastName != null)
+            {
+                people = people.Where(x => x.LastName.Contains(searchLastName));
+            }
+            if (searchNationalityId != null)
+            {
+                people = people.Where(x => x.NationalityID == Guid.Parse(searchNationalityId));
+            }
+
+            // Sort the records
+            switch (sort)
+            {
+                case "lastnamefirstname_desc":
+                    people = people.OrderByDescending(x => x.LastNameFirstName);
+                    break;
+                case "dateofbirth_desc":
+                    people = people.OrderByDescending(x => x.DateofBirth);
+                    break;
+                case "dateofbirth":
+                    people = people.OrderBy(x => x.DateofBirth);
+                    break;
+                case "nationality_desc":
+                    people = people.OrderByDescending(x => x.Nationality);
+                    break;
+                case "nationality":
+                    people = people.OrderBy(x => x.Nationality);
+                    break;
+                case "totalapps_desc":
+                    people = people.OrderByDescending(x => x.TotalApps);
+                    break;
+                case "totalapps":
+                    people = people.OrderBy(x => x.TotalApps);
+                    break;
+                case "totalgoals_desc":
+                    people = people.OrderByDescending(x => x.TotalGoals);
+                    break;
+                case "totalgoals":
+                    people = people.OrderBy(x => x.TotalGoals);
+                    break;
+                case "goalsPerGame_desc":
+                    people = people.OrderByDescending(x => x.GoalsPerGame);
+                    break;
+                case "goalsPerGame":
+                    people = people.OrderBy(x => x.GoalsPerGame);
+                    break;
+                default:
+                    people = people.OrderBy(x => x.LastNameFirstName);
+                    break;
+            }
+
+            // Counts the total number of records before any pagination is applied
+			var totalItemCount = await people.CountAsync();
+
+            // Carries out the query
+			var results = await people.Skip(pageSize * (page - 1)).Take(pageSize).ToListAsync();
+
+            // Return the people (mapped to PeopleDTO) and the item count
+            return (results.Select(p => p.MapToPersonDTO()!).ToList(), totalItemCount);
+        }
+
+        /// <summary>
         /// Returns a person from the database using the id
         /// </summary>
         /// <param name="id"></param>
@@ -38,9 +125,15 @@ namespace DFCStats.Business
             // Includes the PersonSeasons - also include the seasons as well so the description is included
             if (includes.HasFlag(PersonIncludes.Seasons))
                 query = query.Include(p => p.PersonSeasons).ThenInclude(s => s.Season);
+
+            // Includes the stats - also includes the fixture and the category so the stats can be properly caculated
+            if (includes.HasFlag(PersonIncludes.Stats))
+                query = query.Include(p => p.Participation).ThenInclude(f => f.Fixture).ThenInclude(c => c!.Category)
+                             .Include(p => p.Participation).ThenInclude(f => f.Fixture).ThenInclude(s => s!.Season);
     
             // Run the query and map the entity to a DTO and return it
             var person = await query.FirstOrDefaultAsync(p => p.Id == id);
+
             return person?.MapToPersonDTO();
         }
 
@@ -85,6 +178,27 @@ namespace DFCStats.Business
 
             // Map the newly created person to a PersonDTO and return it
             return person.MapToPersonDTO()!;
+        }
+
+        /// <summary>
+        /// Gets the fixtures a selected person appeared in for a selected season
+        /// </summary>
+        /// <param name="personId"></param>
+        /// <param name="seasonId"></param>
+        /// <returns></returns>
+        public async Task<List<ParticipationFixtureDTO>> GetParticipatedFixturesAsync(Guid personId, Guid seasonId)
+        {
+            //Gets all the fixtures participated by a person for a given season
+            var fixturesParticipatedIn = await _dfcStatsDbContext.Participants
+                .Include(p => p.Fixture).ThenInclude(f => f!.Season)
+                .Include(p => p.Fixture).ThenInclude(f => f!.Club)
+                .Include(p => p.Fixture).ThenInclude(f => f!.Venue)
+                .Where(p => p.PersonId == personId && p.Fixture!.SeasonId == seasonId)
+                .OrderBy(p => p.Fixture!.Date)
+                .ToListAsync();
+
+            // Map the participation records to ParticipationFixtureDTO and return it
+            return fixturesParticipatedIn.Select(f => f.MapToParticipationFixtureDTO()!).ToList();
         }
 
         /// <summary>

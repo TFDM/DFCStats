@@ -17,6 +17,7 @@ namespace DFCStats.Data.Entities
         [MaxLength(10)]
         public string? Icon { get; set; }
 
-        public virtual ICollection<Person> People { get; set; } = new List<Person>();
+        public virtual ICollection<Person> People { get; set; } = null!;
+        // public virtual ICollection<Person> People { get; set; } = new List<Person>();
     }
 }

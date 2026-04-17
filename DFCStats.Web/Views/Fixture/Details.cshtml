@@ -1,0 +1,127 @@
+@model DFCStats.Web.Models.Fixtures.Fixtures
+
+<div class="row mb-3">
+    <div class="col-12">
+            @if (Model.PenaltiesRequired)
+            {
+                <p>@string.Format("{0}", Model.PenaltyScoreWithOutcome)</p>
+            }
+            <p><strong>Date:</strong> @Model.Date.ToString("dddd dd MMMM yyyy")</p>
+            <p><strong>Competition:</strong> @Model.Competition</p>
+            <p><strong>Attendance:</strong> @Model.Attendance</p>
+    </div>
+</div>
+<hr />
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <a class="btn btn-primary" asp-controller="Participation" asp-action="Manage" asp-route-id="@Model.Id">Manage Participants</a>
+    </div>
+    <div class="col-md-6">
+        <a class="btn btn-primary" asp-controller="Participation" asp-action="ManageOpposition" asp-route-id="@Model.Id">Manage Opposition Participants</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 @(Model.Venue == "A" ? "order-2" : "order-1")">
+
+        <table class="table caption-top">
+            <caption>Darlington line-up</caption>
+            <thead>
+                <tr>
+                    <th class="table-light">Starting XI</th>
+                    <th class="table-light text-center">Goals</th>
+                    <th class="table-light text-center">Booked</th>
+                    <th class="table-light text-center">Sent Off</th>
+                </tr>
+            </thead>
+            @if (Model.LineUp != null || Model.LineUp?.Count() > 0)
+            {
+                <tbody class="table-group-divider">
+                    @foreach (var person in Model.LineUp.Where(p => p.Started))
+                    {
+                        <tr>
+                            <td class="table-light">
+                                <a asp-controller="People" asp-action="Details" asp-route-id="@person.Id">@string.Format("{0} {1}", person.FirstName, person.LastName)</a>
+                            
+                                @if (person.ReplacedByPersonId != null)
+                                {
+                                    <br /> <i class="fa-solid fa-arrows-rotate"></i>
+                                    @string.Format("Replaced by: {0} {1} on {2} mins", person.ReplacedByFirstName, person.ReplacedByLastName, person.ReplacedByTime)
+                                }
+                            </td>
+                            <td class="table-light text-center">@person.Goals</td>
+                            <td class="table-light text-center">
+                                @if (person.YellowCard)
+                                {
+                                    <img src="~/images/Yellow_card.svg.png" width="15" />
+                                }
+                            </td>
+                            <td class="table-light text-center">
+                                @if (person.RedCard)
+                                {
+                                    <img src="~/images/Red_card.svg.png" width="15" />
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tr>
+                    <th colspan="4" class="table-light">Used Substitutes</th>
+                </tr>
+                <tbody class="table-group-divider">
+                    @foreach (var person in Model.LineUp.Where(p => p.Sub))
+                    {
+                        <tr>
+                            <td class="table-light">
+                                <a asp-controller="People" asp-action="Details" asp-route-id="@person.Id">@string.Format("{0} {1}", person.FirstName, person.LastName)</a>
+                            
+                                @if (person.ReplacedByPersonId != null)
+                                {
+                                    <br /> <i class="fa-solid fa-arrows-rotate"></i>
+                                    @string.Format("Replaced by: {0} {1} on {2} mins", person.ReplacedByFirstName, person.ReplacedByLastName, person.ReplacedByTime)
+                                }
+                            </td>
+                            <td class="table-light text-center">@person.Goals</td>
+                            <td class="table-light text-center">
+                                @if (person.YellowCard)
+                                {
+                                    <img src="~/images/Yellow_card.svg.png" width="15" />
+                                }
+                            </td>
+                            <td class="table-light text-center">
+                                @if (person.RedCard)
+                                {
+                                    <img src="~/images/Red_card.svg.png" width="15" />
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            } else {
+                <tbody class="table-group-divider">
+                    <tr>
+                        <td colspan="4" class="table-warning text-center">No Darlington lineup available</td>
+                    </tr>
+                </tbody>
+            }
+        </table>
+
+    </div>
+
+    <div class="col-md-6 @(Model.Venue == "A" ? "order-1" : "order-2")">
+        
+        <table class="table caption-top">
+            <caption>Opposition line-up</caption>
+            <thead>
+                <tr>
+                    <th class="table-light">Starting XI</th>
+                    <th class="table-light text-center">Goals</th>
+                    <th class="table-light text-center">Booked</th>
+                    <th class="table-light text-center">Sent Off</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+

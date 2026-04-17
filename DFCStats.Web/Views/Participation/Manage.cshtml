@@ -1,0 +1,39 @@
+@model DFCStats.Web.Models.Participants.AddEditParticipant
+
+<dialog class="information-dialog" id="waitingDialog">
+	<div class="spinner-border text-primary" role="status">
+		<span class="visually-hidden">Loading...</span>
+	</div>
+	<div classclass="clear-fix"></div>
+	<span class="dialog-text">Please Wait</span>
+</dialog>
+
+<dialog class="success-dialog" id="successDialog">
+	<span class="dialog-text">Success</span>
+	<form method="dialog">
+		<button class="btn btn-success mt-3">OK</button>
+	</form>
+</dialog>
+
+<dialog class="danger-dialog" id="warningDialog">
+	<span class="dialog-text">Something went wrong</span>
+	<form method="dialog">
+		<button class="btn btn-danger mt-3">OK</button>
+	</form>
+</dialog>
+
+<div id="addEditForm">
+	<partial name="Partial_AddParticipant" />
+</div>
+
+<div class="row">
+	<div class="col-12" id="participants">
+		<partial name="Partial_ParticipantsForFixture" model="(List<DFCStats.Web.Models.Participants.Participant>)ViewBag.listOfParticipants" />
+	</div>
+</div>
+
+@section Scripts
+{
+	<!--Loads in the required javascript to make the manage participants page work-->
+	<script src="~/js/ManageParticipants.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,86 @@
+@model DFCStats.Web.Models.Participants.AddEditParticipant
+
+<form id="addPersonToFixture" onsubmit="addAsParticipant(event)">
+	@Html.AntiForgeryToken()
+
+	@if (ViewBag.People != null)
+	{
+		<input asp-for="FixtureId" hidden />
+
+		<div class="row mb-3">
+			<div class="col-3">
+				<label asp-for="PersonId" class="col-form-label"></label>
+				@Html.DropDownList("PersonId", new SelectList(ViewBag.People, "Value", "Text"), string.Empty, new { @class = "form-control form-select" })
+				<span asp-validation-for="PersonId" class="text-danger"></span>
+			</div>
+
+			<div class="col-2">
+				<label asp-for="RoleInFixture" class="col-form-label"></label>
+				<select asp-for="RoleInFixture" class="form-control form-select">
+					<option value=""></option>
+					<option value="Starting XI">Starting XI</option>
+					<option value="Substitute">Used Substitute</option>
+				</select>
+				<span asp-validation-for="RoleInFixture" class="text-danger"></span>
+			</div>
+
+			<div class="col-1">
+				<label asp-for="Goals" class="col-form-label"></label>
+				<input asp-for="Goals" class="form-control" />
+				<span asp-validation-for="Goals" class="text-danger"></span>
+			</div>
+
+			<div class="col-1">
+				<label asp-for="YellowCard" class="col-form-label"></label>
+				<select asp-for="YellowCard" class="form-control form-select">
+					<option value=""></option>
+					<option value="false">No</option>
+					<option value="true">Yes</option>
+				</select>
+				<span asp-validation-for="YellowCard" class="text-danger"></span>
+			</div>
+
+			<div class="col-1">
+				<label asp-for="RedCard" class="col-form-label"></label>
+				<select asp-for="RedCard" class="form-control form-select">
+					<option value=""></option>
+					<option value="false">No</option>
+					<option value="true">Yes</option>
+				</select>
+				<span asp-validation-for="RedCard" class="text-danger"></span>
+			</div>
+
+			<div class="col-3">
+				<label asp-for="ReplacedByPersonId" class="col-form-label"></label>
+				<select asp-for="ReplacedByPersonId" asp-items="@(new SelectList(ViewBag.People, "Value", "Text"))" class="form-control form-select">
+    				<option value=""> </option>
+				</select>
+				<span asp-validation-for="ReplacedByPersonId" class="text-danger"></span>
+			</div>
+
+			<div class="col-1">
+				<label asp-for="ReplacedTime" class="col-form-label"></label>
+				<input asp-for="ReplacedTime" class="form-control" />
+				<span asp-validation-for="ReplacedTime" class="text-danger"></span>
+			</div>
+
+		</div>
+
+		<div class="row mb-3">
+			<div class="col-3">
+				<button type="submit" class="btn btn-primary" id="addPerson">Add to Fixture</button>
+			</div>
+		</div>
+	} else
+	{
+		<div class="row mb-3">
+			<div class="col-12">
+
+				<div class="alert alert-danger" role="alert">
+					There was a problem - please refresh the page
+				</div>
+
+			</div>
+		</div>
+	}
+</form>

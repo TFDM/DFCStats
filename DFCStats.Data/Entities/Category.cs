@@ -22,7 +22,8 @@ namespace DFCStats.Data.Entities
         [Required]
         public int OrderNo { get; set; }
 
-        public virtual ICollection<Fixture> Fixtures { get; set; } = new List<Fixture>();
+        public virtual ICollection<Fixture> Fixtures { get; set; } = null!;
+        //public virtual ICollection<Fixture> Fixtures { get; set; } = new List<Fixture>();
     }
 }
 

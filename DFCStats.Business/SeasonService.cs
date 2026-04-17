@@ -39,6 +39,12 @@ namespace DFCStats.Business
                     .ThenInclude(f => f.Category)
                     .Include(s => s.Fixtures)
                     .ThenInclude(f => f.Venue);
+
+            // Include the appearance data by including the participation data, fixtures and categories
+            if (includes.HasFlag(SeasonIncludes.Appearances))
+                query = query.Include(s => s.Fixtures)
+                    .ThenInclude(p => p.Participants).ThenInclude(p => p.Person)
+                    .Include(s => s.Fixtures).ThenInclude(f => f.Category);
         
             // Run the query and map the entity to a DTO and return it
             var season = await query.FirstOrDefaultAsync(s => s.Id == id);

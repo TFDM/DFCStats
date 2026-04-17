@@ -9,7 +9,8 @@ namespace DFCStats.Business.Interfaces
         None = 0,
         PeopleAttachedToSeason = 1,
         Fixtures = 2,
-        All = PeopleAttachedToSeason | Fixtures
+        Appearances = 4,
+        All = PeopleAttachedToSeason | Fixtures | Appearances
     }
 
     public interface ISeasonService

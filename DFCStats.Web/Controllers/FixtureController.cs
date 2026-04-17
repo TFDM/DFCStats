@@ -15,14 +15,17 @@ public class FixtureController : Controller
     private readonly IVenueService _venueService;
     private readonly IClubService _clubService;
     private readonly IFixtureService _fixtureService;
+    private readonly IParticipationService _participationService;
     
-    public FixtureController(ISeasonService seasonService, ICategoryService categoryService, IVenueService venueService, IClubService clubService, IFixtureService fixtureService)
+    public FixtureController(ISeasonService seasonService, ICategoryService categoryService, IVenueService venueService, IClubService clubService, IFixtureService fixtureService, 
+    IParticipationService participationService)
     {
         _seasonService = seasonService;
         _categoryService = categoryService;
         _venueService = venueService;
         _clubService = clubService;
         _fixtureService = fixtureService;
+        _participationService = participationService;
     }
 
     public async Task<IActionResult> Index(string season, string opponent, string competition, string venue, string outcome, string category, string sort, int page = 1, int pageSize = 50)
@@ -99,6 +102,61 @@ public class FixtureController : Controller
         return View(fixturesAsIPagedList);
     }
 
+    public async Task<IActionResult> Details(string id)
+    {
+        // Validate that the id parameter is a valid GUID format
+        // the fixtureId is set to the guid if the parsing is successful
+        if (!Guid.TryParse(id, out var fixtureId))
+            // If the id is not a valid GUID, return a 400 Bad Request HTTP response
+            return BadRequest("Invalid ID format");
+
+        // Get the fixture from the database and include the participants
+        var fixture = await _fixtureService.GetFixtureByIdAsync(fixtureId, FixtureIncludes.Participants);
+
+        // Check if the fixture was found
+        if (fixture == null)
+            return NotFound("Fixture not found");
+
+        // Set the page heading and the page title
+		ViewData["PageHeading"] = fixture.TeamsAndScores;
+		ViewData["Title"] = fixture.TeamsAndScores;
+
+        // Map the fixture to the model for displaying on the page
+        var fixtureToDisplay = new Fixtures
+        {
+            Id = fixture.Id,
+            Season = fixture.Season,
+            Date = fixture.Date,
+            Attendance = string.Format("{0:n0}", fixture.Attendance),
+            Competition = fixture.Competition,
+            Outcome = fixture.Outcome,
+            Scoreline = fixture.Scoreline,
+            Teams = fixture.Teams,
+            TeamsWithScore = fixture.TeamsAndScores,
+            PenaltiesRequired = fixture.PenaltiesRequired,
+            PenaltyScoreWithOutcome = fixture.PenaltyScoreWithOutcome,
+            Venue = fixture.VenueShort,
+            LineUp = fixture.Participants?.Select(p => new LineUp
+            {
+                Id = p.Id,
+                OrderNo = p.OrderNo,
+                FirstName = p.FirstName,
+                LastName = p.LastName,
+                Role = p.Role,
+                Started = p.Started,
+                Sub = p.Sub,
+                YellowCard = p.YellowCard,
+                RedCard = p.RedCard,
+                ReplacedByPersonId = p.ReplacedByPersonId,
+                ReplacedByFirstName = p.ReplacedByFirstName,
+                ReplacedByLastName = p.ReplacedByLastName,
+                ReplacedByTime = p.ReplacedByTime
+            }).ToList()
+        };
+
+        return View(fixtureToDisplay);
+    }
+
     public async Task<IActionResult> New()
     {
         // Set the page heading and the page title
@@ -127,7 +185,7 @@ public class FixtureController : Controller
             try
             {
                 // Convert the newFixture model to a DTO
-                var newFixtureDTO = new NewFixtureDTO
+                var newFixtureDTO = new FixtureDTO
                 {
                     SeasonId = newFixture.SeasonId,
                     Date = newFixture.Date,
@@ -237,7 +295,7 @@ public class FixtureController : Controller
             try
             {
                 // Convert the EditFixture model to a EditFixtureDTO
-                var editFixtureDTO = new EditFixtureDTO
+                var editFixtureDTO = new FixtureDTO
                 {
                     Id = editFixture.Id,
                     SeasonId = editFixture.SeasonId,

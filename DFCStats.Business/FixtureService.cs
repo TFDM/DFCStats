@@ -111,7 +111,7 @@ namespace DFCStats.Business
         /// <param name="id"></param>
         /// <param name="includes"></param>
         /// <returns></returns>
-        public async Task<FixtureDTO?> GetFixtureByIdAsync(Guid id)
+        public async Task<FixtureDTO?> GetFixtureByIdAsync(Guid id, FixtureIncludes includes = FixtureIncludes.None)
         {
             var query = _dfcStatsDbContext.Fixtures.AsNoTracking().AsQueryable();
     
@@ -120,6 +120,10 @@ namespace DFCStats.Business
             query = query.Include(f => f.Club);
             query = query.Include(f => f.Category);
             query = query.Include(f => f.Venue);
+
+            // Includes the participants - also include the people as well
+            if (includes.HasFlag(FixtureIncludes.Participants))
+                query = query.Include(f => f.Participants).ThenInclude(p => p.Person).Include(f => f.Participants).ThenInclude(p => p.ReplacedByPerson);
 
             // Run the query and map the entity to a DTO and return it
             var fixture = await query.FirstOrDefaultAsync(f => f.Id == id);
@@ -132,7 +136,7 @@ namespace DFCStats.Business
         /// <param name="newFixtureDTO"></param>
         /// <returns></returns>
         /// <exception cref="DFCStatsException"></exception>
-        public async Task<FixtureDTO> AddFixtureAsync(NewFixtureDTO newFixtureDTO)
+        public async Task<FixtureDTO> AddFixtureAsync(FixtureDTO newFixtureDTO)
         {
             // Gets the season, club, venue and category from the database
             var season = await _seasonService.GetSeasonByIdAsync(newFixtureDTO.SeasonId);
@@ -190,7 +194,7 @@ namespace DFCStats.Business
         /// <param name="editFixtureDTO"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<FixtureDTO> UpdateFixtureAsync(EditFixtureDTO editFixtureDTO)
+        public async Task<FixtureDTO> UpdateFixtureAsync(FixtureDTO editFixtureDTO)
         {
             // Gets the fixture from the database
             var existingfixture = await _dfcStatsDbContext.Fixtures

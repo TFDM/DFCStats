@@ -1,0 +1,60 @@
+@using DFCStats.Web.Models.People
+@model List<ParticipatedFixtures>
+
+<div id="ParticipationPanel">
+
+	<div class="row">
+		<div class="col-12">
+			<h5>Appearances for Season @Model.First().Season</h5>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12">
+
+			<table class="table">
+				<thead>
+					<tr>
+						<th class="table-light">Date</th>
+						<th class="table-light"></th>
+						<th class="table-light">Fixture</th>
+						<th class="table-light">Competition</th>
+						<th class="table-light">Goals</th>
+						<th class="table-light">Role</th>
+					</tr>
+				</thead>
+				<tbody class="table-group-divider">
+					@if (Model != null)
+					{
+						@foreach (var p in Model)
+						{
+							<tr>
+								<td class="table-light">@p.Date</td>
+
+								<td class="text-center
+									@if (p.Outcome == "W")
+									{
+										@string.Format("{0}", "table-success text-success")
+									} else if (p.Outcome == "D")
+									{
+										@string.Format("{0}", "table-warning alert-warning")
+									} else {
+										@string.Format("{0}", "table-danger text-danger")
+									}
+								">@p.Outcome</td>
+								<td class="table-light">
+									@p.TeamsWithScore
+								</td>
+								<td class="table-light">@p.Competition</td>
+								<td class="table-light">@p.Goals</td>
+								<td class="table-light">@p.Role</td>
+							</tr>
+						}
+					}
+				</tbody>
+			</table>
+
+		</div>
+	</div>
+
+</div>
