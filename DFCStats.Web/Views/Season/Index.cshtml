@@ -1,3 +1,9 @@
+@using DFCStats.Web.Models.Seasons;
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+
+@model IPagedList<Seasons>
+
 @if (TempData["Success"] != null)
 {
     <div class="row mb-3">
@@ -11,6 +17,67 @@
     </div>
 }
 
-<div>
-    Season Controller
+<div class="row">
+    <div class="col-12">
+
+        <table class="table">
+			<thead>
+				<tr>
+					<th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByDescription" asp-route-pageSize="@Context.Request.Query["pageSize"]">Season</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByGamesPlayed" asp-route-pageSize="@Context.Request.Query["pageSize"]">Played</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByWins" asp-route-pageSize="@Context.Request.Query["pageSize"]">Won</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByDraws" asp-route-pageSize="@Context.Request.Query["pageSize"]">Drawn</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByLoses" asp-route-pageSize="@Context.Request.Query["pageSize"]">Lost</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByWinPercentage" asp-route-pageSize="@Context.Request.Query["pageSize"]">Win %</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByAvgHomeAtt" asp-route-pageSize="@Context.Request.Query["pageSize"]">Avg Home Att</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByHighestHomeAtt" asp-route-pageSize="@Context.Request.Query["pageSize"]">Highest Home Att</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByPlayersUsed" asp-route-pageSize="@Context.Request.Query["pageSize"]">Players Used</a></th>
+                    <th class="table-light"></th>
+                    <th class="table-light"></th>
+                </tr>
+			</thead>
+			<tbody class="table-group-divider">
+                @foreach (Seasons season in Model)
+                {
+                    <tr>
+                        <td class="table-light">@season.Season</td>
+                        <td class="table-light">@season.GamesPlayed</td>
+                        <td class="table-light">@season.Wins</td>
+                        <td class="table-light">@season.Draws</td>
+                        <td class="table-light">@season.Loses</td>
+                        <td class="table-light">@season.WinPercentage</td>
+                        <td class="table-light">@season.AverageHomeAttendance</td>
+                        <td class="table-light">@season.HighestHomeAttendance</td>
+                        <td class="table-light">@season.TotalPlayersUsed</td>
+                        <td class="align-middle table-light">
+                            <a asp-action="Details" asp-route-id="@season.Id">Details</a>
+                        </td>
+                        <td class="align-middle table-light">
+                            <a asp-action="Edit" asp-route-id="@season.Id">Edit</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<div class="row">
+	<div class="col-12">
+
+		@Html.PagedListPager(Model, page => Url.Action("Index", new
+			{
+				page = page,
+                pageSize = Context.Request.Query["pageSize"],
+                sort = Context.Request.Query["sort"]
+			}),
+            new X.PagedList.Mvc.Core.PagedListRenderOptions
+		{
+			MaximumPageNumbersToDisplay = 3,
+			LiElementClasses = new string[] { "page-itm" },
+			PageClasses = new string[] { "page-link" }
+		})
+
+	</div>
 </div>

@@ -8,6 +8,7 @@ namespace DFCStats.Web.Models.Seasons
         public int? Wins { get; set; }
         public int? Draws { get; set; }
         public int? Loses { get; set; }
+        public string? WinPercentage { get; set; }
         public int? TotalPlayersUsed { get; set; }
         public string? AverageHomeAttendance { get; set; }
         public string? HighestHomeAttendance { get; set; }

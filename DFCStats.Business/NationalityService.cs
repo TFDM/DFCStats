@@ -180,7 +180,7 @@ namespace DFCStats.Business
 
             // If the name is already in use and it's not the same record as the one we are trying to update then throw an exception as the name is already in use
             if (existingNationalityWithName != null && existingNationalityWithName.Id != editNationalityDTO.Id)
-                 throw new DFCStatsException($"{editNationalityDTO.Nationality} is already in use" );
+                throw new DFCStatsException($"{editNationalityDTO.Nationality} is already in use" );
             
             // Find the existing nationality in the database
             var existingNationality = await _dfcStatsDbContext.Nationalities.FirstOrDefaultAsync(n => n.Id == editNationalityDTO.Id);

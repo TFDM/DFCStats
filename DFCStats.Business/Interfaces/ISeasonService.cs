@@ -44,5 +44,12 @@ namespace DFCStats.Business.Interfaces
         /// <param name="seasonDTO"></param>
         /// <returns></returns>
         Task<SeasonDTO> AddSeasonAsync(SeasonDTO seasonDTO);
+
+        /// <summary>
+        /// Updates a season in the database
+        /// </summary>
+        /// <param name="editSeasonDTO"></param>
+        /// <returns></returns>
+        Task<SeasonDTO> UpdateSeasonAsync(SeasonDTO editSeasonDTO);
     }
 }
