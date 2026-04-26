@@ -9,6 +9,31 @@ namespace DFCStats.Business.MappingExtensions
     public static class SeasonMappingExtensions
     {
         /// <summary>
+        /// Maps a View_Seasons entity to a SeasonDTO
+        /// </summary>
+        /// <param name="season"></param>
+        /// <returns></returns>
+        public static SeasonDTO? MapToSeasonDTO(this View_Seasons season)
+        {
+            if (season == null)
+                return null;
+
+            return new SeasonDTO
+            {
+                Id = season.Id,
+                Description = season.Description,
+                GamesPlayed = season.GamesPlayed,
+                GamesWon = season.Wins,
+                GamesDrawn = season.Draws,
+                GamesLost = season.Loses,
+                TotalPlayersUed = season.PlayersUsed,
+                WinPercentage = season.WinPercentage,
+                AverageHomeAttendance = season.AverageHomeAttendance,
+                HighestHomeAttendance = season.HighestHomeAttendance
+            };
+        }
+
+        /// <summary>
         /// Maps a Season entity to a SeasonDTO
         /// </summary>
         /// <param name="season"></param>
@@ -40,6 +65,7 @@ namespace DFCStats.Business.MappingExtensions
                 GamesDrawn = season.Fixtures?.Where(f => f.Outcome == "D").Count(),
                 GamesLost = season.Fixtures?.Where(f => f.Outcome == "L").Count(),
                 TotalPlayersUed = season.Fixtures?.Where(f => f.Category?.Description != "Friendly").SelectMany(p => p.Participants.Select(p => p.PersonId)).Distinct().Count(),
+                WinPercentage = season.Fixtures != null && season.Fixtures.Any() ? (decimal)season.Fixtures.Count(f => f.Outcome == "W")  / season.Fixtures.Count() * 100m : 0m,
                 AverageHomeAttendance = (int)Math.Floor(season.Fixtures?
                     .Where(f => f.Category?.Description != "Friendly" && 
                                 f.Venue?.ShortDescription == "H" && 

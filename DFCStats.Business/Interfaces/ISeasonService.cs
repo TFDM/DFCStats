@@ -16,6 +16,15 @@ namespace DFCStats.Business.Interfaces
     public interface ISeasonService
     {
         /// <summary>
+        /// Returns a list of all the seasons paginated
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        Task<(List<SeasonDTO>, int)> GetAllSeasonsWithPaginationAsync(int page = 1, int pageSize = 50, string? sort = null);
+
+        /// <summary>
         /// Returns a season from the database using the id
         /// </summary>
         /// <param name="id"></param>
@@ -35,5 +44,12 @@ namespace DFCStats.Business.Interfaces
         /// <param name="seasonDTO"></param>
         /// <returns></returns>
         Task<SeasonDTO> AddSeasonAsync(SeasonDTO seasonDTO);
+
+        /// <summary>
+        /// Updates a season in the database
+        /// </summary>
+        /// <param name="editSeasonDTO"></param>
+        /// <returns></returns>
+        Task<SeasonDTO> UpdateSeasonAsync(SeasonDTO editSeasonDTO);
     }
 }

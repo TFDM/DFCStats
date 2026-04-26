@@ -77,7 +77,7 @@ public class FixtureController : Controller
             searchCategory: category,
             sort: sort);
 
-        // Convert the nationalities from a DTO to a model
+        // Convert the fixtures from a DTO to a model
         var listOfFixtures = fixtures.Select(dto => new Fixtures
         {
             Id = dto.Id,
@@ -254,7 +254,7 @@ public class FixtureController : Controller
         if (fixture == null)
             return NotFound("Fixture not found");
 
-        // Convert the personDTO to an EditPerson model
+        // Convert the fixtureDTO to an EditFixture model
         var fixtureToEdit = new EditFixture
         { 
             Id = fixture.Id,
