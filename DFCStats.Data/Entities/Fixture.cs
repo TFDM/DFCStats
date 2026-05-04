@@ -35,9 +35,6 @@ namespace DFCStats.Data.Entities
         public virtual Club? Club { get; set; }
         public virtual Category? Category { get; set; }
         public virtual Venue? Venue { get; set; }
-
-        // public virtual ICollection<Participation> Participants { get; set; } = new List<Participation>();
-
         public virtual ICollection<Participation> Participants { get; set; } = null!;
     }
 }

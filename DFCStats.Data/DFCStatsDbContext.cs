@@ -10,6 +10,7 @@ namespace DFCStats.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Club> Clubs { get; set; }
         public DbSet<Fixture> Fixtures { get; set; }
+        public DbSet<Manager> Managers { get; set; }
         public DbSet<Nationality> Nationalities { get; set; }
         public DbSet<Participation> Participants { get; set; }
         public DbSet<Person> People { get; set; }
@@ -17,6 +18,7 @@ namespace DFCStats.Data
         public DbSet<Season> Seasons { get; set; }
         public DbSet<Venue> Venues { get; set; }
 
+        public DbSet<View_Managers> View_Managers { get; set; }
         public DbSet<View_People> View_People { get; set; }
         public DbSet<View_Seasons> View_Seasons { get; set; }
 
@@ -37,6 +39,7 @@ namespace DFCStats.Data
                 .HasForeignKey(x => x.ReplacedByPersonId);
 
             // Configures SQL views so the entity maps to the actual sql view
+            modelBuilder.Entity<View_Managers>().ToView("View_Managers");
             modelBuilder.Entity<View_People>().ToView("View_People");
             modelBuilder.Entity<View_Seasons>().ToView("View_Seasons");
         }
