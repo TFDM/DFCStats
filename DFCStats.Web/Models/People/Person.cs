@@ -10,6 +10,7 @@ namespace DFCStats.Web.Models.People
         public string? Nationality { get; set; }
         public string? NationalityIcon { get; set; }
         public string? Biography { get; set; }
+        public List<ManagementRecord>? ManagementRecord = null!;
         public List<SeasonalAppearances>? AppearancesBySeason = null!;
         public int? TotalAppearances { get; set; }
         public int? TotalStarts { get; set; }
@@ -47,6 +48,21 @@ namespace DFCStats.Web.Models.People
         public int? PlayOffSubs { get; set; }
         public int? PlayOffGoals { get; set; }
         public decimal? GoalsPerGame { get; set; }
+    }
+
+    public class ManagementRecord
+    {
+        public DateOnly DateFrom { get; set; }
+        public DateOnly? DateTo { get; set; }
+        public bool CurrentlyOnGoing { get; set; }
+        public bool Caretaker { get; set; }
+        public int GamesManaged { get; set; }
+        public int Wins { get; set; }
+        public int Draws { get; set; }
+        public int Loses { get; set; }
+        public int GoalsFor { get; set; }
+        public int GoalsAgainst { get; set; }
+        public string? WinPercentage { get; set; }
     }
 
 }

@@ -41,6 +41,74 @@
 
 <hr />
 
+@if (Model.ManagementRecord != null && Model.ManagementRecord.Count > 0)
+{
+    <div class="row">
+        <div class="col-12">
+            <h5>Management Record</h5>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="text-center table-light">Date From</th>
+                            <th class="text-center table-light border-end">Date To</th>
+                            <th class="text-center table-light border-end">Caretaker</th>
+                            <th class="text-center table-light">Managed</th>
+                            <th class="text-center table-light">Won</th>
+                            <th class="text-center table-light">Drawn</th>
+                            <th class="text-center table-light border-end">Lost</th>
+                            <th class="text-center table-light">Goals For</th>
+                            <th class="text-center table-light border-end">Goals Ag</th>
+                            <th class="text-center table-light">Win %</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        @foreach (var managementRecord in Model.ManagementRecord)
+                        {
+                            <tr>
+                                <td class="table-light text-center">@managementRecord.DateFrom.ToString("dd/MM/yyyy")</td>
+                                <td class="table-light border-end text-center">
+                                    @if (managementRecord.CurrentlyOnGoing)
+                                    {
+                                        <span>To Present</span>
+                                    }
+                                    else if (managementRecord.DateTo != null)
+                                    {
+                                        @managementRecord.DateTo.Value.ToString("dd/MM/yyyy")
+                                    }
+                                </td>
+                                <td class="text-center table-light border-end">
+                                    @if (managementRecord.Caretaker)
+                                    {
+                                        <i class="fa-solid fa-check text-success"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa-solid fa-xmark text-danger"></i>
+                                    }
+                                </td>
+                                <td class="text-center table-light">@managementRecord.GamesManaged</td>
+                                <td class="text-center table-light">@managementRecord.Wins</td>
+                                <td class="text-center table-light">@managementRecord.Draws</td>
+                                <td class="text-center table-light border-end">@managementRecord.Loses</td>
+                                <td class="text-center table-light">@managementRecord.GoalsFor</td>
+                                <td class="text-center table-light border-end">@managementRecord.GoalsAgainst</td>
+                                <td class="text-center table-light">@managementRecord.WinPercentage</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+
+            
+        </div>
+    </div>
+
+
+}
+
 @if (Model.AppearancesBySeason != null && Model.AppearancesBySeason.Count > 0)
 {
     <div class="row">

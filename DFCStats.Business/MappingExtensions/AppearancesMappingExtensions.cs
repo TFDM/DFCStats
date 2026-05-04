@@ -47,41 +47,6 @@ namespace DFCStats.Business.MappingExtensions
                     PlayOffSubs = seasonParticipations.TotalPlayOffSubs(),
                     PlayOffGoals = seasonParticipations.TotalPlayOffGoals(),
                     GoalsPerGame = seasonParticipations.GoalsPerGame()
-                    // RedCards = participations.Where(p => p.Fixture?.SeasonId == season?.Id && p.RedCard == true).Count(),
-                    // TotalAppearances = participations.Where(p => p.Fixture?.SeasonId == season?.Id).Count(),
-                    // Starts = participations.Where(p => p.Fixture?.SeasonId == season?.Id && p.Started == true).Count(),
-                    // Subs = participations.Where(p => p.Fixture?.SeasonId == season?.Id && p.Sub == true).Count(),
-                    // Goals = participations.Where(p => p.Fixture?.SeasonId == season?.Id).Sum(p => p.Goals),
-                    // LeagueStarts = participations.Where(p => p.Fixture?.SeasonId == season?.Id
-                    //     && p.Started == true 
-                    //     && p.Fixture?.Category?.PlayOff == false 
-                    //     && (p.Fixture?.Category?.FootballLeague == true 
-                    //     || p.Fixture?.Category?.NonLeague == true)).Count(),
-                    // LeagueSubs = participations.Where(p => p.Fixture?.SeasonId == season?.Id
-                    //     && p.Sub == true 
-                    //     && p.Fixture?.Category?.PlayOff == false 
-                    //     && (p.Fixture?.Category?.FootballLeague == true 
-                    //     || p.Fixture?.Category?.NonLeague == true)).Count(),
-                    // LeagueGoals = participations.Where(p => p.Fixture?.SeasonId == season?.Id
-                    //     && p.Fixture?.Category?.PlayOff == false
-                    //     && (p.Fixture?.Category?.FootballLeague == true 
-                    //     || p.Fixture?.Category?.NonLeague == true)).Sum(p => p.Goals),
-                    // CupStarts = participations.Where(p => p.Fixture?.Season?.Id == season?.Id
-                    //     && p.Started == true
-                    //     && p.Fixture?.Category?.Cup == true).Count(),
-                    // CupSubs = participations.Where(p => p.Fixture?.Season?.Id == season?.Id
-                    //     && p.Sub == true
-                    //     && p.Fixture?.Category?.Cup == true).Count(),
-                    // CupGoals = participations.Where(p => p.Fixture?.Season?.Id == season?.Id
-                    //     && p.Fixture?.Category?.Cup == true).Sum(p => p.Goals),
-                    // PlayOffStarts = participations.Where(p => p.Fixture?.Season?.Id == season?.Id
-                    //     && p.Started == true
-                    //     && p.Fixture?.Category?.PlayOff == true).Count(),
-                    // PlayOffSubs = participations.Where(p => p.Fixture?.Season?.Id == season?.Id
-                    //     && p.Sub == true
-                    //     && p.Fixture?.Category?.PlayOff == true).Count(),
-                    // PlayOffGoals = participations.Where(p => p.Fixture?.Season?.Id == season?.Id
-                    //     && p.Fixture?.Category?.PlayOff == true).Sum(p => p.Goals)
                 });
             };
 

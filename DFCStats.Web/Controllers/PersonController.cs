@@ -259,7 +259,7 @@ public class PersonController : Controller
             return BadRequest("Invalid ID format");
 
         // Get the person from the database
-        var person = await _personService.GetPersonByIdAsync(personId, PersonIncludes.Nationality | PersonIncludes.Stats);
+        var person = await _personService.GetPersonByIdAsync(personId, PersonIncludes.Nationality | PersonIncludes.Stats | PersonIncludes.ManagementRecord );
 
         // Check if the person was found
         if (person == null)
@@ -310,7 +310,21 @@ public class PersonController : Controller
                 PlayOffSubs = a.PlayOffSubs,
                 PlayOffGoals = a.PlayOffGoals,
                 GoalsPerGame = a.GoalsPerGame
-            }).ToList()
+            }).ToList(),
+            ManagementRecord = person.ManagementSpells?.Select(m => new ManagementRecord
+            {
+                DateFrom = m.StartDate,
+                DateTo = m.EndDate,
+                CurrentlyOnGoing = (m.EndDate == null) ? true : false,
+                Caretaker = m.IsCaretaker,
+                GamesManaged = m.NumberOfGamesManaged,
+                Wins = m.Wins,
+                Draws = m.Draws,
+                Loses = m.Losses,
+                GoalsFor = m.GoalsFor,
+                GoalsAgainst = m.GoalsAgainst,
+                WinPercentage = (m.WinPercentage != null) ? string.Format("{0:0}%", m.WinPercentage) : null,
+            }).OrderBy(m => m.DateFrom).ToList()
         };
 
         // Check has appearances

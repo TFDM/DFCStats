@@ -12,14 +12,16 @@ namespace DFCStats.Business
     public class PersonService : IPersonService
     {
         private readonly DFCStatsDBContext _dfcStatsDbContext;
-        private readonly ISeasonService _seasons;
-        private readonly INationalityService _nationalities;
+        private readonly ISeasonService _seasonService;
+        private readonly INationalityService _nationalityService;
+        private readonly IManagerService _managerService;
 
-        public PersonService(DFCStatsDBContext dFCStatsDBContext, ISeasonService seasons, INationalityService nationalities)
+        public PersonService(DFCStatsDBContext dFCStatsDBContext, ISeasonService seasonService, INationalityService nationalityService, IManagerService managerService)
         {
             _dfcStatsDbContext = dFCStatsDBContext;
-            _seasons = seasons;
-            _nationalities = nationalities;
+            _seasonService = seasonService;
+            _nationalityService = nationalityService;
+            _managerService = managerService;
         }
 
         /// <summary>
@@ -129,12 +131,25 @@ namespace DFCStats.Business
             // Includes the stats - also includes the fixture and the category so the stats can be properly caculated
             if (includes.HasFlag(PersonIncludes.Stats))
                 query = query.Include(p => p.Participation).ThenInclude(f => f.Fixture).ThenInclude(c => c!.Category)
-                             .Include(p => p.Participation).ThenInclude(f => f.Fixture).ThenInclude(s => s!.Season);
-    
+                            .Include(p => p.Participation).ThenInclude(f => f.Fixture).ThenInclude(s => s!.Season);
+
             // Run the query and map the entity to a DTO and return it
             var person = await query.FirstOrDefaultAsync(p => p.Id == id);
 
-            return person?.MapToPersonDTO();
+            // Map the person to a PersonDTO
+            var personDTO = person?.MapToPersonDTO();
+
+            // Includes the management management spell for a person
+            if (includes.HasFlag(PersonIncludes.ManagementRecord))
+            {
+                // Get the management records for the person
+                var managementRecords = await _managerService.GetManagementRecordsByPersonIdAsync(id);
+
+                // Add the management records to the personDTO
+                personDTO!.ManagementSpells = managementRecords;            
+            }
+
+            return personDTO;
         }
 
         /// <summary>
@@ -273,7 +288,7 @@ namespace DFCStats.Business
                     throw new DFCStatsException("A season has been used more than once");
 
                 // Get all seasons from the database
-                var allSeasons = await _seasons.GetAllSeasonsAsync();
+                var allSeasons = await _seasonService.GetAllSeasonsAsync();
                 var validSeasonIds = allSeasons.Select(s => s.Id).ToHashSet();
         
                 // Check if all provided season ids exist
@@ -294,7 +309,7 @@ namespace DFCStats.Business
             if (nationalityId != null)
             {
                 //Get the nationality from the database using the id
-                var nationality = await _nationalities.GetNationalityByIdAsync((Guid)nationalityId);
+                var nationality = await _nationalityService.GetNationalityByIdAsync((Guid)nationalityId);
 
                 //If the nationality wasn't found then throw an error
                 if (nationality == null)
