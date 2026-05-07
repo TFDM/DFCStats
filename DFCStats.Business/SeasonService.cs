@@ -33,7 +33,7 @@ namespace DFCStats.Business
 
             var seasons = _dfcStatsDbContext.View_Seasons.AsNoTracking().AsQueryable();
 
-            //Sorts the records
+            // Sorts the records
             switch (sort)
             {
                 case "description_desc":

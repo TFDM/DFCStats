@@ -1,5 +1,6 @@
 using DFCStats.Data.Entities;
 using DFCStats.Domain.DTOs.Managers;
+using DFCStats.Business.Helpers;
 
 namespace DFCStats.Business.MappingExtensions
 {
@@ -19,6 +20,12 @@ namespace DFCStats.Business.MappingExtensions
             {
                 Id = managerRecord.Id,
                 PersonId = managerRecord.PersonId,
+                LastName = managerRecord.LastName,
+                FirstName = managerRecord.FirstName,
+                LastNameFirstName = managerRecord.LastNameFirstName,
+                FirstNameLastName = managerRecord.FirstNameLastName,
+                Nationality = managerRecord.Nationality,
+                NationalityIcon = managerRecord.Icon,
                 StartDate = managerRecord.StartDate,
                 EndDate = managerRecord.EndDate,
                 NumberOfGamesManaged = managerRecord.GamesManaged,
@@ -29,7 +36,8 @@ namespace DFCStats.Business.MappingExtensions
                 GoalsFor = managerRecord.GoalsFor,
                 GoalsAgainst = managerRecord.GoalsAg,
                 WinPercentage = managerRecord.WinPercentage,
-                DaysInCharge = managerRecord.DaysInCharge
+                DaysInCharge = managerRecord.DaysInCharge,
+                TimeInChargeAsString = DateAndTimeHelper.TimeAsString(managerRecord.StartDate, managerRecord.AltEndDate)
             };
         }
     }

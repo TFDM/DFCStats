@@ -13,6 +13,7 @@ namespace DFCStats.Data.Entities
         public string FirstNameLastName { get; set; } = string.Empty;
         public DateOnly? DateOfBirth { get; set; }
         public Guid? NationalityId { get; set; }
+        public string? Nationality { get; set; }
         public string? Icon { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
