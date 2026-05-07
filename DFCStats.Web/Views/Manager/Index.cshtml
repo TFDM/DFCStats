@@ -1,0 +1,105 @@
+@using DFCStats.Web.Models.Managers
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+
+@model IPagedList<Manager>
+
+<form method="get">
+    <div class="row mb-3">
+        <div class="col-12 col-lg-2">
+            <label>Include Caretakers</label>
+            @Html.DropDownList("includeCaretakers", new SelectList(ViewBag.includeCaretakers, "Value", "Text"), string.Empty, new { @class = "form-control form-select" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <button type="submit" class="btn btn-success">Search</button>
+        </div>
+    </div>
+</form>
+
+<div class="row">
+    <div class="col-12">
+
+        <table class="table">
+			<thead>
+				<tr>
+					<th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByStartDate" asp-route-pageSize="@Context.Request.Query["pageSize"]" asp-route-includeCaretakers="@Context.Request.Query["includeCaretakers"]">From</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByEndDate" asp-route-pageSize="@Context.Request.Query["pageSize"]" asp-route-includeCaretakers="@Context.Request.Query["includeCaretakers"]">To</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByName" asp-route-pageSize="@Context.Request.Query["pageSize"]" asp-route-includeCaretakers="@Context.Request.Query["includeCaretakers"]">Name</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByTimeInCharge" asp-route-pageSize="@Context.Request.Query["pageSize"]" asp-route-includeCaretakers="@Context.Request.Query["includeCaretakers"]">Days In Charge</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByNationality" asp-route-pageSize="@Context.Request.Query["pageSize"]" asp-route-includeCaretakers="@Context.Request.Query["includeCaretakers"]">Nationality</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByGamesManaged" asp-route-pageSize="@Context.Request.Query["pageSize"]" asp-route-includeCaretakers="@Context.Request.Query["includeCaretakers"]">Managed</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByGamesWon" asp-route-pageSize="@Context.Request.Query["pageSize"]" asp-route-includeCaretakers="@Context.Request.Query["includeCaretakers"]">Won</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByGamesDrawn" asp-route-pageSize="@Context.Request.Query["pageSize"]" asp-route-includeCaretakers="@Context.Request.Query["includeCaretakers"]">Drawn</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByGamesLost" asp-route-pageSize="@Context.Request.Query["pageSize"]" asp-route-includeCaretakers="@Context.Request.Query["includeCaretakers"]">Lost</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByGoalsFor" asp-route-pageSize="@Context.Request.Query["pageSize"]" asp-route-includeCaretakers="@Context.Request.Query["includeCaretakers"]">GF</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByGoalsAgainst" asp-route-pageSize="@Context.Request.Query["pageSize"]" asp-route-includeCaretakers="@Context.Request.Query["includeCaretakers"]">GA</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByWinPercentage" asp-route-pageSize="@Context.Request.Query["pageSize"]" asp-route-includeCaretakers="@Context.Request.Query["includeCaretakers"]">Win %</a></th>
+                    <th class="table-light">Caretaker</a></th>
+                
+                </tr>
+			</thead>
+			<tbody class="table-group-divider">
+                @foreach (Manager manager in Model)
+                {
+                    <tr>
+                        <td class="table-light">@manager.DateFrom</td>
+                        <td class="table-light">
+                            @if (manager.CurrentlyOnGoing)
+                            {
+                                <span>To Present</span>
+                            } else if (manager.DateTo != null) {
+                                @manager.DateTo.Value.ToString("dd/MM/yyyy")
+                            }
+                        </td>
+                        <td class="table-light">@manager.Name</td>
+                        <td class="table-light">@manager.TimeInCharge</td>
+                        <td class="table-light">
+                            @if (manager.Nationality != null)
+                            {
+                                <img src="~/images/Flags/@manager.NationalityIcon" /> @manager.Nationality
+                            }
+                        </td>
+                        <td class="table-light">@manager.GamesManaged</td>
+                        <td class="table-light">@manager.Wins</td>
+                        <td class="table-light">@manager.Draws</td>
+                        <td class="table-light">@manager.Loses</td>
+                        <td class="table-light">@manager.GoalsFor</td>
+                        <td class="table-light">@manager.GoalsAgainst</td>
+                        <td class="table-light">@manager.WinPercentage</td>
+                        <td class="table-light">
+                            @if (manager.Caretaker)
+                            {
+                                <i class="fa-solid fa-check text-success"></i>
+                            } else {
+                                <i class="fa-solid fa-xmark text-danger"></i>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<div class="row">
+	<div class="col-12">
+
+		@Html.PagedListPager(Model, page => Url.Action("Index", new
+			{
+                includeCaretakers = Context.Request.Query["includeCaretakers"],
+				page = page,
+                pageSize = Context.Request.Query["pageSize"],
+                sort = Context.Request.Query["sort"]
+			}),
+            new X.PagedList.Mvc.Core.PagedListRenderOptions
+		{
+			MaximumPageNumbersToDisplay = 3,
+			LiElementClasses = new string[] { "page-itm" },
+			PageClasses = new string[] { "page-link" }
+		})
+
+	</div>
+</div>
