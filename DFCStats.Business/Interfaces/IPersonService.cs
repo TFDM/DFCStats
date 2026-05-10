@@ -39,6 +39,12 @@ namespace DFCStats.Business.Interfaces
         Task<PersonDTO?> GetPersonByIdAsync(Guid id, PersonIncludes includes = PersonIncludes.None);
 
         /// <summary>
+        /// Gets people who are managers
+        /// </summary>
+        /// <returns></returns>
+        Task<List<PersonDTO>> GetPeopleWhoAreManagersAsync(string? sort = null);
+
+        /// <summary>
         /// Adds a new person to the database
         /// </summary>
         /// <param name="newPersonDTO"></param>

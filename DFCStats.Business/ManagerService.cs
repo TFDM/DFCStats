@@ -3,6 +3,8 @@ using DFCStats.Business.Interfaces;
 using DFCStats.Domain.DTOs.Managers;
 using Microsoft.EntityFrameworkCore;
 using DFCStats.Business.MappingExtensions;
+using DFCStats.Data.Entities;
+using DFCStats.Domain.Exceptions;
 
 namespace DFCStats.Business
 {
@@ -135,6 +137,114 @@ namespace DFCStats.Business
 
             // Map the View_Managers to the ManagementRecordDTO and return them
             return await managerRecords.Select(m => m.MapToManagementRecordDTO()!).ToListAsync();
+        }
+    
+        /// <summary>
+        /// Gets a management record by its id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="includes"></param>
+        /// <returns></returns>
+        public async Task<ManagementRecordDTO?> GetManagementRecordByIdAsync(Guid id, ManagerIncludes includes = ManagerIncludes.None)
+        {
+            var query = _dfcStatsDbContext.Managers.AsNoTracking().AsQueryable();
+
+            // Include the person if specified
+            if (includes.HasFlag(ManagerIncludes.Person))
+                query = query.Include(m => m.Person);
+
+            // Include the nationality if specified
+            if (includes.HasFlag(ManagerIncludes.Nationality))
+                query = query.Include(m => m.Person).ThenInclude(p => p!.Nationality);
+
+            // Run the query and map the entity to a DTO and return it
+            var managerRecord = await query.FirstOrDefaultAsync(m => m.Id == id);
+
+            return managerRecord?.MapToManagementRecordDTO();
+        }
+
+        /// <summary>
+        /// Adds a management record to the database
+        /// </summary>
+        /// <param name="newManagementRecordDTO"></param>
+        /// <returns></returns>
+        public async Task<ManagementRecordDTO> AddManagerRecordAsync(ManagementRecordDTO newManagementRecordDTO)
+        {
+            // Check the dates are valid (start date is before end date, and start date isn't in the future)
+            CheckDates(newManagementRecordDTO.StartDate, newManagementRecordDTO.EndDate);
+
+            // Create the management record entity using the dto
+            var managementRecord = new Manager
+            {
+                StartDate = newManagementRecordDTO.StartDate,
+                EndDate = newManagementRecordDTO.EndDate,
+                PersonId = newManagementRecordDTO.PersonId,
+                IsCaretaker = newManagementRecordDTO.IsCaretaker
+            };
+
+            // Add the management record to the database
+            await _dfcStatsDbContext.Managers.AddAsync(managementRecord);
+            await _dfcStatsDbContext.SaveChangesAsync();
+
+            // Map the newly created management record to a ManagementRecordDTO and return it
+            return managementRecord.MapToManagementRecordDTO()!;
+        }
+
+        /// <summary>
+        /// Updates a management record in the database
+        /// </summary>
+        /// <param name="editManagerRecordDTO"></param>
+        /// <returns></returns>
+        public async Task<ManagementRecordDTO> UpdateManagerRecordAsync(ManagementRecordDTO editManagerRecordDTO)
+        {
+            // Check the date are valid (start date is before end date, and start date isn't in the future)
+            CheckDates(editManagerRecordDTO.StartDate, editManagerRecordDTO.EndDate);
+
+            // Get the management record from the database
+            var existingManagementRecord = await _dfcStatsDbContext.Managers
+                .Include(m => m.Person).ThenInclude(p => p.Nationality)
+                .FirstOrDefaultAsync(m => m.Id == editManagerRecordDTO.Id);
+
+            // Check if the management record exists in the database
+            if (existingManagementRecord == null)
+                throw new DFCStatsException($"Management record with id {editManagerRecordDTO.Id} not found");
+
+            // Update the management record
+            existingManagementRecord.PersonId = editManagerRecordDTO.PersonId;
+            existingManagementRecord.StartDate = editManagerRecordDTO.StartDate;
+            existingManagementRecord.EndDate = editManagerRecordDTO.EndDate;
+            existingManagementRecord.IsCaretaker = editManagerRecordDTO.IsCaretaker;
+
+            // Update the management record in the database
+            _dfcStatsDbContext.Managers.Update(existingManagementRecord);
+            await _dfcStatsDbContext.SaveChangesAsync();
+
+            return existingManagementRecord.MapToManagementRecordDTO()!;
+        }
+
+        /// <summary>
+        /// Check the dates are valid for the management record
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <exception cref="DFCStatsException"></exception>
+        private void CheckDates(DateOnly startDate, DateOnly? endDate)
+        {
+            // Check that the start date isn't in the future
+            if (startDate > DateOnly.FromDateTime(DateTime.UtcNow))
+                throw new DFCStatsException("Start date cannot be in the future");
+
+            // Check that the end date is not null for the remaining checks
+            if (endDate != null)
+            {
+                // Check that the end date is not before the start date
+                if (endDate < startDate)
+                    throw new DFCStatsException("End date cannot be before start date");
+
+                // Check that the end date isn't in the future
+                if (endDate > DateOnly.FromDateTime(DateTime.UtcNow))
+                    throw new DFCStatsException("End date cannot be in the future");
+            }
         }
     }
 }
