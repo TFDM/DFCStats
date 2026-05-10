@@ -40,5 +40,31 @@ namespace DFCStats.Business.MappingExtensions
                 TimeInChargeAsString = DateAndTimeHelper.TimeAsString(managerRecord.StartDate, managerRecord.AltEndDate)
             };
         }
+
+        /// <summary>
+        /// Maps a manager entity to a ManagementRecordDTO
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <returns></returns>
+        public static ManagementRecordDTO? MapToManagementRecordDTO(this Manager manager)
+        {
+            if (manager == null)
+                return null;
+
+            return new ManagementRecordDTO
+            {
+                Id = manager.Id,
+                LastName = manager.Person?.LastName,
+                FirstName = manager.Person?.FirstName,
+                LastNameFirstName = $"{manager.Person?.LastName}, {manager.Person?.FirstName}",
+                FirstNameLastName = $"{manager.Person?.FirstName} {manager.Person?.LastName}",
+                Nationality = manager.Person?.Nationality?.Name,
+                NationalityIcon = manager.Person?.Nationality?.Icon,
+                PersonId = manager.PersonId,
+                StartDate = manager.StartDate,
+                EndDate = manager.EndDate,
+                IsCaretaker = manager.IsCaretaker
+            };
+        }
     }
 }

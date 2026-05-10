@@ -7,6 +7,22 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Sets an empty variable for the connection string.
+// This will be populated based on the environment the app is running under below
+var darloStatsConnectionString = "";
+
+if (builder.Environment.IsDevelopment())
+{
+    // In development mode get the settings from the user secrets
+
+    // Get the connection string for the database
+    darloStatsConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+} else
+{
+    // In production mode get settings from Azure secrets manager
+    // To be implemented in the future
+}
+
 // Add services to the container.
 builder.Services.AddControllersWithViews(
     // This is required to stop the framework from adding the [Required] attribute to non-nullable reference types
@@ -18,9 +34,9 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 
-// Add the dbcontext
+// Add the dbcontext and specify the connection string
 builder.Services.AddDbContext<DFCStatsDBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseSqlServer(darloStatsConnectionString)
 );
 
 // Register the business services

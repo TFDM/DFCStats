@@ -49,20 +49,19 @@ namespace DFCStats.Web.Models.People
         public int? PlayOffGoals { get; set; }
         public decimal? GoalsPerGame { get; set; }
     }
-
+    
     public class ManagementRecord
     {
         public DateOnly DateFrom { get; set; }
         public DateOnly? DateTo { get; set; }
-        public bool CurrentlyOnGoing { get; set; }
+        public bool? CurrentlyOnGoing { get; set; }
         public bool Caretaker { get; set; }
-        public int GamesManaged { get; set; }
-        public int Wins { get; set; }
-        public int Draws { get; set; }
-        public int Loses { get; set; }
-        public int GoalsFor { get; set; }
-        public int GoalsAgainst { get; set; }
+        public int? GamesManaged { get; set; }
+        public int? Wins { get; set; }
+        public int? Draws { get; set; }
+        public int? Loses { get; set; }
+        public int? GoalsFor { get; set; }
+        public int? GoalsAgainst { get; set; }
         public string? WinPercentage { get; set; }
     }
-
 }

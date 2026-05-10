@@ -69,13 +69,16 @@
                             <tr>
                                 <td class="table-light text-center">@managementRecord.DateFrom.ToString("dd/MM/yyyy")</td>
                                 <td class="table-light border-end text-center">
-                                    @if (managementRecord.CurrentlyOnGoing)
+                                    @if (managementRecord.CurrentlyOnGoing != null)
                                     {
-                                        <span>To Present</span>
-                                    }
-                                    else if (managementRecord.DateTo != null)
-                                    {
-                                        @managementRecord.DateTo.Value.ToString("dd/MM/yyyy")
+                                        if (managementRecord.CurrentlyOnGoing.Value)
+                                        {
+                                            <span>To Present</span>
+                                        }
+                                        else if (managementRecord.DateTo != null)
+                                        {
+                                            @managementRecord.DateTo.Value.ToString("dd/MM/yyyy")
+                                        }
                                     }
                                 </td>
                                 <td class="text-center table-light border-end">

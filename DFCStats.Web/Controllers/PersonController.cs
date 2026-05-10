@@ -121,7 +121,7 @@ public class PersonController : Controller
                 };
 
                 // Adds the new person to the database
-                var x = await _personService.AddPersonAsync(newPersonDTO);
+                await _personService.AddPersonAsync(newPersonDTO);
 
                 // Add a success message to TempData
                 TempData["Success"] = $"{newPerson.FirstName} {newPerson.LastName} has been added successfully";
@@ -344,6 +344,7 @@ public class PersonController : Controller
                 Scoreline = p.Scoreline,
                 Outcome = p.Outcome,
                 Season = p.Season,
+                Goals = p.Goals,
                 Role = p.Role
             }).ToList();
 
@@ -369,6 +370,7 @@ public class PersonController : Controller
             Scoreline = p.Scoreline,
             Outcome = p.Outcome,
             Season = p.Season,
+            Goals = p.Goals,
             Role = p.Role
         }).ToList();
 

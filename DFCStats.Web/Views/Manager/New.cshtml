@@ -1,0 +1,62 @@
+@model DFCStats.Web.Models.Managers.NewManager
+
+@if (TempData["Failure"] != null)
+{
+    <div class="row mb-3">
+        <div class="col-12">
+
+            <div class="alert alert-danger" role="alert">
+                @TempData["Failure"]
+            </div>
+
+        </div>
+    </div>
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="row mb-3">
+        <label asp-for="PersonId" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-4">
+            <select asp-for="PersonId" asp-items="Model.ManagerOptions" class="form-control form-select">
+            <option selected value=""></option>
+        </select>
+        <span asp-validation-for="PersonId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="StartDate" class="col-2 col-form-label"></label>
+        <div class="col-5 col-lg-2">
+            <input asp-for="StartDate" class="form-control" type="date" />
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="EndDate" class="col-2 col-form-label"></label>
+        <div class="col-5 col-lg-2">
+            <input asp-for="EndDate" class="form-control" type="date" />
+            <span asp-validation-for="EndDate" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="IsCaretaker" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-4">
+            <select asp-for="IsCaretaker" asp-items="Model.CaretakerOptions" class="form-control form-select">
+            <option selected value=""></option>
+        </select>
+        <span asp-validation-for="IsCaretaker" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-2"></div>
+        <div class="col-10">
+            <button class="btn btn-primary">Save</button>
+        </div>
+    </div>
+
+</form>

@@ -153,6 +153,32 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Gets people who are managers
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<PersonDTO>> GetPeopleWhoAreManagersAsync(string? sort = null)
+        {
+            // Gets all the people who are marked as managers in the database
+            var peopleWhoAreManagers = _dfcStatsDbContext.People.AsNoTracking()
+                .Where(p => p.IsManager)
+                .AsQueryable();
+
+            // Sort the records based on the sort parameter
+            switch (sort)
+            {
+                case "lastName_desc":
+                    peopleWhoAreManagers = peopleWhoAreManagers.OrderByDescending(p => p.LastName);
+                    break;
+                case "lastName":
+                    peopleWhoAreManagers = peopleWhoAreManagers.OrderBy(p => p.LastName);
+                    break;
+            }
+
+            // Map the people to PersonDTO and return them
+            return await peopleWhoAreManagers.Select(p => p.MapToPersonDTO()!).ToListAsync();
+        }
+
+        /// <summary>
         /// Adds a new person to the database
         /// </summary>
         /// <param name="newPersonDTO"></param>
