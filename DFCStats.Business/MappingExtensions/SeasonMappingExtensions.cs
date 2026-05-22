@@ -3,6 +3,7 @@ using DFCStats.Domain.DTOs.Appearances;
 using DFCStats.Domain.DTOs.Fixtures;
 using DFCStats.Domain.DTOs.People;
 using DFCStats.Domain.DTOs.Seasons;
+using DFCStats.Domain.DTOs.Tables;
 
 namespace DFCStats.Business.MappingExtensions
 {
@@ -79,7 +80,11 @@ namespace DFCStats.Business.MappingExtensions
                                 f.Attendance.HasValue)
                     .Select(f => f.Attendance!.Value)
                     .DefaultIfEmpty(0)
-                    .Max() ?? 0
+                    .Max() ?? 0,
+                Table = season.Tables?
+                    .Select(t => t.MapToTableDTO())
+                    .OfType<TableDTO>()
+                    .ToList()
             };
         }
 

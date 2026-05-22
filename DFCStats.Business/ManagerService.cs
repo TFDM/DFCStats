@@ -202,7 +202,7 @@ namespace DFCStats.Business
 
             // Get the management record from the database
             var existingManagementRecord = await _dfcStatsDbContext.Managers
-                .Include(m => m.Person).ThenInclude(p => p.Nationality)
+                .Include(m => m.Person).ThenInclude(p => p!.Nationality)
                 .FirstOrDefaultAsync(m => m.Id == editManagerRecordDTO.Id);
 
             // Check if the management record exists in the database

@@ -48,6 +48,7 @@ builder.Services.AddScoped<INationalityService, NationalityService>();
 builder.Services.AddScoped<IParticipationService, ParticipationService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
+builder.Services.AddScoped<ITableService, TableService>();
 builder.Services.AddScoped<IVenueService, VenueService>();
 
 // Allows the anti forgery token to be usable in request headers for internal api calls

@@ -133,3 +133,92 @@
 		</tbody>
 	</table>
 </div>
+
+<h5>Table</h5>
+<p>The league table for the season can be seen below.</p>
+
+<div class="table-responsive">
+	<table class="table">
+		<thead>
+			<tr>
+				<th colspan="3" class="text-center table-light border-end"></th>
+				<th colspan="5" class="text-center table-light border-end border-top">Home</th>
+				<th colspan="5" class="text-center table-light border-end border-top">Away</th>
+				<th colspan="3" class="text-center table-light"></th>
+			</tr>
+			<tr>
+				<th class="table-light text-center">Pos</th>
+				<th class="table-light">Team</th>
+				<th class="table-light text-center border-end">Ply</th>
+				<th class="table-light text-center">W</th>
+				<th class="table-light text-center">D</th>
+				<th class="table-light text-center">L</th>
+				<th class="table-light text-center">GF</th>
+				<th class="table-light text-center border-end">GA</th>
+				<th class="table-light text-center">W</th>
+				<th class="table-light text-center">D</th>
+				<th class="table-light text-center">L</th>
+				<th class="table-light text-center">GF</th>
+				<th class="table-light text-center border-end">GA</th>
+				<th class="table-light text-center">GD</th>
+				<th class="table-light text-center">Pts</th>
+				<th class="table-light">Notes</th>
+			</tr>
+		</thead>
+		<tbody class="table-group-divider">
+			@if (Model.Table != null && Model.Table.Count > 0)
+			{
+				@foreach (var t in Model.Table)
+				{
+					string rowClass = "";
+
+					//Sets the rowClass based on the IsChampion
+					//IsPromotion, IsPlayOffs and IsRelegated flags
+					if (t.IsChampion)
+					{
+						rowClass = "table-success";
+					}
+					else if (t.IsPromotion)
+					{
+						rowClass = "table-success";
+					}
+					else if (t.IsPlayOff)
+					{
+						rowClass = "table-warning";
+					}
+					else if (t.IsRelegation)
+					{
+						rowClass = "table-danger";
+					}
+					else
+					{
+						rowClass = "table-light";
+					}
+
+					<tr>
+						<td class="@rowClass text-center">@t.Position</td>
+						<td class="@rowClass">@t.ClubName</td>
+						<td class="@rowClass text-center border-end">@t.GamesPlayed</td>
+						<td class="@rowClass text-center">@t.HomeGamesWon</td>
+						<td class="@rowClass text-center">@t.HomeGamesDrawn</td>
+						<td class="@rowClass text-center">@t.HomeGamesLost</td>
+						<td class="@rowClass text-center">@t.HomeGoalsFor</td>
+						<td class="@rowClass text-center border-end">@t.HomeGoalsAgainst</td>
+						<td class="@rowClass text-center">@t.AwayGamesWon</td>
+						<td class="@rowClass text-center">@t.AwayGamesDrawn</td>
+						<td class="@rowClass text-center">@t.AwayGamesLost</td>
+						<td class="@rowClass text-center">@t.AwayGoalsFor</td>
+						<td class="@rowClass text-center border-end">@t.AwayGoalsAgainst</td>
+						<td class="@rowClass text-center">@t.GoalDifference</td>
+						<td class="@rowClass text-center">@t.Points</td>
+						<td class="@rowClass">@t.Notes</td>
+					</tr>
+				}
+			} else {
+				<tr>
+					<td colspan="16" class="text-center table-warning text-warning-emphasis">There is no league table for this season</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>

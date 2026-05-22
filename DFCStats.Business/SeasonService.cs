@@ -129,6 +129,11 @@ namespace DFCStats.Business
                 query = query.Include(s => s.Fixtures)
                     .ThenInclude(p => p.Participants).ThenInclude(p => p.Person)
                     .Include(s => s.Fixtures).ThenInclude(f => f.Category);
+
+            // Include the table data
+            if (includes.HasFlag(SeasonIncludes.Tables))
+                query = query.Include(s => s.Tables)
+                    .ThenInclude(t => t.Club);
         
             // Run the query and map the entity to a DTO and return it
             var season = await query.FirstOrDefaultAsync(s => s.Id == id);
