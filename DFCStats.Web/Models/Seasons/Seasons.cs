@@ -75,6 +75,7 @@ namespace DFCStats.Web.Models.Seasons
         public bool IsPromotion { get; set; }
         public bool IsRelegation { get; set; }
         public bool IsPlayOff { get; set; }
+        public bool IsDarlington { get; set; }
         public string? Notes { get; set; }
     }
 }

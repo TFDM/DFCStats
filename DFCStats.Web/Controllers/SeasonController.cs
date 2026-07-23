@@ -153,6 +153,7 @@ public class SeasonController : Controller
                 IsPromotion = t.IsPromotion,
                 IsRelegation = t.IsRelegation,
                 IsPlayOff = t.IsPlayOff,
+                IsDarlington = t.IsDarlington,
                 Notes = t.Notes
             }).OrderBy(t => t.Position).ToList()
         };

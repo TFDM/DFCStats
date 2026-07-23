@@ -39,6 +39,7 @@ namespace DFCStats.Business.MappingExtensions
                 IsPromotion = table.IsPromotion,
                 IsRelegation = table.IsRelegated,
                 IsPlayOff = table.IsPlayOffs,
+                IsDarlington = table.IsDarlington,
                 Notes = table.Notes
             };
         }

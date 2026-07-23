@@ -137,6 +137,12 @@
 <h5>Table</h5>
 <p>The league table for the season can be seen below.</p>
 
+<div class="row mb-3">
+	<div class="col-12">
+		<a class="btn btn-primary" asp-controller="Table" asp-action="Manage" asp-route-id="@Model.Id">Manage League Table</a>
+	</div>
+</div>
+
 <div class="table-responsive">
 	<table class="table">
 		<thead>

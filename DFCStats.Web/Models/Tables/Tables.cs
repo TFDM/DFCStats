@@ -1,10 +1,8 @@
-namespace DFCStats.Domain.DTOs.Tables
+namespace DFCStats.Web.Models.Tables
 {
-    public class TableDTO
+    public class Tables
     {
         public Guid Id { get; set; }
-        public Guid SeasonId { get; set; }
-        public Guid? ClubId { get; set; }
         public string ClubName { get; set; } = string.Empty;
         public int Position { get; set; }
         public int GamesPlayed { get; set; }
