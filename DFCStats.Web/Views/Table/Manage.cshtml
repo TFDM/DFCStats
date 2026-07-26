@@ -1,3 +1,9 @@
+@model DFCStats.Web.Models.Tables.NewTable
+
+<div id="addEditForm">
+	<partial name="Partial_AddToTable" />
+</div>
+
 <div class="row">
 	<div class="col-12" id="table">
 		<partial name="Partial_LeagueTable" model="(List<DFCStats.Web.Models.Tables.Tables>)ViewBag.table" />

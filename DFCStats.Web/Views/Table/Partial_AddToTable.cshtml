@@ -1,0 +1,144 @@
+@model DFCStats.Web.Models.Tables.NewTable
+
+<form id="addTeamToTable" method="post">
+    <input asp-for="SeasonId" value="@Model.SeasonId" hidden />
+
+    <!-- Home section of the form -->
+    <div class="row mb-3">
+        <div class="col-3">
+            <label asp-for="ClubId" cite="" class="col-form-label"></label>
+            <select asp-for="ClubId" asp-items="Model.ClubOptions" class="form-control form-select">
+                <option selected value=""></option>
+            </select>
+            <span asp-validation-for="ClubId" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="Played" class="col-form-label"></label>
+            <input asp-for="Played" class="form-control" />
+            <span asp-validation-for="Played" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="HomeWon" class="col-form-label"></label>
+            <input asp-for="HomeWon" class="form-control" />
+            <span asp-validation-for="HomeWon" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="HomeDrawn" class="col-form-label"></label>
+            <input asp-for="HomeDrawn" class="form-control" />
+            <span asp-validation-for="HomeDrawn" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="HomeLost" class="col-form-label"></label>
+            <input asp-for="HomeLost" class="form-control" />
+            <span asp-validation-for="HomeLost" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="HomeGoalsFor" class="col-form-label"></label>
+            <input asp-for="HomeGoalsFor" class="form-control" />
+            <span asp-validation-for="HomeGoalsFor" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="HomeGoalsAgainst" class="col-form-label"></label>
+            <input asp-for="HomeGoalsAgainst" class="form-control" />
+            <span asp-validation-for="HomeGoalsAgainst" class="text-danger"></span>
+        </div>
+    </div>
+
+    <!-- Away section of the form -->
+    <div class="row mb-3">
+        <div class="col-4"></div>
+
+        <div class="col-1">
+            <label asp-for="AwayWon" class="col-form-label"></label>
+            <input asp-for="AwayWon" class="form-control" />
+            <span asp-validation-for="AwayWon" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="AwayDrawn" class="col-form-label"></label>
+            <input asp-for="AwayDrawn" class="form-control" />
+            <span asp-validation-for="AwayDrawn" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="AwayLost" class="col-form-label"></label>
+            <input asp-for="AwayLost" class="form-control" />
+            <span asp-validation-for="AwayLost" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="AwayGoalsFor" class="col-form-label"></label>
+            <input asp-for="AwayGoalsFor" class="form-control" />
+            <span asp-validation-for="AwayGoalsFor" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="AwayGoalsAgainst" class="col-form-label"></label>
+            <input asp-for="AwayGoalsAgainst" class="form-control" />
+            <span asp-validation-for="AwayGoalsAgainst" class="text-danger"></span>
+        </div>
+    </div>
+
+    <!-- Promotion and relegation section of the form -->
+    <div class="row mb-3">
+        <div class="col-4"></div>
+
+        <div class="col-1">
+            <label asp-for="Points" class="col-form-label"></label>
+            <input asp-for="Points" class="form-control" />
+            <span asp-validation-for="Points" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="IsChampion" cite="" class="col-form-label"></label>
+            <select asp-for="IsChampion" asp-items="Model.IsChampionOptions" class="form-control form-select">
+                <option selected value=""></option>
+            </select>
+            <span asp-validation-for="IsChampion" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="IsPromotion" cite="" class="col-form-label"></label>
+            <select asp-for="IsPromotion" asp-items="Model.IsPromotionOptions" class="form-control form-select">
+                <option selected value=""></option>
+            </select>
+            <span asp-validation-for="IsPromotion" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="IsPlayOffs" cite="" class="col-form-label"></label>
+            <select asp-for="IsPlayOffs" asp-items="Model.IsPlayOffsOptions" class="form-control form-select">
+                <option selected value=""></option>
+            </select>
+            <span asp-validation-for="IsPlayOffs" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="IsRelegated" cite="" class="col-form-label"></label>
+            <select asp-for="IsRelegated" asp-items="Model.IsRelegatedOptions" class="form-control form-select">
+                <option selected value=""></option>
+            </select>
+            <span asp-validation-for="IsRelegated" class="text-danger"></span>
+        </div>
+
+        <div class="col-1">
+            <label asp-for="IsDarlington" cite="" class="col-form-label"></label>
+            <select asp-for="IsDarlington" asp-items="Model.IsDarlingtonOptions" class="form-control form-select">
+                <option selected value=""></option>
+            </select>
+            <span asp-validation-for="IsDarlington" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-3">
+            <button type="submit" class="btn btn-primary" id="addClub">Add to Table</button>
+        </div>
+    </div>
+</form>
