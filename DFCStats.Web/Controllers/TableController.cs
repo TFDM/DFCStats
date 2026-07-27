@@ -115,7 +115,33 @@ public class TableController : Controller
 
         if (ModelState.IsValid)
         {
-            // Process the form submission and save the new table entry to the database
+            // Create the table DTO - validation should ensure the values and valid and not null
+            var tableDTO = new DFCStats.Domain.DTOs.Tables.TableDTO
+            {
+                SeasonId = newTable.SeasonId,
+                ClubId = newTable.ClubId,
+                GamesPlayed = newTable.Played ?? 0,
+                HomeGamesWon = newTable.HomeWon ?? 0,
+                HomeGamesDrawn = newTable.HomeDrawn ?? 0,
+                HomeGamesLost = newTable.HomeLost ?? 0,
+                HomeGoalsFor = newTable.HomeGoalsFor ?? 0,
+                HomeGoalsAgainst = newTable.HomeGoalsAgainst ?? 0,
+                AwayGamesWon = newTable.AwayWon ?? 0,
+                AwayGamesDrawn = newTable.AwayDrawn ?? 0,
+                AwayGamesLost = newTable.AwayLost ?? 0,
+                AwayGoalsFor = newTable.AwayGoalsFor ?? 0,
+                AwayGoalsAgainst = newTable.AwayGoalsAgainst ?? 0,
+                Points = newTable.Points ?? 0,
+                IsChampion = newTable.IsChampion ?? false,
+                IsPromotion = newTable.IsPromotion ?? false,
+                IsPlayOff = newTable.IsPlayOffs ?? false,
+                IsRelegation = newTable.IsRelegated ?? false,
+                IsDarlington = newTable.IsDarlington ?? false,
+                Notes = newTable.Notes
+            };
+
+            // Add the new table entry to the database
+            await _tableService.AddTableEntryAsync(tableDTO);
 
             // Return the user to the manage page and maintain the form input values
             return View(newTable);
