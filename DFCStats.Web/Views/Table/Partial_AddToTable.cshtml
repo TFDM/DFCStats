@@ -136,6 +136,15 @@
         </div>
     </div>
 
+    <!-- Notes section of the form -->
+    <div class="row mb-3">
+            <div class="col-12">
+                <label asp-for="Notes" class="col-form-label"></label>
+                <textarea asp-for="Notes" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+        </div>
+
     <div class="row mb-3">
         <div class="col-3">
             <button type="submit" class="btn btn-primary" id="addClub">Add to Table</button>

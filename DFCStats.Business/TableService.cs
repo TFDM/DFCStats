@@ -33,11 +33,49 @@ namespace DFCStats.Business
             // Checks that the club is not already in the table for the season
             CheckClubNotAlreadyInTable(tableDTO, tableForSeason);
 
-            // Get the last position in the table for the season and then increase it by 1 to get the position for the new table entry
-            var position = tableForSeason.Max(t => t.Position);
-            position++;
+            // Set the position for the new table entry to 1
+            var position = 1;
 
-            return new TableDTO();
+            // If there are already table entries for the season, get the last position and increase it by 1
+            if (tableForSeason.Count > 0)
+            {
+                // Get the last position in the table for the season and then increase it by 1 to get the position for the new table entry
+                position = tableForSeason.Max(t => t.Position);
+                position++;
+            }
+
+            // Create the table entry using the dto and the calculated position
+            var tableEntry = new Table()
+            {
+                SeasonId = tableDTO.SeasonId,
+                ClubId = tableDTO.ClubId,
+                Position = position,
+                Played = tableDTO.GamesPlayed,
+                HomeWon = tableDTO.HomeGamesWon,
+                HomeDrawn = tableDTO.HomeGamesDrawn,
+                HomeLost = tableDTO.HomeGamesLost,
+                HomeGoalsFor = tableDTO.HomeGoalsFor,
+                HomeGoalsAgainst = tableDTO.HomeGoalsAgainst,
+                AwayWon = tableDTO.AwayGamesWon,
+                AwayDrawn = tableDTO.AwayGamesDrawn,
+                AwayLost = tableDTO.AwayGamesLost,
+                AwayGoalsFor = tableDTO.AwayGoalsFor,
+                AwayGoalsAgainst = tableDTO.AwayGoalsAgainst,
+                Points = tableDTO.Points,
+                IsChampion = tableDTO.IsChampion,
+                IsPromotion = tableDTO.IsPromotion,
+                IsPlayOffs = tableDTO.IsPlayOff,
+                IsRelegated = tableDTO.IsRelegation,
+                IsDarlington = tableDTO.IsDarlington,
+                Notes = tableDTO.Notes
+            };
+
+            // Add the table entry to the database and save the changes
+            await _dfcStatsDbContext.Tables.AddAsync(tableEntry);
+            await _dfcStatsDbContext.SaveChangesAsync();
+
+            // Map the newly created table entry to a TableDTO and return it
+            return tableEntry.MapToTableDTO()!;
         }
 
         /// <summary>
@@ -104,7 +142,7 @@ namespace DFCStats.Business
 
             // If the club is not specified, check that there is not already a table entry with a club id of no value for the season
             if (!tableDTO.ClubId.HasValue && currentTable.Any(t => !t.ClubId.HasValue))
-                throw new DFCStatsException("Darlington already has a table entry for an unknown club in this season");
+                throw new DFCStatsException("Darlington already has a table entry for this season");
         }
 
     }

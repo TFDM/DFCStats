@@ -1,5 +1,31 @@
 @model DFCStats.Web.Models.Tables.NewTable
 
+@if (TempData["Success"] != null)
+{
+    <div class="row mb-3">
+        <div class="col-12">
+
+            <div class="alert alert-success" role="alert">
+                @TempData["Success"]
+            </div>
+
+        </div>
+    </div>
+}
+
+@if (TempData["Failure"] != null)
+{
+    <div class="row mb-3">
+        <div class="col-12">
+
+            <div class="alert alert-danger" role="alert">
+                @TempData["Failure"]
+            </div>
+
+        </div>
+    </div>
+}
+
 <div id="addEditForm">
 	<partial name="Partial_AddToTable" />
 </div>
