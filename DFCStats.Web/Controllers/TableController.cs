@@ -19,7 +19,7 @@ public class TableController : Controller
         _clubService = clubService;
     }
 
-    public async Task<IActionResult> Manage(string id)
+    public async Task<IActionResult> Add(string id)
     {
         // Validate that the id parameter is a valid GUID format
         // the seasonId is set to the guid if the parsing is successful
@@ -72,7 +72,8 @@ public class TableController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Manage(NewTable newTable)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Add(NewTable newTable)
     {
         if (ModelState.IsValid)
         {
@@ -157,6 +158,58 @@ public class TableController : Controller
         ViewBag.table = ConvertToTableModel(season.Table!);
 
         return View(newTable);
+    }
+
+    public async Task<IActionResult> Edit(string id)
+    {
+        // To be completed later on
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Remove([FromBody] DFCStats.Web.Models.Tables.Tables tableToRemove)
+    {
+        // Get the table entry from the database
+        var table = await _tableService.GetTableEntryByIdAsync(tableToRemove.Id);
+
+        // Check if the table entry was found in the database
+        if (table == null)
+            // The table entry was not found in the database, return an error response
+            return Json(new { success = false, messageToUser = "Table entry not found" });
+
+        try
+        {
+            // Create a new table DTO with the id of the table entry to be removed
+            var tableDTO = new DFCStats.Domain.DTOs.Tables.TableDTO { Id = table.Id };
+
+            // Remove the table entry from the database
+            await _tableService.RemoveTableEntryAsync(tableDTO);
+        }
+        catch (Exception ex)
+        {
+            // There was a problem removing the record
+            return Json(new { success = false, messageToUser = ex.Message });
+        }
+
+        return Json(new { success = true, messageToUser = "Club removed from table" });
+    }
+
+    public async Task<IActionResult> RefreshTablesPanel(string seasonId)
+    {
+        // Get the season from the database - including the table
+        var season = await _seasonService.GetSeasonByIdAsync(Guid.Parse(seasonId), SeasonIncludes.Tables);
+
+        // Check that the season was found in the database
+        if (season == null)
+            // Return the partial view with a null model if the season wasn't found
+            return PartialView("Partial_LeagueTable", null);
+
+        // Convert the season's table into a model
+        var tableModel = ConvertToTableModel(season.Table!);
+
+        // Return the partial view with the table model
+        return PartialView("Partial_LeagueTable", tableModel);
     }
 
     /// <summary>

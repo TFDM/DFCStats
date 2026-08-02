@@ -1,8 +1,30 @@
 @model DFCStats.Web.Models.Tables.NewTable
 
+<dialog class="information-dialog" id="waitingDialog">
+	<div class="spinner-border text-primary" role="status">
+		<span class="visually-hidden">Loading...</span>
+	</div>
+	<div classclass="clear-fix"></div>
+	<span class="dialog-text">Please Wait</span>
+</dialog>
+
+<dialog class="success-dialog" id="successDialog">
+	<span class="dialog-text">Success</span>
+	<form method="dialog">
+		<button class="btn btn-success mt-3">OK</button>
+	</form>
+</dialog>
+
+<dialog class="danger-dialog" id="warningDialog">
+	<span class="dialog-text">Something went wrong</span>
+	<form method="dialog">
+		<button class="btn btn-danger mt-3">OK</button>
+	</form>
+</dialog>
+
 @if (TempData["Success"] != null)
 {
-    <div class="row mb-3">
+    <div class="row mb-3" id="successTempData">
         <div class="col-12">
 
             <div class="alert alert-success" role="alert">
@@ -15,7 +37,7 @@
 
 @if (TempData["Failure"] != null)
 {
-    <div class="row mb-3">
+    <div class="row mb-3" id="failureTempData">
         <div class="col-12">
 
             <div class="alert alert-danger" role="alert">

@@ -1,6 +1,8 @@
 @model DFCStats.Web.Models.Tables.NewTable
 
 <form id="addTeamToTable" method="post">
+    @Html.AntiForgeryToken()
+
     <input asp-for="SeasonId" value="@Model.SeasonId" hidden />
 
     <!-- Home section of the form -->

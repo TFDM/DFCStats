@@ -71,7 +71,8 @@
 								<button class="btn btn-primary" onclick="moveClub(@string.Format("'{0}'", t.Id), 'down')"><i class="fa-solid fa-arrow-down"></i></button>
 							}
 						</td>
-						<td class="@rowClass"><button class="btn btn-primary" onclick="editClub(@string.Format("'{0}'", t.Id))">Edit</button></td>
+						<td class="@rowClass"><a asp-action="Edit" class="btn btn-primary" asp-route-id="@t.Id">Edit</a></td>
+						@* <td class="@rowClass"><button class="btn btn-primary" onclick="editClub(@string.Format("'{0}'", t.Id))">Edit</button></td> *@
 						<td class="@rowClass"><button class="btn btn-danger" onclick="removeClub(@string.Format("'{0}'", t.Id))">Remove</button></td>
 					</tr>
 				}

@@ -18,6 +18,24 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Gets a table by its id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="includes"></param>
+        /// <returns></returns>
+        public async Task<TableDTO?> GetTableEntryByIdAsync(Guid id, TableIncludes includes = TableIncludes.None)
+        {
+            var query = _dfcStatsDbContext.Tables.AsNoTracking().AsQueryable();
+
+            // Includes the clubs if the includes flag is set to include clubs
+            if (includes.HasFlag(TableIncludes.Clubs))
+                query = query.Include(t => t.Club);
+
+            var table = await query.FirstOrDefaultAsync(t => t.Id == id);
+            return table?.MapToTableDTO();
+        }
+
+        /// <summary>
         /// Adds a new table entry to the database
         /// </summary>
         /// <param name="tableDTO"></param>
@@ -79,6 +97,46 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Removes a table entry from the database
+        /// </summary>
+        /// <param name="tableDTO"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task RemoveTableEntryAsync(TableDTO tableDTO)
+        {
+            // Get the table entry to be removed from the database
+            var tableEntryToRemove = await _dfcStatsDbContext.Tables
+                .FirstOrDefaultAsync(t => t.Id == tableDTO.Id);
+
+            // If the table entry to be removed is null, throw an exception
+            if (tableEntryToRemove == null)
+                throw new DFCStatsException("Table entry not found");
+
+            // Mark the table entry for deletion
+            _dfcStatsDbContext.Tables.Remove(tableEntryToRemove);
+
+            // Get all the table entries for the season of the table entry to be removed
+            var tableEntriesForSeason = await _dfcStatsDbContext.Tables
+                .Where(t => t.SeasonId == tableEntryToRemove.SeasonId)
+                .OrderBy(t => t.Position)
+                .ToListAsync();
+
+            // Remove the table entry to be removed from the list of table entries returned
+            tableEntriesForSeason.Remove(tableEntryToRemove);
+
+            // Loop over the remaining table entries in the list and update their position to be in the correct order starting from 1
+            foreach (var tableEntry in tableEntriesForSeason)
+            {
+                // Update the position to be the index of the table entry in the list + 1
+                tableEntry.Position = tableEntriesForSeason.IndexOf(tableEntry) + 1;
+            }
+
+            // Update the table entries in the database with the new order numbers
+            _dfcStatsDbContext.Tables.UpdateRange(tableEntriesForSeason);
+            await _dfcStatsDbContext.SaveChangesAsync();
+        }
+
+        /// <summary>
         /// Gets a table for a specific season
         /// </summary>
         /// <param name="seasonId"></param>
@@ -91,7 +149,7 @@ namespace DFCStats.Business
             var tableForSeason = _dfcStatsDbContext.Tables
                 .AsNoTracking().AsQueryable().Where(t => t.SeasonId == seasonId);
 
-            // Includes the people attached to the season and then the people themselves
+            // Includes the clubs if the includes flag is set to include clubs
             if (includes.HasFlag(TableIncludes.Clubs))
                 tableForSeason = tableForSeason.Include(t => t.Club);
 

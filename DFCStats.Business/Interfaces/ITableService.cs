@@ -14,11 +14,25 @@ namespace DFCStats.Business.Interfaces
     public interface ITableService
     {
         /// <summary>
+        /// Gets a table entry by its Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<TableDTO?> GetTableEntryByIdAsync(Guid id, TableIncludes includes = TableIncludes.None);
+
+        /// <summary>
         /// Adds a table entry to the database
         /// </summary>
         /// <param name="tableDTO"></param>
         /// <returns></returns>
         Task<TableDTO> AddTableEntryAsync(TableDTO tableDTO);
+
+        /// <summary>
+        /// Removes a table entry from the database
+        /// </summary>
+        /// <param name="tableDTO"></param>
+        /// <returns></returns>
+        Task RemoveTableEntryAsync(TableDTO tableDTO);
 
         /// <summary>
         /// Gets a table for a specific season
