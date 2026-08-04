@@ -170,29 +170,49 @@ public class TableController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Remove([FromBody] DFCStats.Web.Models.Tables.Tables tableToRemove)
     {
-        // Get the table entry from the database
-        var table = await _tableService.GetTableEntryByIdAsync(tableToRemove.Id);
-
-        // Check if the table entry was found in the database
-        if (table == null)
-            // The table entry was not found in the database, return an error response
-            return Json(new { success = false, messageToUser = "Table entry not found" });
-
         try
         {
             // Create a new table DTO with the id of the table entry to be removed
-            var tableDTO = new DFCStats.Domain.DTOs.Tables.TableDTO { Id = table.Id };
+            var tableDTO = new DFCStats.Domain.DTOs.Tables.TableDTO { Id = tableToRemove.Id };
 
             // Remove the table entry from the database
             await _tableService.RemoveTableEntryAsync(tableDTO);
         }
-        catch (Exception ex)
+        catch (DFCStatsException ex)
         {
             // There was a problem removing the record
             return Json(new { success = false, messageToUser = ex.Message });
         }
 
         return Json(new { success = true, messageToUser = "Club removed from table" });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Move([FromBody] DFCStats.Web.Models.Tables.MoveTable moveTable)
+    {
+        try
+        {
+            // Create a new table DTO with the id of the table entry to be moved
+            var tableDTO = new DFCStats.Domain.DTOs.Tables.TableDTO { Id = moveTable.Id };
+
+            // Checks the direction
+            if (moveTable.Direction == "up")
+            {
+                // Move the table entry up in the table
+                await _tableService.ChangeTableEntryPositionAsync(tableDTO, TableDirections.Up);
+            } else
+            {
+                // Move the table entry down in the table
+                await _tableService.ChangeTableEntryPositionAsync(tableDTO, TableDirections.Down);
+            }
+        } catch (DFCStatsException ex)
+        {
+            // There was a problem moving the record
+            return Json(new { success = false, messageToUser = ex.Message });
+        }
+
+        return Json(new { success = true, messageToUser = "Club moved in table" });
     }
 
     public async Task<IActionResult> RefreshTablesPanel(string seasonId)

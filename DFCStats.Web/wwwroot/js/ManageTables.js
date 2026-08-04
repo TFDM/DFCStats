@@ -46,9 +46,80 @@ function editClub(tableID) {
     alert(tableID);
 }
 
-function moveClub(tableID, direction) {
-    alert(direction);
-    alert(tableID);
+/* Move a club up or down in the table */
+function moveClub(tableId, direction) {
+    // Remove any existing temp-data messages before proceeding with the removal request
+    removeTempDataMessages();
+    
+    // Gets the waiting dialog and displays it on the page
+    const waitingDialog = document.getElementById("waitingDialog");
+    showDialog(waitingDialog, "Removing club from table... please wait");
+
+    // Gets the verification token from the form
+    var requestVerificationToken = document.querySelector('input[name="__RequestVerificationToken"]');
+
+    // Set the data for the api call
+    var data = {
+        Id: tableId,
+        Direction: direction
+    };
+
+    // Set the url for the api call
+    var url = "/Table/Move";
+
+    // Configure the request
+    const requestOptions = {
+        method: 'POST', // Specify the request method
+        headers: {
+            'Content-Type': 'application/json',
+            '__RequestVerificationToken': requestVerificationToken.value
+        },
+        body: JSON.stringify(data) // Convert the data to JSON format
+    };
+
+    // Make the post request
+    fetch(url, requestOptions)
+        .then(response => {
+            // Check if the request was successful (status code 2xx)
+            if (!response.ok) {
+                // Status was not ok - throw the response to be handled by the catch block
+                throw response; //Will get picked up by the catch block
+            }
+            // Parse the response JSON
+            return response.json();
+        })
+        .then(data => {
+            // Handle the response data
+
+            if (data.success) {
+                //Club moved in the table succesfully
+
+                //Refresh the participants list
+                refreshTablesPanel();
+
+                // Close the waiting diaglog and show the success dialog
+                closeDialog(waitingDialog);
+                showDialog(successDialog, data.messageToUser);
+            } else {
+                // The server was succesfully reached and the request to move the club in the table was done
+                // However the club was not moved successfully for some reason
+
+                // Close the waiting dialog
+                closeDialog(waitingDialog);
+
+                // Show the warning dialog with the message from the server so the user knows what went wrong
+                showDialog(warningDialog, data.messageToUser);
+            }
+        })
+        .catch(error => {
+            // Complete error - the server wasn't reached or just completely failed
+
+            // Close the waiting dialog
+            closeDialog(waitingDialog);
+
+            // Show the warning dialog with the message from the server
+            showDialog(warningDialog, error);
+        });
 }
 
 /* Removes a club from the table. This function is called when the user clicks the 

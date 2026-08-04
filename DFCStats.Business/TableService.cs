@@ -137,6 +137,73 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Changes the position of a table entry in the table
+        /// </summary>
+        /// <param name="tableDTO"></param>
+        /// <param name="direction"></param>
+        /// <returns></returns>
+        public async Task ChangeTableEntryPositionAsync(TableDTO tableDTO, TableDirections direction)
+        {
+            // Get the table entry to be moved from the database
+            var tableEntryToMove = await _dfcStatsDbContext.Tables
+                .FirstOrDefaultAsync(t => t.Id == tableDTO.Id);
+
+            // If the table entry to be moved is null, throw an exception
+            if (tableEntryToMove == null)
+                throw new DFCStatsException("Table entry not found");
+
+            // Check if the direction is up and the table entry is already at the top of the table
+            if (direction == TableDirections.Up && tableEntryToMove.Position == 1)
+                // Table entry can't be moved any higher, throw an exception
+                throw new DFCStatsException("Table entry is already at the top of the table");
+
+            // Get all the table entries for the season of the table entry being moved
+            var tableEntriesForSeason = await _dfcStatsDbContext.Tables
+                .Where(t => t.SeasonId == tableEntryToMove.SeasonId)
+                .OrderBy(t => t.Position)
+                .ToListAsync();
+
+            // Check if the direction is down and the table entry is already at the bottom of the table
+            if (direction == TableDirections.Down && tableEntryToMove.Position == tableEntriesForSeason.Count)
+                // Table entry can't be moved any lower, throw an exception
+                throw new DFCStatsException("Table entry is already at the bottom of the table");
+
+            if (direction == TableDirections.Up)
+            {
+                // Set the new position for the table entry to be moved to one less than its current position
+                var newPosition = tableEntryToMove.Position - 1;
+
+                // Get the table entry that is currently at the new position
+                var tableEntryToSwap = tableEntriesForSeason.FirstOrDefault(t => t.Position == newPosition);
+
+                // Swap the positions of the two table entries
+                tableEntryToSwap!.Position = tableEntryToMove.Position;
+                tableEntryToMove.Position = newPosition;
+
+                // Save the changes to the database
+                _dfcStatsDbContext.Tables.UpdateRange(tableEntryToMove, tableEntryToSwap);
+                await _dfcStatsDbContext.SaveChangesAsync();
+            }
+
+            if (direction == TableDirections.Down)
+            {
+                // Set the new position for the table entry to be moved to one more than its current position
+                var newPosition = tableEntryToMove.Position + 1;
+
+                // Get the table entry that is currently at the new position
+                var tableEntryToSwap = tableEntriesForSeason.FirstOrDefault(t => t.Position == newPosition);
+
+                // Swap the positions of the two table entries
+                tableEntryToSwap!.Position = tableEntryToMove.Position;
+                tableEntryToMove.Position = newPosition;
+
+                // Save the changes to the database
+                _dfcStatsDbContext.Tables.UpdateRange(tableEntryToMove, tableEntryToSwap);
+                await _dfcStatsDbContext.SaveChangesAsync();
+            }
+        }
+
+        /// <summary>
         /// Gets a table for a specific season
         /// </summary>
         /// <param name="seasonId"></param>

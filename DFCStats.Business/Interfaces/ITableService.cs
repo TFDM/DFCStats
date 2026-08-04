@@ -11,6 +11,12 @@ namespace DFCStats.Business.Interfaces
         All = Clubs
     }
 
+    public enum TableDirections
+    {
+        Up,
+        Down
+    }
+
     public interface ITableService
     {
         /// <summary>
@@ -33,6 +39,14 @@ namespace DFCStats.Business.Interfaces
         /// <param name="tableDTO"></param>
         /// <returns></returns>
         Task RemoveTableEntryAsync(TableDTO tableDTO);
+
+        /// <summary>
+        /// Changes the position of a table entry in the table
+        /// </summary>
+        /// <param name="tableDTO"></param>
+        /// <param name="direction"></param>
+        /// <returns></returns>
+        Task ChangeTableEntryPositionAsync(TableDTO tableDTO, TableDirections direction);
 
         /// <summary>
         /// Gets a table for a specific season
