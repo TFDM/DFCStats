@@ -162,8 +162,135 @@ public class TableController : Controller
 
     public async Task<IActionResult> Edit(string id)
     {
+        // Validate that the id parameter is a valid GUID format
+        // the tableId is set to the guid if the parsing is successful
+        if (!Guid.TryParse(id, out var tableId))
+            // If the id is not a valid GUID, return a 400 Bad Request HTTP response
+            return BadRequest("Invalid ID format");
+
+        // Get the table entry from the database
+        var tableEntry = await _tableService.GetTableEntryByIdAsync(tableId, TableIncludes.Clubs);
+
+        // If the table entry is not found, return a 404 Not Found HTTP response
+        if (tableEntry == null)
+            return NotFound("Table entry not found");
+
+        // Get the season from the database - including the table
+        var season = await _seasonService.GetSeasonByIdAsync(tableEntry.SeasonId, SeasonIncludes.Tables);
+
+        // If the season record is not found, return a 404 not found HTTP response
+        if (season == null)
+            return NotFound("Season not found");
+
+        // Set the page heading and the page title
+        var pageHeadingAndTitle = string.Format($"Manage Table for Season {season.Description}");
+		@ViewData["PageHeading"] =  pageHeadingAndTitle;
+		ViewData["Title"] = pageHeadingAndTitle;
+
+        // Get all the clubs from the database and sort by their name
+        var clubs = await _clubService.GetAllClubsAsync(sort: "name");
+
+        // Sets up the true/false options for the dropdowns
+        var trueFalseOptions = new List<SelectListItem>
+        {
+            new SelectListItem { Text = "Yes", Value = "true" },
+            new SelectListItem { Text = "No", Value = "false" }
+        };
+
+        // Sets up the edit table form - this includes all the options for the dropdowns and the season id
+        var viewModel = new EditTable
+        {
+            Id = tableEntry.Id,
+            SeasonId = tableEntry.SeasonId,
+            ClubId = tableEntry.ClubId,
+            Played = tableEntry.GamesPlayed,
+            HomeWon = tableEntry.HomeGamesWon,
+            HomeDrawn = tableEntry.HomeGamesDrawn,
+            HomeLost = tableEntry.HomeGamesLost,
+            HomeGoalsFor = tableEntry.HomeGoalsFor,
+            HomeGoalsAgainst = tableEntry.HomeGoalsAgainst,
+            AwayWon = tableEntry.AwayGamesWon,
+            AwayDrawn = tableEntry.AwayGamesDrawn,
+            AwayLost = tableEntry.AwayGamesLost,
+            AwayGoalsFor = tableEntry.AwayGoalsFor,
+            AwayGoalsAgainst = tableEntry.AwayGoalsAgainst,
+            Points = tableEntry.Points,
+            IsChampion = tableEntry.IsChampion,
+            IsPromotion = tableEntry.IsPromotion,
+            IsPlayOffs = tableEntry.IsPlayOff,
+            IsRelegated = tableEntry.IsRelegation,
+            IsDarlington = tableEntry.IsDarlington,
+            Notes = tableEntry.Notes,
+            ClubOptions = clubs.Select(dto => new SelectListItem
+            {
+                Text = dto.Name,
+                Value = dto.Id.ToString()
+            }),
+            IsChampionOptions = trueFalseOptions,
+            IsPromotionOptions = trueFalseOptions,  
+            IsPlayOffsOptions = trueFalseOptions,
+            IsRelegatedOptions = trueFalseOptions,
+            IsDarlingtonOptions = trueFalseOptions
+        };
+
+        // Convert the season's table into a model
+        ViewBag.table = ConvertToTableModel(season.Table!);
+
         // To be completed later on
-        return View();
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(EditTable editTable)
+    {
+        if (ModelState.IsValid)
+        {
+            // Process the form if the model state is valid
+            var x = "";
+        }
+
+        // Get the season from the database - including the table
+        var season = await _seasonService.GetSeasonByIdAsync(editTable.SeasonId, SeasonIncludes.Tables);
+
+        // If the season record is not found, return a 404 Not Found HTTP response
+        // The season should be found as its passed in the form as a hidden field 
+        if (season == null)
+            return NotFound("Season not found");
+
+        // Set the page heading and the page title
+        var pageHeadingAndTitle = string.Format($"Manage Table for Season {season.Description}");
+		@ViewData["PageHeading"] =  pageHeadingAndTitle;
+		ViewData["Title"] = pageHeadingAndTitle;
+
+        // Get all the clubs from the database and sort by their name
+        var clubs = await _clubService.GetAllClubsAsync(sort: "name");
+
+        // Populate the ClubOptions property of the model with the list of clubs for the dropdown
+        editTable.ClubOptions = clubs.Select(dto => new SelectListItem
+        {
+            Text = dto.Name,
+            Value = dto.Id.ToString()
+        });
+
+        // Sets up the true/false options for the dropdowns
+        var trueFalseOptions = new List<SelectListItem>
+        {
+            new SelectListItem { Text = "Yes", Value = "true" },
+            new SelectListItem { Text = "No", Value = "false" }
+        };
+
+        // Populate the true/false options for the dropdowns in the model
+        editTable.IsChampionOptions = trueFalseOptions;
+        editTable.IsPromotionOptions = trueFalseOptions;
+        editTable.IsPlayOffsOptions = trueFalseOptions;
+        editTable.IsRelegatedOptions = trueFalseOptions;
+        editTable.IsDarlingtonOptions = trueFalseOptions;
+
+        // Convert the season's table into a model
+        ViewBag.table = ConvertToTableModel(season.Table!);
+
+        return View(editTable);
     }
 
     [HttpPost]
