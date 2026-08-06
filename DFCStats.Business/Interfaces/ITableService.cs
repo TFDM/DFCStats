@@ -34,6 +34,13 @@ namespace DFCStats.Business.Interfaces
         Task<TableDTO> AddTableEntryAsync(TableDTO tableDTO);
 
         /// <summary>
+        /// Updates a table entry in the database
+        /// </summary>
+        /// <param name="tableDTO"></param>
+        /// <returns></returns>
+        Task<TableDTO> UpdateTableEntryAsync(TableDTO tableDTO);
+
+        /// <summary>
         /// Removes a table entry from the database
         /// </summary>
         /// <param name="tableDTO"></param>

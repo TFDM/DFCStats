@@ -97,6 +97,63 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Updates a table entry in the database
+        /// </summary>
+        /// <param name="tableDTO"></param>
+        /// <returns></returns>
+        public async Task<TableDTO> UpdateTableEntryAsync(TableDTO tableDTO)
+        {
+            // Check the flags for the table entry
+            CheckFlags(tableDTO);
+
+            // Gets the table for the season specified in the DTO
+            var tableForSeason = await GetTableBySeasonIdAsync(tableDTO.SeasonId, TableIncludes.Clubs, sort: "position_desc");
+
+            // Remove the table entry being updated from the list of table entries for the season
+            tableForSeason.RemoveAll(t => t.Id == tableDTO.Id);
+
+            // Checks that the club is not already in the table for the season
+            CheckClubNotAlreadyInTable(tableDTO, tableForSeason);
+
+            // Get the table entry to be updated from the database
+            var tableEntryToUpdate = await _dfcStatsDbContext.Tables
+                .FirstOrDefaultAsync(t => t.Id == tableDTO.Id);
+
+            // Check that the table entry to be updated is not null
+            if (tableEntryToUpdate == null)
+                throw new DFCStatsException("Table entry not found");
+
+            // Update the table entry with the values from the DTO
+            tableEntryToUpdate.SeasonId = tableDTO.SeasonId;
+            tableEntryToUpdate.ClubId = tableDTO.ClubId;
+            tableEntryToUpdate.Played = tableDTO.GamesPlayed;
+            tableEntryToUpdate.HomeWon = tableDTO.HomeGamesWon;
+            tableEntryToUpdate.HomeDrawn = tableDTO.HomeGamesDrawn;
+            tableEntryToUpdate.HomeLost = tableDTO.HomeGamesLost;
+            tableEntryToUpdate.HomeGoalsFor = tableDTO.HomeGoalsFor;
+            tableEntryToUpdate.HomeGoalsAgainst = tableDTO.HomeGoalsAgainst;
+            tableEntryToUpdate.AwayWon = tableDTO.AwayGamesWon;
+            tableEntryToUpdate.AwayDrawn = tableDTO.AwayGamesDrawn;
+            tableEntryToUpdate.AwayLost = tableDTO.AwayGamesLost;
+            tableEntryToUpdate.AwayGoalsFor = tableDTO.AwayGoalsFor;
+            tableEntryToUpdate.AwayGoalsAgainst = tableDTO.AwayGoalsAgainst;
+            tableEntryToUpdate.Points = tableDTO.Points;
+            tableEntryToUpdate.IsChampion = tableDTO.IsChampion;
+            tableEntryToUpdate.IsPromotion = tableDTO.IsPromotion;
+            tableEntryToUpdate.IsPlayOffs = tableDTO.IsPlayOff;
+            tableEntryToUpdate.IsRelegated = tableDTO.IsRelegation;
+            tableEntryToUpdate.IsDarlington = tableDTO.IsDarlington;
+            tableEntryToUpdate.Notes = tableDTO.Notes;
+            
+            // Update the table entry in the database and save the changes
+            _dfcStatsDbContext.Tables.Update(tableEntryToUpdate);
+            await _dfcStatsDbContext.SaveChangesAsync();
+
+            // Map the updated table entry to a TableDTO and return it
+            return tableEntryToUpdate.MapToTableDTO()!;
+        }
+
+        /// <summary>
         /// Removes a table entry from the database
         /// </summary>
         /// <param name="tableDTO"></param>

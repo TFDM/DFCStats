@@ -247,7 +247,46 @@ public class TableController : Controller
         if (ModelState.IsValid)
         {
             // Process the form if the model state is valid
-            var x = "";
+            try
+            {
+
+                // Create the table DTO - validation should ensure the values and valid and not null
+                var tableDTO = new DFCStats.Domain.DTOs.Tables.TableDTO
+                {
+                    Id = editTable.Id,
+                    SeasonId = editTable.SeasonId,
+                    ClubId = editTable.ClubId,
+                    GamesPlayed = editTable.Played ?? 0,
+                    HomeGamesWon = editTable.HomeWon ?? 0,
+                    HomeGamesDrawn = editTable.HomeDrawn ?? 0,
+                    HomeGamesLost = editTable.HomeLost ?? 0,
+                    HomeGoalsFor = editTable.HomeGoalsFor ?? 0,
+                    HomeGoalsAgainst = editTable.HomeGoalsAgainst ?? 0,
+                    AwayGamesWon = editTable.AwayWon ?? 0,
+                    AwayGamesDrawn = editTable.AwayDrawn ?? 0,
+                    AwayGamesLost = editTable.AwayLost ?? 0,
+                    AwayGoalsFor = editTable.AwayGoalsFor ?? 0,
+                    AwayGoalsAgainst = editTable.AwayGoalsAgainst ?? 0,
+                    Points = editTable.Points ?? 0,
+                    IsChampion = editTable.IsChampion ?? false,
+                    IsPromotion = editTable.IsPromotion ?? false,
+                    IsPlayOff = editTable.IsPlayOffs ?? false,
+                    IsRelegation = editTable.IsRelegated ?? false,
+                    IsDarlington = editTable.IsDarlington ?? false,
+                    Notes = editTable.Notes
+                };
+
+                // Try to update the table entry in the database
+                await _tableService.UpdateTableEntryAsync(tableDTO);
+
+                // Add a success message to TempData
+                TempData["Success"] = "Table has been updated";
+
+            } catch (DFCStatsException ex)
+            {
+                // Add a failure message to TempData
+                TempData["Failure"] = ex.Message;
+            }
         }
 
         // Get the season from the database - including the table
