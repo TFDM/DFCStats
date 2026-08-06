@@ -16,5 +16,6 @@ namespace DFCStats.Data.Entities
 
         public virtual ICollection<PersonSeason> PersonSeasons { get; set; } = null!;
         public virtual ICollection<Fixture> Fixtures { get; set; } = null!;
+        public virtual ICollection<Table> Tables { get; set; } = null!;
     }
 }

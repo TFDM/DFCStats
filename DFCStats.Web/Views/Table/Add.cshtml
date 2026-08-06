@@ -1,0 +1,65 @@
+@model DFCStats.Web.Models.Tables.NewTable
+
+<dialog class="information-dialog" id="waitingDialog">
+	<div class="spinner-border text-primary" role="status">
+		<span class="visually-hidden">Loading...</span>
+	</div>
+	<div classclass="clear-fix"></div>
+	<span class="dialog-text">Please Wait</span>
+</dialog>
+
+<dialog class="success-dialog" id="successDialog">
+	<span class="dialog-text">Success</span>
+	<form method="dialog">
+		<button class="btn btn-success mt-3">OK</button>
+	</form>
+</dialog>
+
+<dialog class="danger-dialog" id="warningDialog">
+	<span class="dialog-text">Something went wrong</span>
+	<form method="dialog">
+		<button class="btn btn-danger mt-3">OK</button>
+	</form>
+</dialog>
+
+@if (TempData["Success"] != null)
+{
+    <div class="row mb-3" id="successTempData">
+        <div class="col-12">
+
+            <div class="alert alert-success" role="alert">
+                @TempData["Success"]
+            </div>
+
+        </div>
+    </div>
+}
+
+@if (TempData["Failure"] != null)
+{
+    <div class="row mb-3" id="failureTempData">
+        <div class="col-12">
+
+            <div class="alert alert-danger" role="alert">
+                @TempData["Failure"]
+            </div>
+
+        </div>
+    </div>
+}
+
+<div id="addEditForm">
+	<partial name="Partial_AddToTable" />
+</div>
+
+<div class="row">
+	<div class="col-12" id="table">
+		<partial name="Partial_LeagueTable" model="(List<DFCStats.Web.Models.Tables.Tables>)ViewBag.table" />
+	</div>
+</div>
+
+@section Scripts
+{
+	<!--Loads in the required javascript to make the manage tables page work-->
+	<script src="~/js/ManageTables.js" asp-append-version="true"></script>
+}

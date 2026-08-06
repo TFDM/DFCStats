@@ -73,8 +73,8 @@ public class SeasonController : Controller
             // If the id is not a valid GUID, return a 400 Bad Request HTTP response
             return BadRequest("Invalid ID format");
 
-        // Get the season from the database including all the appearance and fixture data
-        var season = await _seasonService.GetSeasonByIdAsync(seasonId, SeasonIncludes.All);
+        // Get the season from the database including all the appearance, fixture and table data
+        var season = await _seasonService.GetSeasonByIdAsync(seasonId, SeasonIncludes.Fixtures | SeasonIncludes.Appearances | SeasonIncludes.Tables);
 
         // If the season record is not found, return a 404 Not Found HTTP response
         if (season == null)
@@ -110,7 +110,7 @@ public class SeasonController : Controller
                 Venue = f.Venue,
                 PenaltiesRequired = f.PenaltiesRequired,
                 PenaltyScoreWithOutcome = f.PenaltyScoreWithOutcome
-            }).ToList(),
+            }).OrderBy(f => f.Date).ToList(),
             Appearances = season.Appearances!.Select(a => new SeasonalAppearances
             {
                 PersonId = a.PersonId,
@@ -130,7 +130,32 @@ public class SeasonController : Controller
                 PlayOffStarts = a.PlayOffStarts,
                 PlayOffSubs = a.PlayOffSubs,
                 PlayOffGoals = a.PlayOffGoals
-            }).OrderBy(a => a.LastName).ThenBy(a => a.FirstName).ToList()
+            }).OrderBy(a => a.LastName).ThenBy(a => a.FirstName).ToList(),
+            Table = season.Table!.Select(t => new SeasonalTable
+            {
+                Id = t.Id,
+                ClubName = t.ClubName,
+                Position = t.Position,
+                GamesPlayed = t.GamesPlayed,
+                HomeGamesWon = t.HomeGamesWon,
+                HomeGamesDrawn = t.HomeGamesDrawn,
+                HomeGamesLost = t.HomeGamesLost,
+                HomeGoalsFor = t.HomeGoalsFor,
+                HomeGoalsAgainst = t.HomeGoalsAgainst,
+                AwayGamesWon = t.AwayGamesWon,
+                AwayGamesDrawn = t.AwayGamesDrawn,
+                AwayGamesLost = t.AwayGamesLost,
+                AwayGoalsFor = t.AwayGoalsFor,
+                AwayGoalsAgainst = t.AwayGoalsAgainst,
+                GoalDifference = t.GoalDifference,
+                Points = t.Points,
+                IsChampion = t.IsChampion,
+                IsPromotion = t.IsPromotion,
+                IsRelegation = t.IsRelegation,
+                IsPlayOff = t.IsPlayOff,
+                IsDarlington = t.IsDarlington,
+                Notes = t.Notes
+            }).OrderBy(t => t.Position).ToList()
         };
 
         return View(seasonToDisplay);

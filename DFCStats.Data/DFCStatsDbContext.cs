@@ -16,6 +16,7 @@ namespace DFCStats.Data
         public DbSet<Person> People { get; set; }
         public DbSet<PersonSeason> PeopleSeasons { get; set; }
         public DbSet<Season> Seasons { get; set; }
+        public DbSet<Table> Tables { get; set; }
         public DbSet<Venue> Venues { get; set; }
 
         public DbSet<View_Managers> View_Managers { get; set; }

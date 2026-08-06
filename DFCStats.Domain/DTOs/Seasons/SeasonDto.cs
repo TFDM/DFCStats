@@ -1,6 +1,7 @@
 using DFCStats.Domain.DTOs.Fixtures;
 using DFCStats.Domain.DTOs.People;
 using DFCStats.Domain.DTOs.Appearances;
+using DFCStats.Domain.DTOs.Tables;
 
 namespace DFCStats.Domain.DTOs.Seasons
 {
@@ -19,5 +20,6 @@ namespace DFCStats.Domain.DTOs.Seasons
         public int? TotalPlayersUed { get; set; }
         public int? AverageHomeAttendance { get; set; }
         public int? HighestHomeAttendance { get; set; }
+        public List<TableDTO>? Table { get; set; }
     }
 }

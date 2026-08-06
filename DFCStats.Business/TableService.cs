@@ -1,0 +1,331 @@
+using DFCStats.Data;
+using DFCStats.Data.Entities;
+using DFCStats.Business.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using DFCStats.Domain.DTOs.Tables;
+using DFCStats.Domain.Exceptions;
+using DFCStats.Business.MappingExtensions;
+
+namespace DFCStats.Business
+{
+    public class TableService : ITableService
+    {
+        private readonly DFCStatsDBContext _dfcStatsDbContext;
+        
+        public TableService(DFCStatsDBContext dFCStatsDBContext)
+        {
+            _dfcStatsDbContext = dFCStatsDBContext;
+        }
+
+        /// <summary>
+        /// Gets a table by its id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="includes"></param>
+        /// <returns></returns>
+        public async Task<TableDTO?> GetTableEntryByIdAsync(Guid id, TableIncludes includes = TableIncludes.None)
+        {
+            var query = _dfcStatsDbContext.Tables.AsNoTracking().AsQueryable();
+
+            // Includes the clubs if the includes flag is set to include clubs
+            if (includes.HasFlag(TableIncludes.Clubs))
+                query = query.Include(t => t.Club);
+
+            var table = await query.FirstOrDefaultAsync(t => t.Id == id);
+            return table?.MapToTableDTO();
+        }
+
+        /// <summary>
+        /// Adds a new table entry to the database
+        /// </summary>
+        /// <param name="tableDTO"></param>
+        /// <returns></returns>
+        public async Task<TableDTO> AddTableEntryAsync(TableDTO tableDTO)
+        {
+            // Check the flags for the table entry
+            CheckFlags(tableDTO);
+
+            // Gets the table for the season specified in the DTO
+            var tableForSeason = await GetTableBySeasonIdAsync(tableDTO.SeasonId, TableIncludes.Clubs, sort: "position_desc");
+
+            // Checks that the club is not already in the table for the season
+            CheckClubNotAlreadyInTable(tableDTO, tableForSeason);
+
+            // Set the position for the new table entry to 1
+            var position = 1;
+
+            // If there are already table entries for the season, get the last position and increase it by 1
+            if (tableForSeason.Count > 0)
+            {
+                // Get the last position in the table for the season and then increase it by 1 to get the position for the new table entry
+                position = tableForSeason.Max(t => t.Position);
+                position++;
+            }
+
+            // Create the table entry using the dto and the calculated position
+            var tableEntry = new Table()
+            {
+                SeasonId = tableDTO.SeasonId,
+                ClubId = tableDTO.ClubId,
+                Position = position,
+                Played = tableDTO.GamesPlayed,
+                HomeWon = tableDTO.HomeGamesWon,
+                HomeDrawn = tableDTO.HomeGamesDrawn,
+                HomeLost = tableDTO.HomeGamesLost,
+                HomeGoalsFor = tableDTO.HomeGoalsFor,
+                HomeGoalsAgainst = tableDTO.HomeGoalsAgainst,
+                AwayWon = tableDTO.AwayGamesWon,
+                AwayDrawn = tableDTO.AwayGamesDrawn,
+                AwayLost = tableDTO.AwayGamesLost,
+                AwayGoalsFor = tableDTO.AwayGoalsFor,
+                AwayGoalsAgainst = tableDTO.AwayGoalsAgainst,
+                Points = tableDTO.Points,
+                IsChampion = tableDTO.IsChampion,
+                IsPromotion = tableDTO.IsPromotion,
+                IsPlayOffs = tableDTO.IsPlayOff,
+                IsRelegated = tableDTO.IsRelegation,
+                IsDarlington = tableDTO.IsDarlington,
+                Notes = tableDTO.Notes
+            };
+
+            // Add the table entry to the database and save the changes
+            await _dfcStatsDbContext.Tables.AddAsync(tableEntry);
+            await _dfcStatsDbContext.SaveChangesAsync();
+
+            // Map the newly created table entry to a TableDTO and return it
+            return tableEntry.MapToTableDTO()!;
+        }
+
+        /// <summary>
+        /// Updates a table entry in the database
+        /// </summary>
+        /// <param name="tableDTO"></param>
+        /// <returns></returns>
+        public async Task<TableDTO> UpdateTableEntryAsync(TableDTO tableDTO)
+        {
+            // Check the flags for the table entry
+            CheckFlags(tableDTO);
+
+            // Gets the table for the season specified in the DTO
+            var tableForSeason = await GetTableBySeasonIdAsync(tableDTO.SeasonId, TableIncludes.Clubs, sort: "position_desc");
+
+            // Remove the table entry being updated from the list of table entries for the season
+            tableForSeason.RemoveAll(t => t.Id == tableDTO.Id);
+
+            // Checks that the club is not already in the table for the season
+            CheckClubNotAlreadyInTable(tableDTO, tableForSeason);
+
+            // Get the table entry to be updated from the database
+            var tableEntryToUpdate = await _dfcStatsDbContext.Tables
+                .FirstOrDefaultAsync(t => t.Id == tableDTO.Id);
+
+            // Check that the table entry to be updated is not null
+            if (tableEntryToUpdate == null)
+                throw new DFCStatsException("Table entry not found");
+
+            // Update the table entry with the values from the DTO
+            tableEntryToUpdate.SeasonId = tableDTO.SeasonId;
+            tableEntryToUpdate.ClubId = tableDTO.ClubId;
+            tableEntryToUpdate.Played = tableDTO.GamesPlayed;
+            tableEntryToUpdate.HomeWon = tableDTO.HomeGamesWon;
+            tableEntryToUpdate.HomeDrawn = tableDTO.HomeGamesDrawn;
+            tableEntryToUpdate.HomeLost = tableDTO.HomeGamesLost;
+            tableEntryToUpdate.HomeGoalsFor = tableDTO.HomeGoalsFor;
+            tableEntryToUpdate.HomeGoalsAgainst = tableDTO.HomeGoalsAgainst;
+            tableEntryToUpdate.AwayWon = tableDTO.AwayGamesWon;
+            tableEntryToUpdate.AwayDrawn = tableDTO.AwayGamesDrawn;
+            tableEntryToUpdate.AwayLost = tableDTO.AwayGamesLost;
+            tableEntryToUpdate.AwayGoalsFor = tableDTO.AwayGoalsFor;
+            tableEntryToUpdate.AwayGoalsAgainst = tableDTO.AwayGoalsAgainst;
+            tableEntryToUpdate.Points = tableDTO.Points;
+            tableEntryToUpdate.IsChampion = tableDTO.IsChampion;
+            tableEntryToUpdate.IsPromotion = tableDTO.IsPromotion;
+            tableEntryToUpdate.IsPlayOffs = tableDTO.IsPlayOff;
+            tableEntryToUpdate.IsRelegated = tableDTO.IsRelegation;
+            tableEntryToUpdate.IsDarlington = tableDTO.IsDarlington;
+            tableEntryToUpdate.Notes = tableDTO.Notes;
+            
+            // Update the table entry in the database and save the changes
+            _dfcStatsDbContext.Tables.Update(tableEntryToUpdate);
+            await _dfcStatsDbContext.SaveChangesAsync();
+
+            // Map the updated table entry to a TableDTO and return it
+            return tableEntryToUpdate.MapToTableDTO()!;
+        }
+
+        /// <summary>
+        /// Removes a table entry from the database
+        /// </summary>
+        /// <param name="tableDTO"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task RemoveTableEntryAsync(TableDTO tableDTO)
+        {
+            // Get the table entry to be removed from the database
+            var tableEntryToRemove = await _dfcStatsDbContext.Tables
+                .FirstOrDefaultAsync(t => t.Id == tableDTO.Id);
+
+            // If the table entry to be removed is null, throw an exception
+            if (tableEntryToRemove == null)
+                throw new DFCStatsException("Table entry not found");
+
+            // Mark the table entry for deletion
+            _dfcStatsDbContext.Tables.Remove(tableEntryToRemove);
+
+            // Get all the table entries for the season of the table entry to be removed
+            var tableEntriesForSeason = await _dfcStatsDbContext.Tables
+                .Where(t => t.SeasonId == tableEntryToRemove.SeasonId)
+                .OrderBy(t => t.Position)
+                .ToListAsync();
+
+            // Remove the table entry to be removed from the list of table entries returned
+            tableEntriesForSeason.Remove(tableEntryToRemove);
+
+            // Loop over the remaining table entries in the list and update their position to be in the correct order starting from 1
+            foreach (var tableEntry in tableEntriesForSeason)
+            {
+                // Update the position to be the index of the table entry in the list + 1
+                tableEntry.Position = tableEntriesForSeason.IndexOf(tableEntry) + 1;
+            }
+
+            // Update the table entries in the database with the new order numbers
+            _dfcStatsDbContext.Tables.UpdateRange(tableEntriesForSeason);
+            await _dfcStatsDbContext.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Changes the position of a table entry in the table
+        /// </summary>
+        /// <param name="tableDTO"></param>
+        /// <param name="direction"></param>
+        /// <returns></returns>
+        public async Task ChangeTableEntryPositionAsync(TableDTO tableDTO, TableDirections direction)
+        {
+            // Get the table entry to be moved from the database
+            var tableEntryToMove = await _dfcStatsDbContext.Tables
+                .FirstOrDefaultAsync(t => t.Id == tableDTO.Id);
+
+            // If the table entry to be moved is null, throw an exception
+            if (tableEntryToMove == null)
+                throw new DFCStatsException("Table entry not found");
+
+            // Check if the direction is up and the table entry is already at the top of the table
+            if (direction == TableDirections.Up && tableEntryToMove.Position == 1)
+                // Table entry can't be moved any higher, throw an exception
+                throw new DFCStatsException("Table entry is already at the top of the table");
+
+            // Get all the table entries for the season of the table entry being moved
+            var tableEntriesForSeason = await _dfcStatsDbContext.Tables
+                .Where(t => t.SeasonId == tableEntryToMove.SeasonId)
+                .OrderBy(t => t.Position)
+                .ToListAsync();
+
+            // Check if the direction is down and the table entry is already at the bottom of the table
+            if (direction == TableDirections.Down && tableEntryToMove.Position == tableEntriesForSeason.Count)
+                // Table entry can't be moved any lower, throw an exception
+                throw new DFCStatsException("Table entry is already at the bottom of the table");
+
+            if (direction == TableDirections.Up)
+            {
+                // Set the new position for the table entry to be moved to one less than its current position
+                var newPosition = tableEntryToMove.Position - 1;
+
+                // Get the table entry that is currently at the new position
+                var tableEntryToSwap = tableEntriesForSeason.FirstOrDefault(t => t.Position == newPosition);
+
+                // Swap the positions of the two table entries
+                tableEntryToSwap!.Position = tableEntryToMove.Position;
+                tableEntryToMove.Position = newPosition;
+
+                // Save the changes to the database
+                _dfcStatsDbContext.Tables.UpdateRange(tableEntryToMove, tableEntryToSwap);
+                await _dfcStatsDbContext.SaveChangesAsync();
+            }
+
+            if (direction == TableDirections.Down)
+            {
+                // Set the new position for the table entry to be moved to one more than its current position
+                var newPosition = tableEntryToMove.Position + 1;
+
+                // Get the table entry that is currently at the new position
+                var tableEntryToSwap = tableEntriesForSeason.FirstOrDefault(t => t.Position == newPosition);
+
+                // Swap the positions of the two table entries
+                tableEntryToSwap!.Position = tableEntryToMove.Position;
+                tableEntryToMove.Position = newPosition;
+
+                // Save the changes to the database
+                _dfcStatsDbContext.Tables.UpdateRange(tableEntryToMove, tableEntryToSwap);
+                await _dfcStatsDbContext.SaveChangesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Gets a table for a specific season
+        /// </summary>
+        /// <param name="seasonId"></param>
+        /// <param name="includes"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        public async Task<List<TableDTO>> GetTableBySeasonIdAsync(Guid seasonId, TableIncludes includes = TableIncludes.None, string? sort = null)
+        {
+            // Get the table entries for the specified season
+            var tableForSeason = _dfcStatsDbContext.Tables
+                .AsNoTracking().AsQueryable().Where(t => t.SeasonId == seasonId);
+
+            // Includes the clubs if the includes flag is set to include clubs
+            if (includes.HasFlag(TableIncludes.Clubs))
+                tableForSeason = tableForSeason.Include(t => t.Club);
+
+            // Apply sorting if specified
+            switch(sort)
+            {
+                case "position_desc":
+                    tableForSeason = tableForSeason.OrderByDescending(t => t.Position);
+                    break;
+                default:
+                    tableForSeason = tableForSeason.OrderBy(t => t.Position);
+                    break;
+            }
+
+            // Map the table entries to DTOs and return them
+            return await tableForSeason.Select(n => n.MapToTableDTO()!).ToListAsync();
+        }
+
+        /// <summary>
+        /// Checks the is champion, is promotion, is play-offs and is relegated flags
+        /// </summary>
+        /// <param name="tableDTO"></param>
+        /// <exception cref="DFCStatsException"></exception>
+        private void CheckFlags(TableDTO tableDTO)
+		{
+			// Each boolean is treated as 1 if true and 0 if false.
+            // The sum gives the number of true values and it should always be 1 or less
+			bool onlyOneOrNoneTrue =
+				(tableDTO.IsChampion ? 1 : 0) +
+				(tableDTO.IsPromotion ? 1 : 0) +
+				(tableDTO.IsPlayOff ? 1 : 0) +
+				(tableDTO.IsRelegation ? 1 : 0) <= 1;
+
+			if (!onlyOneOrNoneTrue)
+                throw new DFCStatsException("Only one of is Champion, is promotion, is play-offs and is relgated can be set to yes");
+		}
+
+        /// <summary>
+        /// Checks that club is not already in the table for the season
+        /// </summary>
+        /// <param name="tableDTO"></param>
+        /// <param name="currentTable"></param>
+        private void CheckClubNotAlreadyInTable(TableDTO tableDTO, List<TableDTO> currentTable)
+        {
+            // If the club is specified, check that it is not already in the table for the season
+            if (tableDTO.ClubId.HasValue && currentTable.Any(t => t.ClubId == tableDTO.ClubId))
+                throw new DFCStatsException("The club is already in the table for this season");
+
+            // If the club is not specified, check that there is not already a table entry with a club id of no value for the season
+            if (!tableDTO.ClubId.HasValue && currentTable.Any(t => !t.ClubId.HasValue))
+                throw new DFCStatsException("Darlington already has a table entry for this season");
+        }
+
+    }
+}

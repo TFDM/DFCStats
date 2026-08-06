@@ -11,6 +11,6 @@ namespace DFCStats.Data.Entities
         public string Name { get; set; } = string.Empty;
 
         public virtual ICollection<Fixture> Fixtures { get; set; } = null!;
-        // public virtual ICollection<Fixture> Fixtures { get; set; } = new List<Fixture>();
+        public virtual ICollection<Table> Table { get; set; } = null!;
     }
 }
