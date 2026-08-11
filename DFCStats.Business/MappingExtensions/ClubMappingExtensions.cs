@@ -21,5 +21,28 @@ namespace DFCStats.Business.MappingExtensions
                 Name =  club.Name
             };
         }
+
+        /// <summary>
+        /// Maps a View_Clubs entity to a ClubDTO
+        /// </summary>
+        /// <param name="club"></param>
+        /// <returns></returns>
+        public static ClubDTO? MapToClubDTO(this View_Clubs club)
+        {
+            if (club == null)
+                return null;
+
+            return new ClubDTO
+            {
+                Id = club.Id,
+                Name = club.Name,
+                Played = club.Played,
+                Won = club.Won,
+                Drawn = club.Drawn,
+                Lost = club.Lost,
+                GoalsFor = club.GoalsFor,
+                GoalsAgainst = club.GoalsAgainst
+            };
+        }
     }
 }

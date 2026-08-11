@@ -19,6 +19,16 @@ namespace DFCStats.Business.Interfaces
         Task<List<ClubDTO>> GetAllClubsAsync(string? sort = null);
         
         /// <summary>
+        /// Returns a list of all the club records paginated. Also allows filtering out of caretaker records
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="searchName"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        Task<(List<ClubDTO>, int)> SearchForClubsAsync(int page = 1, int pageSize = 50, string? searchName = null, string? sort = null);
+
+        /// <summary>
         /// Adds a club to the database
         /// </summary>
         /// <param name="dto"></param>

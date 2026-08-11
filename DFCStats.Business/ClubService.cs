@@ -72,6 +72,85 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Returns a list of all the club records paginated. Also allows filtering out of caretaker records
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="searchName"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        public async Task<(List<ClubDTO>, int)> SearchForClubsAsync(int page = 1, int pageSize = 50, string? searchName = null, string? sort = null)
+        {
+            // Ensure the page and page size are above not zero or negative
+            page = (page < 1) ? 1 : page;
+            pageSize = (pageSize < 1) ? 50 : pageSize;
+
+            var clubs = _dfcStatsDbContext.View_Clubs.AsNoTracking().AsQueryable();
+
+            // Filter the records
+            if (searchName != null)
+            {
+                clubs = clubs.Where(c => c.Name.Contains(searchName));
+            }
+
+            // Sort the records
+            switch (sort)
+            {
+                case "name_desc":
+                    clubs = clubs.OrderByDescending(c => c.Name);
+                    break;
+                case "played_desc":
+                    clubs = clubs.OrderByDescending(c => c.Played);
+                    break;
+                case "played":
+                    clubs = clubs.OrderBy(c => c.Played);
+                    break;
+                case "won_desc":
+                    clubs = clubs.OrderByDescending(c => c.Won);
+                    break;
+                case "won":
+                    clubs = clubs.OrderBy(c => c.Won);
+                    break;
+                case "drawn_desc":
+                    clubs = clubs.OrderByDescending(c => c.Drawn);
+                    break;
+                case "drawn":
+                    clubs = clubs.OrderBy(c => c.Drawn);
+                    break;
+                case "lost_desc":
+                    clubs = clubs.OrderByDescending(c => c.Lost);
+                    break;
+                case "lost":
+                    clubs = clubs.OrderBy(c => c.Lost);
+                    break;
+                case "goalsFor_desc":
+                    clubs = clubs.OrderByDescending(c => c.GoalsFor);
+                    break;
+                case "goalsFor":
+                    clubs = clubs.OrderBy(c => c.GoalsFor);
+                    break;
+                case "goalsAgainst_desc":
+                    clubs = clubs.OrderByDescending(c => c.GoalsAgainst);
+                    break;
+                case "goalsAgainst":
+                    clubs = clubs.OrderBy(c => c.GoalsAgainst);
+                    break;
+                default:
+                    clubs = clubs.OrderBy(c => c.Name);
+                    break;
+            }
+
+            // Counts the total number of records before any pagination is applied
+			var totalItemCount = await clubs.CountAsync();
+
+            // Carries out the query
+			var results = await clubs.Skip(pageSize * (page - 1)).Take(pageSize).ToListAsync();
+
+            // Return the clubs (mapped to ClubsDTO) and the item count
+            return (results.Select(p => p.MapToClubDTO()!).ToList(), totalItemCount);
+        }
+
+        /// <summary>
         /// Adds a club to the database
         /// </summary>
         /// <param name="dto"></param>
