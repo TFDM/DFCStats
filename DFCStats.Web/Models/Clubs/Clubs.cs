@@ -1,9 +1,9 @@
-namespace DFCStats.Domain.DTOs.Clubs
+namespace DFCStats.Web.Models.Clubs
 {
-    public class ClubDTO
+    public class Clubs
     {
         public Guid Id { get; set; }
-        public string Name { get; set;} = string.Empty;
+        public string Name { get; set; } = string.Empty;
         public int Played { get; set; }
         public int Won { get; set; }
         public int Drawn { get; set; }
