@@ -1,3 +1,9 @@
+@using DFCStats.Web.Models.Clubs;
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+
+@model IPagedList<Clubs>
+
 @if (TempData["Success"] != null)
 {
     <div class="row mb-3">
@@ -11,6 +17,81 @@
     </div>
 }
 
-<div>
-    Club Controller
+<form method="get">
+
+    <div class="row mb-3">
+      
+        <div class="col-12 col-lg-5">
+            <label>Club Name</label>
+            @Html.TextBox("clubName", string.Empty, new { @class = "form-control" })
+        </div>
+        <div class="col-12 col-lg-2">
+            <label>Results to Show</label>
+            @Html.DropDownList("pageSize", new SelectList(ViewBag.pageSize, "Value", "Text"), string.Empty, new { @class = "form-control form-select" })
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <button type="submit" class="btn btn-success">Search</button>
+        </div>
+    </div>
+</form>
+
+<div class="row">
+    <div class="col-12">
+
+        <table class="table">
+			<thead>
+				<tr>
+					<th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByName" asp-route-clubName="@Context.Request.Query["clubName"]" asp-route-pageSize="@Context.Request.Query["pageSize"]">Club Name</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByPlayed" asp-route-clubName="@Context.Request.Query["clubName"]" asp-route-pageSize="@Context.Request.Query["pageSize"]">Played</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByWon" asp-route-clubName="@Context.Request.Query["clubName"]" asp-route-pageSize="@Context.Request.Query["pageSize"]">Won</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByDrawn" asp-route-clubName="@Context.Request.Query["clubName"]" asp-route-pageSize="@Context.Request.Query["pageSize"]">Drawn</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByLost" asp-route-clubName="@Context.Request.Query["clubName"]" asp-route-pageSize="@Context.Request.Query["pageSize"]">Lost</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByGoalsFor" asp-route-clubName="@Context.Request.Query["clubName"]" asp-route-pageSize="@Context.Request.Query["pageSize"]">GF</a></th>
+                    <th class="table-light"><a asp-action="Index" asp-route-page="@Model.PageNumber" asp-route-sort="@ViewBag.SortByGoalsAgainst" asp-route-clubName="@Context.Request.Query["clubName"]" asp-route-pageSize="@Context.Request.Query["pageSize"]">GA</a></th>
+                    <th class="table-light"></th>
+                    <th class="table-light"></th>
+                </tr>
+			</thead>
+			<tbody class="table-group-divider">
+				@foreach (Clubs club in Model)
+				{
+					<tr>
+                        <td class="table-light">@club.Name</td>
+						<td class="table-light">@club.Played</td>
+                        <td class="table-light">@club.Won</td>
+                        <td class="table-light">@club.Drawn</td>
+                        <td class="table-light">@club.Lost</td>
+                        <td class="table-light">@club.GoalsFor</td>
+                        <td class="table-light">@club.GoalsAgainst</td>
+                        <td class="table-light"><a asp-action="Index" asp-controller="Fixture" asp-route-opponent="@club.Id">Meetings</a></td>
+                        <td class="align-middle table-light"><a asp-action="Edit" asp-route-id="@club.Id">Edit</a></td>
+                    </tr>
+				}
+			</tbody>
+		</table>
+
+    </div>
+</div>
+
+<div class="row">
+	<div class="col-12">
+
+		@Html.PagedListPager(Model, page => Url.Action("Index", new
+			{
+				page = page,
+				clubName = Context.Request.Query["clubName"],
+                pageSize = Context.Request.Query["pageSize"],
+                sort = Context.Request.Query["sort"]
+			}),
+            new X.PagedList.Mvc.Core.PagedListRenderOptions
+		{
+			MaximumPageNumbersToDisplay = 3,
+			LiElementClasses = new string[] { "page-itm" },
+			PageClasses = new string[] { "page-link" }
+		})
+
+	</div>
 </div>
