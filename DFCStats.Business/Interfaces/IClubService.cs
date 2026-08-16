@@ -34,6 +34,14 @@ namespace DFCStats.Business.Interfaces
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<ClubDTO> AddClubAsync(ClubDTO clubDTO);
+    
+        /// <summary>
+        /// Updates a club in the database
+        /// </summary>
+        /// <param name="editClubDTO"></param>
+        /// <returns></returns>
+        /// <exception cref="DFCStatsException"></exception>
+        Task<ClubDTO> UpdateClubAsync(ClubDTO editClubDTO);
     }
 }
 

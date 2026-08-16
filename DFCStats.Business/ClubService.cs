@@ -40,10 +40,15 @@ namespace DFCStats.Business
         /// Will return true if it is in use otherwise false
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="currentId"></param>
         /// <returns></returns>
-        private async Task<bool> IsClubNameInUseAsync(string name)
+        private async Task<bool> IsClubNameInUseAsync(string name, Guid? currentId = null)
         {
-            return await _dfcStatsDbContext.Clubs.AsNoTracking().AnyAsync(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
+            var normalizedName = name.ToLower().Trim();
+
+            return await _dfcStatsDbContext.Clubs
+                .AsNoTracking()
+                .AnyAsync(c => c.Name.ToLower().Trim() == normalizedName && (currentId == null || c.Id != currentId));
         }
 
         /// <summary>
@@ -170,6 +175,35 @@ namespace DFCStats.Business
 
             // Map the newly created club to a ClubDTO and return it
             return club.MapToClubDTO()!;
+        }
+
+        /// <summary>
+        /// Updates a club in the database
+        /// </summary>
+        /// <param name="editClubDTO"></param>
+        /// <returns></returns>
+        /// <exception cref="DFCStatsException"></exception>
+        public async Task<ClubDTO> UpdateClubAsync(ClubDTO editClubDTO)
+        {
+            // Get the club from the database
+            var existingClub = await _dfcStatsDbContext.Clubs
+                .FirstOrDefaultAsync(c => c.Id == editClubDTO.Id);
+
+            if (existingClub == null)
+                throw new DFCStatsException($"Club with id {editClubDTO.Id} not found");
+
+            // Check to see if the club name is already in use
+            if(await IsClubNameInUseAsync(editClubDTO.Name, editClubDTO.Id))
+                throw new DFCStatsException($"{editClubDTO.Name} is already in use");
+
+            // Update the club in the database
+            existingClub.Name = editClubDTO.Name;
+            
+            _dfcStatsDbContext.Clubs.Update(existingClub);
+            await _dfcStatsDbContext.SaveChangesAsync();
+
+            // Map the updated club to a clubDTO and return it
+            return existingClub.MapToClubDTO()!;
         }
     }
 }
