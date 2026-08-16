@@ -114,4 +114,69 @@ public class ClubController : Controller
         return View(newClub);
     }
 
+    public async Task<IActionResult> Edit(string id)
+    {
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Edit Club";
+		ViewData["Title"] = "Edit Club";
+
+        // Validate that the id parameter is a valid GUID format
+        // the clubId is set to the guid if the parsing is successful
+        if (!Guid.TryParse(id, out var clubId))
+            // If the id is not a valid GUID, return a 400 Bad Request HTTP response
+            return BadRequest("Invalid ID format");
+
+        // Retrieve the club record from the database using the validated GUID
+        var club = await _clubService.GetClubByIdAsync(clubId);
+
+        // If the club record is not found, return a 404 Not Found HTTP response
+        if (club == null)
+            return NotFound("Club not found");
+
+        // Convert the clubDTO to an EditClub model
+        var clubToEdit = new EditClub
+        { 
+            Id = club.Id,
+            Name = club.Name
+        };
+
+        return View(clubToEdit);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(EditClub editClub)
+    {
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                // Convert the EditClub model to a DTO
+                var clubDTO = new ClubDTO
+                {
+                    Id = editClub.Id,
+                    Name = editClub.Name
+                };
+
+                // Attempt to update the club in the database
+                await _clubService.UpdateClubAsync(clubDTO);
+                
+                // Add a success message to TempData
+                TempData["Success"] = $"{clubDTO.Name} has been updated successfully";
+
+                // Redirect to the index action
+                return RedirectToAction("Index");
+            } catch(DFCStatsException ex)
+            {
+                // Add a failure message to TempData
+                TempData["Failure"] = ex.Message;
+            }
+        }
+
+        //Set the page heading and the page title
+		ViewData["PageHeading"] = "Edit Club";
+		ViewData["Title"] = "Edit Club";
+
+        return View(editClub);
+    }
 }
