@@ -15,8 +15,11 @@ namespace DFCStats.Data
         public DbSet<Participation> Participants { get; set; }
         public DbSet<Person> People { get; set; }
         public DbSet<PersonSeason> PeopleSeasons { get; set; }
+        public DbSet<Role> Roles { get; set;}
         public DbSet<Season> Seasons { get; set; }
         public DbSet<Table> Tables { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<Venue> Venues { get; set; }
 
         public DbSet<View_Clubs> View_Clubs { get; set; }
@@ -29,6 +32,8 @@ namespace DFCStats.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<PersonSeason>().HasKey(x => new { x.PersonId, x.SeasonId });
+
+            modelBuilder.Entity<UserRole>().HasKey(x => new { x.UserId, x.RoleId });
 
             modelBuilder.Entity<Participation>()
                 .HasOne(x => x.Person)

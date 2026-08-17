@@ -4,6 +4,7 @@ using DFCStats.Data;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,15 @@ builder.Services.AddControllersWithViews(
     // This is required to stop the framework from adding the [Required] attribute to non-nullable reference types
     options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 
+// Configures Cookie Authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+    options.SlidingExpiration = true;
+    options.AccessDeniedPath = "/Home/Error/";
+    options.LoginPath = "/User/Login";
+});
+
 // Add validation - This scans the assembly where program.cs is defined
 // it will find ever class that inherits from AbstractValidator<T>
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
@@ -46,9 +56,11 @@ builder.Services.AddScoped<IFixtureService, FixtureService>();
 builder.Services.AddScoped<IManagerService, ManagerService>();
 builder.Services.AddScoped<INationalityService, NationalityService>();
 builder.Services.AddScoped<IParticipationService, ParticipationService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
 builder.Services.AddScoped<ITableService, TableService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IVenueService, VenueService>();
 
 // Allows the anti forgery token to be usable in request headers for internal api calls
