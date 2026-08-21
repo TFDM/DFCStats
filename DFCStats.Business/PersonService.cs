@@ -191,17 +191,8 @@ namespace DFCStats.Business
             // Check the nationality exists in the database
             await CheckNationalityAsync(newPersonDTO.NationalityId);
 
-            var peopleSeasons = new List<DFCStats.Data.Entities.PersonSeason>();
-
-            if (newPersonDTO.ListOfSeasons != null)
-            {
-                // Create a new list of PersonSeason which can added to the new person
-                peopleSeasons = newPersonDTO.ListOfSeasons.Select(seasonId => new PersonSeason
-                {
-                    Id = Guid.NewGuid(),
-                    SeasonId = seasonId
-                }).ToList();
-            }
+            // Create a list of PersonSeasons based on the season Ids
+            var peopleSeasons = await CreatePersonSeasonAssignmentsAsync(newPersonDTO.ListOfSeasons);
 
             // Create the person using the Dto
             var person = new Person { 
@@ -268,17 +259,8 @@ namespace DFCStats.Business
             // Clear existing seasons
             existingPerson.PersonSeasons.Clear();
 
-            var peopleSeasons = new List<DFCStats.Data.Entities.PersonSeason>();
-
-            if (editPersonDTO.ListOfSeasons != null)
-            {
-                // Create a new list of PersonSeason which can added to the new person
-                peopleSeasons = editPersonDTO.ListOfSeasons.Select(seasonId => new PersonSeason
-                {
-                    Id = Guid.NewGuid(),
-                    SeasonId = seasonId
-                }).ToList();
-            }
+            // Create a list of PersonSeasons based on the season Ids
+            var peopleSeasons = await CreatePersonSeasonAssignmentsAsync(editPersonDTO.ListOfSeasons);
 
             // Update the person
             existingPerson.FirstName = editPersonDTO.FirstName;
@@ -343,7 +325,31 @@ namespace DFCStats.Business
             }
         }
 
+        /// <summary>
+        /// Creates person-season assignments for the supplied season ids
+        /// </summary>
+        /// <param name="seasonIds"></param>
+        /// <returns></returns>
+        private async Task<List<PersonSeason>> CreatePersonSeasonAssignmentsAsync(List<Guid>? seasonIds)
+        {
+            // If the season ids are null return a new list of PersonSeason entities
+            if (seasonIds == null)
+                return new List<DFCStats.Data.Entities.PersonSeason>();
 
+            // Find all the seasons with matching Ids
+            var seasons = await _dfcStatsDbContext.Seasons
+                .Where(season => seasonIds.Contains(season.Id))
+                .ToListAsync();
 
+            // Create the person seasons list and add each of the seasons
+            var personSeasons = seasons.Select(season => new PersonSeason
+            {
+                Id = Guid.NewGuid(),
+                Season = season
+            }).ToList();
+
+            // Return the list of person seasons entities
+            return personSeasons;
+        }
     }
 }

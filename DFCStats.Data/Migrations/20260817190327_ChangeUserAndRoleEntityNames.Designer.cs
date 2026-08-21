@@ -4,6 +4,7 @@ using DFCStats.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DFCStats.Data.Migrations
 {
     [DbContext(typeof(DFCStatsDBContext))]
-    partial class DFCStatsDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260817190327_ChangeUserAndRoleEntityNames")]
+    partial class ChangeUserAndRoleEntityNames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -437,7 +440,7 @@ namespace DFCStats.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoles");
+                    b.ToTable("UserRole");
                 });
 
             modelBuilder.Entity("DFCStats.Data.Entities.Venue", b =>

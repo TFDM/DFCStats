@@ -4,6 +4,7 @@ using DFCStats.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DFCStats.Data.Migrations
 {
     [DbContext(typeof(DFCStatsDBContext))]
-    partial class DFCStatsDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260817184002_ChangeCasingOnUserRolesTable")]
+    partial class ChangeCasingOnUserRolesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -285,7 +288,7 @@ namespace DFCStats.Data.Migrations
                     b.ToTable("PeopleSeasons");
                 });
 
-            modelBuilder.Entity("DFCStats.Data.Entities.Role", b =>
+            modelBuilder.Entity("DFCStats.Data.Entities.Roles", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -395,7 +398,25 @@ namespace DFCStats.Data.Migrations
                     b.ToTable("Tables");
                 });
 
-            modelBuilder.Entity("DFCStats.Data.Entities.User", b =>
+            modelBuilder.Entity("DFCStats.Data.Entities.UserRoles", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("UserRoles");
+                });
+
+            modelBuilder.Entity("DFCStats.Data.Entities.Users", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -420,24 +441,6 @@ namespace DFCStats.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("DFCStats.Data.Entities.UserRole", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("DFCStats.Data.Entities.Venue", b =>
@@ -794,15 +797,15 @@ namespace DFCStats.Data.Migrations
                     b.Navigation("Season");
                 });
 
-            modelBuilder.Entity("DFCStats.Data.Entities.UserRole", b =>
+            modelBuilder.Entity("DFCStats.Data.Entities.UserRoles", b =>
                 {
-                    b.HasOne("DFCStats.Data.Entities.Role", "Role")
+                    b.HasOne("DFCStats.Data.Entities.Roles", "Role")
                         .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DFCStats.Data.Entities.User", "User")
+                    b.HasOne("DFCStats.Data.Entities.Users", "User")
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -844,7 +847,7 @@ namespace DFCStats.Data.Migrations
                     b.Navigation("PersonSeasons");
                 });
 
-            modelBuilder.Entity("DFCStats.Data.Entities.Role", b =>
+            modelBuilder.Entity("DFCStats.Data.Entities.Roles", b =>
                 {
                     b.Navigation("UserRoles");
                 });
@@ -858,7 +861,7 @@ namespace DFCStats.Data.Migrations
                     b.Navigation("Tables");
                 });
 
-            modelBuilder.Entity("DFCStats.Data.Entities.User", b =>
+            modelBuilder.Entity("DFCStats.Data.Entities.Users", b =>
                 {
                     b.Navigation("UserRoles");
                 });
