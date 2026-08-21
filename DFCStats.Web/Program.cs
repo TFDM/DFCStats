@@ -58,6 +58,7 @@ builder.Services.AddScoped<INationalityService, NationalityService>();
 builder.Services.AddScoped<IParticipationService, ParticipationService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
 builder.Services.AddScoped<ITableService, TableService>();
 builder.Services.AddScoped<IUserService, UserService>();

@@ -1,0 +1,77 @@
+@model DFCStats.Web.Models.Users.NewUser;
+
+@if (TempData["Failure"] != null)
+{
+    <div class="row mb-3">
+        <div class="col-12">
+
+            <div class="alert alert-danger" role="alert">
+                @TempData["Failure"]
+            </div>
+
+        </div>
+    </div>
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="row mb-3">
+        <label asp-for="EmailAddress" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-4">
+            <input asp-for="EmailAddress" class="form-control" />
+            <span asp-validation-for="EmailAddress" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="Password" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-2">
+            <input asp-for="Password" type="password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="ConfirmPassword" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-2">
+            <input asp-for="ConfirmPassword" type="password" class="form-control" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="Roles" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-4">
+            @for (var i = 0; i < Model.Roles.Count; i++)
+            {
+                <div class="form-check mb-2">
+                    <input type="hidden" asp-for="Roles[i].RoleId" />
+                    <input type="hidden" asp-for="Roles[i].RoleName" />
+                    <input asp-for="Roles[i].IsSelected" class="form-check-input" />
+                    <label asp-for="Roles[i].IsSelected" class="form-check-label">
+                        @Model.Roles[i].RoleName
+                    </label>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="AllowLogin" class="col-2 col-form-label"></label>
+        <div class="col-3 col-lg-1">
+            <select asp-for="AllowLogin" asp-items="Model.AllowLoginOptions" class="form-control form-select">
+                <option selected value=""></option>
+            </select>
+            <span asp-validation-for="AllowLogin" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-2"></div>
+        <div class="col-10">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</form>
+

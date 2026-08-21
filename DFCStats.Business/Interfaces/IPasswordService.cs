@@ -2,6 +2,8 @@ namespace DFCStats.Business.Interfaces
 {
     public interface IPasswordService
     {
+        int MinPasswordLength { get; }
+
         /// <summary>
         /// Checks a password matches basic complexity rules
         /// </summary>

@@ -6,6 +6,9 @@ namespace DFCStats.Business
 {
     public class PasswordService : IPasswordService
     {
+        // Set the minimum password length to 8 characters
+        public int MinPasswordLength { get; } = 8;
+
         /// <summary>
         /// Checks a password matches basic complexity rules
         /// </summary>
@@ -14,7 +17,7 @@ namespace DFCStats.Business
         public bool CheckPasswordComplexity(string password)
         {
             // Check if the password is over 8 characters long
-            if (password.Length < 8)
+            if (password.Length < MinPasswordLength)
                 return false;
 
             // Check if the string contains at least one uppercase character
@@ -45,19 +48,6 @@ namespace DFCStats.Business
                 32); // 256-bit output
 
             return Convert.ToHexString(hashedPassword);
-
-            // // Concatenate the password and the salt
-            // var saltedPassword = string.Concat(password, salt);
-
-            // // Returns the salted password as bytes
-            // var saltedPasswordAsAsBytes = Encoding.UTF8.GetBytes(saltedPassword);
-
-            // // Hash the password as bytes
-            // SHA256 hash = SHA256.Create();
-            // byte[] hashedPassword = hash.ComputeHash(saltedPasswordAsAsBytes);
-
-            // // Convert the bytes back to a string
-            // return Convert.ToHexString(hashedPassword);
         }
 
         /// <summary>
