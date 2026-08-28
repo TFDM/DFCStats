@@ -24,6 +24,25 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Get a user by their id from the database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="includes"></param>
+        /// <returns></returns>
+        public async Task<UserDTO?> GetUserById(Guid id, UserIncludes includes = UserIncludes.None)
+        {
+            var query = _dfcStatsDbContext.Users.AsNoTracking();
+
+            // Includes the user roles if the flag has been set
+            if (includes.HasFlag(UserIncludes.Roles))
+                query = query.Include(u => u.UserRoles).ThenInclude(ur => ur.Role);
+
+            // Run the query and map the entity to a DTO and return it
+            var user = await query.FirstOrDefaultAsync(u => u.Id == id);
+            return user?.MapToUserDTO();
+        }
+
+        /// <summary>
         /// Registers a user
         /// </summary>
         /// <param name="userDTO"></param>
@@ -79,6 +98,55 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Updates a user without changing their password
+        /// </summary>
+        /// <param name="userDTO"></param>
+        /// <returns></returns>
+        /// <exception cref="DFCStatsException"></exception>
+        public async Task<UserDTO> UpdateUserAsync(UserDTO userDTO)
+        {
+            // Validate the selected roles to ensure they exist in the database
+            await ValidateRoles(userDTO.Roles);
+
+            // Look for a user with the same email address so we can check its not in use already
+            var userWithSameEmail = await GetUserByEmailAddressAsync(userDTO.EmailAddress);
+
+            // If the a user with the same email address was found, and their user
+            // id's don't match then this means the email address has been used by 
+            // a different user
+            if (userWithSameEmail != null && userWithSameEmail.Id != userDTO.Id)
+                // Throw an exception saying the email address can't be used
+                throw new DFCStatsException($"{userDTO.EmailAddress} can't be used");
+
+            // Get the user from the database
+            var existingUser = await _dfcStatsDbContext.Users
+                .Include(u => u.UserRoles)
+                .FirstOrDefaultAsync(u => u.Id == userDTO.Id);
+
+            // Check if the user exists in the database
+            if (existingUser == null)
+                throw new DFCStatsException($"Person with id {userDTO.Id} not found");
+
+            // Clear existing user roles
+            existingUser.UserRoles.Clear();
+
+            // Create user-role assignments only after every submitted role has been validated.
+            var userRoles = await CreateUserRoleAssignmentsAsync(userDTO.Roles?.Select(ur => ur.Id).ToList());
+
+            // Update the user
+            existingUser.EmailAddress = userDTO.EmailAddress;
+            existingUser.AllowLogin = userDTO.AllowLogin;
+            existingUser.UserRoles = userRoles;
+
+            // Save the changes to the database
+            _dfcStatsDbContext.Users.Update(existingUser);
+            await _dfcStatsDbContext.SaveChangesAsync();
+
+            // Map the updated user to a UserDTO and return it
+            return existingUser.MapToUserDTO()!;
+        }
+
+        /// <summary>
         /// Gets a user record by e-mail address
         /// </summary>
         /// <param name="emailAddress"></param>
@@ -90,16 +158,6 @@ namespace DFCStats.Business
             // Run the query and map the entity to a DTO and return it
             var user = await query.FirstOrDefaultAsync(u => u.EmailAddress == emailAddress);
             return user?.MapToUserDTO();
-        }
-
-        public async Task<List<UserDTO>> GetAllUsersAsync()
-        {
-            var query = _dfcStatsDbContext.Users.AsNoTracking().AsQueryable();
-
-            query = query.Include(u => u.UserRoles)
-                .ThenInclude(r => r.Role);
-
-            return await query.Select(u => u.MapToUserDTO()!).ToListAsync();
         }
 
         /// <summary>
