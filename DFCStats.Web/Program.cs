@@ -97,6 +97,7 @@ builder.Services.AddScoped<IClubService, ClubService>();
 builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
 builder.Services.AddScoped<IFixtureService, FixtureService>();
 builder.Services.AddScoped<IManagerService, ManagerService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<INationalityService, NationalityService>();
 builder.Services.AddScoped<IParticipationService, ParticipationService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();

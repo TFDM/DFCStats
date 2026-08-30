@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using DFCStats.Domain.Exceptions;
+using DFCStats.Domain.DTOs.Messages;
 
 namespace DFCStats.Business
 {
@@ -19,7 +20,13 @@ namespace DFCStats.Business
             _logger = logger;
         }
 
-        public async Task SendSomething()
+        /// <summary>
+        /// Sends an email used the supplied email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        /// <exception cref="DFCStatsException"></exception>
+        public async Task SendEmailAsync(EmailMessageDTO email)
         {
             // Set up the authentication header
 			var encodedCredentials = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _options.Username, _options.ApiKey)));
@@ -27,10 +34,10 @@ namespace DFCStats.Business
 
             // Prepare form-data
             using var formData = new MultipartFormDataContent();
-            formData.Add(new StringContent("<p>Hello World</p><p>This is my email.</p>"), "html");
+            formData.Add(new StringContent(email.Body), "html");
             formData.Add(new StringContent(_options.FromAddress), "from");
-            formData.Add(new StringContent("kevin.luff@the-tinshed.co.uk"), "to");
-            formData.Add(new StringContent("A test email"), "subject");
+            formData.Add(new StringContent(string.Join(",", email.Recipients)), "to");
+            formData.Add(new StringContent(email.SubjectLine), "subject");
 
             // Set the request uri - this is the base url / domain / messages
             var requestUri = $"{_options.BaseUrl}/{_options.Domain}/messages";
