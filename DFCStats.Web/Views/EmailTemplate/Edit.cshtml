@@ -1,0 +1,54 @@
+@model DFCStats.Web.Models.EmailTemplates.EditEmailTemplate;
+
+@if (TempData["Failure"] != null)
+{
+    <div class="row mb-3">
+        <div class="col-12">
+
+            <div class="alert alert-danger" role="alert">
+                @TempData["Failure"]
+            </div>
+
+        </div>
+    </div>
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <input asp-for="Id" hidden />
+
+    <div class="row mb-3">
+        <label asp-for="Title" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-4">
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label asp-for="Template" class="col-2 col-form-label"></label>
+        <div class="col-10 col-lg-8">
+            <textarea asp-for="Template" class="form-control" rows="60"></textarea>
+            <span asp-validation-for="Template" class="text-danger"></span>
+        </div>
+    </div>
+    
+    <div class="row mb-3">
+        <label asp-for="IsHtml" class="col-2 col-form-label"></label>
+        <div class="col-3 col-lg-1">
+            <select asp-for="IsHtml" asp-items="Model.IsHtmlOptions" class="form-control form-select">
+                <option selected value=""></option>
+            </select>
+            <span asp-validation-for="IsHtml" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-2"></div>
+        <div class="col-10">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</form>
+

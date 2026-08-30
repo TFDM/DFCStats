@@ -55,10 +55,10 @@ namespace DFCStats.Business
                 throw new DFCStatsException("Passwords must match");
 
             // Look for a user with the same email address so we can check its not in use already
-            var user = await GetUserByEmailAddressAsync(userDTO.EmailAddress);
+            var userWithSameEmail = await GetUserByEmailAddressAsync(userDTO.EmailAddress);
 
             // Check if the user is null or not
-            if (user != null)
+            if (userWithSameEmail != null)
                 // If the user is not null then the email address has already been used
                 throw new DFCStatsException($"{userDTO.EmailAddress} can't be used");
 
