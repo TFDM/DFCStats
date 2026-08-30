@@ -5,6 +5,10 @@
     <ProjectReference Include="..\DFCStats.Data\DFCStats.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Handlebars.Net" Version="2.4.3" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
