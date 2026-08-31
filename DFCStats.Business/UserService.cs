@@ -150,14 +150,60 @@ namespace DFCStats.Business
         /// Gets a user record by e-mail address
         /// </summary>
         /// <param name="emailAddress"></param>
+        /// <param name="includes"></param>
         /// <returns></returns>
-        public async Task<UserDTO?> GetUserByEmailAddressAsync(string emailAddress)
+        public async Task<UserDTO?> GetUserByEmailAddressAsync(string emailAddress, UserIncludes includes = UserIncludes.None)
         {
             var query = _dfcStatsDbContext.Users.AsNoTracking().AsQueryable();
+
+            // Includes the user roles if the flag has been set
+            if (includes.HasFlag(UserIncludes.Roles))
+                query = query.Include(u => u.UserRoles).ThenInclude(ur => ur.Role);
 
             // Run the query and map the entity to a DTO and return it
             var user = await query.FirstOrDefaultAsync(u => u.EmailAddress == emailAddress);
             return user?.MapToUserDTO();
+        }
+
+        /// <summary>
+        /// Attemps a user login and returns a login result
+        /// </summary>
+        /// <param name="loginDTO"></param>
+        /// <returns></returns>
+        public async Task<LoginResultDTO> LoginAsync(LoginDTO loginDTO)
+        {
+            // Attempt to get the user with the email address and include the user roles.
+            // Working directly with the entity here rather than using the GetUserByEmailAddressAsync method.
+            // This ensures the hashed password and salt aren't exposed in the user dto.
+            var user = await _dfcStatsDbContext.Users.AsNoTracking().AsQueryable()
+                .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.EmailAddress == loginDTO.EmailAddress);
+
+            // In order to avoid any giving away information about if a user has been found or not
+            // when people are keeping track of processing times, hash a dummy password with a random
+            // salt. Even if the user isn't found the processing time will be the same if a user was
+            // found and not leak any information to malicious users
+            var dummySalt = _passwordService.GenerateRandomSalt();
+            var dummyHash = _passwordService.HashPassword("dummy", dummySalt);
+
+            // Check if the user password is valid - If the user wasn't found the the dummy hash and dummy
+            // salt are fed in to avoid leaking any timing information to maclicious users
+            bool passwordValid = _passwordService.ValidatePassword(
+                loginDTO.Password,
+                (user != null) ? user.Password : dummyHash,
+                (user != null) ? user.Salt : dummySalt
+            );
+
+            // Check if the user wasn't found or the password was invalid
+            if (user == null || !passwordValid)
+                return new LoginResultDTO { Succeeded = false, FailureReason = LoginFailureReason.InvalidCredentials };
+
+            // Check if the user is allowed to login
+            if (!user.AllowLogin)
+                return new LoginResultDTO { Succeeded = false, FailureReason = LoginFailureReason.AccountDisabled };
+
+            // Return a succesful login result
+            return new LoginResultDTO { Succeeded = true, User = user.MapToUserDTO() };
         }
 
         /// <summary>

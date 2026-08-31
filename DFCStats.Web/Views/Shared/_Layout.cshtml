@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -49,6 +51,18 @@
                 </li>
             </ul>
 
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <hr>
+                <div class="d-flex" id="user-login">
+                    <span>
+                        <h6 class="nav-item mt-1 mb-0">
+                            <a asp-area="" asp-controller="User" asp-action="Index">@User.FindFirstValue(ClaimTypes.Email)</a>
+                        </h6>
+                        <small><a class="nav-item" asp-area="" asp-controller="User" asp-action="Logout">Logout</a></small>
+                    </span>
+                </div>
+            }
 
         </div>
 
