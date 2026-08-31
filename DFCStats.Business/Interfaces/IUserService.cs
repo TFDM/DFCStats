@@ -39,7 +39,15 @@ namespace DFCStats.Business.Interfaces
         /// Gets a user record by e-mail address
         /// </summary>
         /// <param name="emailAddress"></param>
+        /// <param name="includes"></param>
         /// <returns></returns>
-        Task<UserDTO?> GetUserByEmailAddressAsync(string emailAddress);
+        Task<UserDTO?> GetUserByEmailAddressAsync(string emailAddress, UserIncludes includes = UserIncludes.None);
+    
+        /// <summary>
+        /// Attemps a user login and returns a login result
+        /// </summary>
+        /// <param name="loginDTO"></param>
+        /// <returns></returns>
+        Task<LoginResultDTO> LoginAsync(LoginDTO loginDTO);
     }
 }
