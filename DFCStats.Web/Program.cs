@@ -100,6 +100,7 @@ builder.Services.AddScoped<IManagerService, ManagerService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<INationalityService, NationalityService>();
 builder.Services.AddScoped<IParticipationService, ParticipationService>();
+builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<IRoleService, RoleService>();

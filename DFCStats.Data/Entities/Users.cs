@@ -17,5 +17,6 @@ namespace DFCStats.Data.Entities
         public bool AllowLogin { get; set; }
 
          public virtual ICollection<UserRole> UserRoles { get; set; } = null!;
+         public virtual ICollection<PasswordReset> PasswordResets { get; set; } = null!;
     }
 }
