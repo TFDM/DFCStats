@@ -94,6 +94,42 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Validates a reset token and ensures it is still valid
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task<PasswordResetTokenStatus> ValidateResetTokenAsync(string token)
+        {
+            // Hash the token to compare with the stored hashed token in the database
+            var hashedToken = HashToken(token);
+
+            // Get the password reset request from the database that matches the hashed token
+            var passwordResetRequest = await _dfcStatsDbContext.PasswordResets
+                .FirstOrDefaultAsync(pr => pr.Token == hashedToken);
+
+            // Check the status of the password reset request and return the appropriate status
+
+            if (passwordResetRequest == null)
+                // The token does not exist in the database
+                return PasswordResetTokenStatus.NotFound;
+
+            if (passwordResetRequest.UsedAt != null)
+                // The token has already been used
+                return PasswordResetTokenStatus.AlreadyUsed;
+
+            if (passwordResetRequest.InvalidatedAt != null)
+                // The token has been invalidated
+                return PasswordResetTokenStatus.Invalidated;
+
+            if (passwordResetRequest.ExpiresAt < DateTime.UtcNow)
+                // The token has expired
+                return PasswordResetTokenStatus.Expired;
+
+            // The token is valid
+            return PasswordResetTokenStatus.Valid;
+        }
+
+        /// <summary>
         /// Generates a cryptographically secure random token to email to the user
         /// </summary>
         /// <returns></returns>

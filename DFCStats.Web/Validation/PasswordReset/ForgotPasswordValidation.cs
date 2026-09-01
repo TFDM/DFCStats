@@ -1,4 +1,4 @@
-using DFCStats.Web.Models.Users;
+using DFCStats.Web.Models.PasswordResets;
 using FluentValidation;
 
 public class ForgotPasswordValidation : AbstractValidator<ForgotPassword>

@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace DFCStats.Web.Models.Users
+namespace DFCStats.Web.Models.PasswordResets
 {
     public class ForgotPassword
     {
