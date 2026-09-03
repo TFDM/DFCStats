@@ -51,7 +51,7 @@ namespace DFCStats.Business
         public async Task<UserDTO> RegisterUserAsync(UserDTO userDTO)
         {
             // Check the password and confirm password match
-            if (userDTO.Password != userDTO.ConfirmPassword)
+            if (!_passwordService.DoPasswordsMatch(userDTO.Password, userDTO.ConfirmPassword))
                 throw new DFCStatsException("Passwords must match");
 
             // Look for a user with the same email address so we can check its not in use already

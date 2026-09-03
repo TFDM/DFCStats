@@ -14,16 +14,18 @@ namespace DFCStats.Business
         private readonly IEmailService _emailService;
         private readonly IMessageService _messageService;
         private readonly IUserService _userService;
+        private readonly IPasswordService _passwordService;
 
         // The time in minutes before a password reset request expires
         public int RequestExpiryTimeInMinutes { get; } = 5;
 
-        public PasswordResetService(DFCStatsDBContext dfcStatsDbContext, IEmailService emailService, IMessageService messageService, IUserService userService)
+        public PasswordResetService(DFCStatsDBContext dfcStatsDbContext, IEmailService emailService, IMessageService messageService, IUserService userService, IPasswordService passwordService)
         {
             _dfcStatsDbContext = dfcStatsDbContext;
             _emailService = emailService;
             _messageService = messageService;
             _userService = userService;
+            _passwordService = passwordService;
         }
 
         /// <summary>
@@ -126,6 +128,60 @@ namespace DFCStats.Business
                 return PasswordResetTokenStatus.Expired;
 
             // The token is valid
+            return PasswordResetTokenStatus.Valid;
+        }
+
+        /// <summary>
+        /// Rsets the user's password using the provided token and new password
+        /// </summary>
+        /// <param name="passwordResetDTO"></param>
+        /// <returns></returns>
+        public async Task<PasswordResetTokenStatus> ResetPasswordAsync(PasswordResetDTO passwordResetDTO)
+        {
+            // Validate the reset token to ensure it is still valid
+            var tokenStatus = await ValidateResetTokenAsync(passwordResetDTO.Token);
+
+            // If the token is not valid, return the status immediatly
+            if (tokenStatus != PasswordResetTokenStatus.Valid)
+                return tokenStatus;
+
+             // Check the password and confirm password match
+            if (!_passwordService.DoPasswordsMatch(passwordResetDTO.NewPassword, passwordResetDTO.ConfirmNewPassword))
+                throw new DFCStatsException("Passwords must match");
+
+            // Check the password passes basic complexitty rules
+            if (!_passwordService.CheckPasswordComplexity(passwordResetDTO.NewPassword))
+                // Passowrd failed basic complexity checks and can't be used
+                throw new DFCStatsException($"Password must be longer than {_passwordService.MinPasswordLength} characters, have at least one uppercase character and one number");
+
+            // Hash the token to compare with the stored hashed token in the database
+            var hashedToken = HashToken(passwordResetDTO.Token);
+
+            // Get the password reset request from the database that matches the hashed token
+            var passwordResetRequest = await _dfcStatsDbContext.PasswordResets
+                .Include(pr => pr.User)
+                .FirstOrDefaultAsync(pr => pr.Token == hashedToken);
+
+            if (passwordResetRequest == null)
+                // The token does not exist in the database - this should never happen as we have already validated the token but we check again to be safe
+                return PasswordResetTokenStatus.NotFound;
+
+            // Generate a random salt for the password
+            var salt = _passwordService.GenerateRandomSalt();
+
+            // Generate hashed password for storing in the database
+            var hashedPwd = _passwordService.HashPassword(passwordResetDTO.NewPassword, salt);
+
+            // Update the user's password and salt in the database
+            passwordResetRequest.User!.Password = hashedPwd;
+            passwordResetRequest.User!.Salt = salt;
+
+            // Mark the token as used so it can't be replayed
+            passwordResetRequest.UsedAt = DateTime.UtcNow;
+
+            // Save the changes to the database
+            await _dfcStatsDbContext.SaveChangesAsync();
+
             return PasswordResetTokenStatus.Valid;
         }
 

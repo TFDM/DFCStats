@@ -79,8 +79,77 @@ public class PasswordResetController : Controller
         // Get the status of the reset token to determine if it is valid
         var tokenStatus = await _passwordResetService.ValidateResetTokenAsync(token);
 
-        
+        // Check the status of the token. If it is not valid redirect 
+        // the user to the ForgotPassword page with an error message
+        if (tokenStatus != PasswordResetTokenStatus.Valid)
+        {
+            // If the token is not valid, redirect to the ForgotPassword page with an error message
+            TempData["Failure"] = "The password reset link is invalid or has expired. Please request a new password reset link.";
+            return RedirectToAction("ForgotPassword");
+        }
 
-        return View();
+        // Set the page heading and the page title
+		ViewData["PageHeading"] = "Reset Password";
+		ViewData["Title"] = "Reset Password";
+
+        // Create a new ResetPassword model with the token and pass it to the view
+        var resetPasswordModel = new ResetPassword { Token = token };
+
+        return View(resetPasswordModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(ResetPassword resetPassword)
+    {
+        if (ModelState.IsValid)
+        {
+            // Get the status of the reset token to determine if it is valid
+            var tokenStatus = await _passwordResetService.ValidateResetTokenAsync(resetPassword.Token);
+
+            // Check the status of the token. If it is not valid redirect 
+            // the user to the ForgotPassword page with an error message
+            if (tokenStatus != PasswordResetTokenStatus.Valid)
+            {
+                // If the token is not valid, redirect to the ForgotPassword page with an error message
+                TempData["Failure"] = "The password reset link is invalid or has expired. Please request a new password reset link.";
+                return RedirectToAction("ForgotPassword");
+            }
+
+            // Create the password reset DTO
+            var passwordResetDTO = new PasswordResetDTO
+            {
+                Token = resetPassword.Token,
+                NewPassword = resetPassword.NewPassword,
+                ConfirmNewPassword = resetPassword.ConfirmNewPassword
+            };
+
+            // Attempt to reset the password
+            try
+            {
+                // Reset the password
+                var result = await _passwordResetService.ResetPasswordAsync(passwordResetDTO);
+
+                // If the password reset was successful, redirect to the login page with a success message
+                if (result == PasswordResetTokenStatus.Valid)
+                {
+                    // Show a success message
+                    TempData["Success"] = "Your password has been reset successfully. You can now log in with your new password.";
+                    return RedirectToAction("Login", "User");
+                } else
+                {
+                    // If the token is not valid, redirect to the ForgotPassword page with an error message
+                    TempData["Failure"] = "The password reset link is invalid or has expired. Please request a new password reset link.";
+                    return RedirectToAction("ForgotPassword");
+                }
+
+            } catch (DFCStatsException ex)
+            {
+                // If the token is not valid, show an error message to the user
+                TempData["Failure"] = ex.Message;
+            }
+        }
+
+        return View(resetPassword);
     }
 }

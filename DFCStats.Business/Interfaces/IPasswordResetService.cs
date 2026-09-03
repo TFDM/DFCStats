@@ -21,6 +21,13 @@ namespace DFCStats.Business.Interfaces
         Task<PasswordResetTokenStatus> ValidateResetTokenAsync(string token);
 
         /// <summary>
+        /// Rsets the user's password using the provided token and new password
+        /// </summary>
+        /// <param name="passwordResetDTO"></param>
+        /// <returns></returns>
+        Task<PasswordResetTokenStatus> ResetPasswordAsync(PasswordResetDTO passwordResetDTO);
+
+        /// <summary>
         /// Deletes password reset requests that have expired more than 
         /// 30 days ago to keep the database clean and prevent unnecessary data accumulation
         /// </summary>
