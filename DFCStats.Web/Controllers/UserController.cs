@@ -233,10 +233,10 @@ public class UserController : Controller
                 Password = userLogin.Password
             };
 
-            // Get the login in result
+            // Get the login result
             var userLoginResult = await _userService.LoginAsync(loginDTO);
 
-            // Check if the login was succesful or not
+            // Check if the login was successful or not
             if (userLoginResult.Succeeded)
             {
                 // Sets the claims for the user
@@ -289,7 +289,7 @@ public class UserController : Controller
                 return Redirect(returnURL);      
             }
 
-            // If we get this far we can assume the user has not been sucesfully logged in
+            // If we get this far we can assume the user has not been successfully logged in
 
             // Set some appropriate messages for the failure temp data
             TempData["Failure"] = "Unable to login - invalid email address or password";        

@@ -33,6 +33,17 @@ namespace DFCStats.Business
         }
 
         /// <summary>
+        /// Checks whether the two supplied passwords match
+        /// </summary>
+        /// <param name="password"></param>
+        /// <param name="confirmPassword"></param>
+        /// <returns></returns>
+        public bool DoPasswordsMatch(string password, string confirmPassword)
+        {
+            return password == confirmPassword;
+        }
+
+        /// <summary>
         /// Hashes a password using a salt
         /// </summary>
         /// <param name="password"></param>

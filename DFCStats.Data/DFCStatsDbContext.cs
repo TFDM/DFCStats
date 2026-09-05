@@ -14,6 +14,7 @@ namespace DFCStats.Data
         public DbSet<Manager> Managers { get; set; }
         public DbSet<Nationality> Nationalities { get; set; }
         public DbSet<Participation> Participants { get; set; }
+        public DbSet<PasswordReset> PasswordResets { get; set; }
         public DbSet<Person> People { get; set; }
         public DbSet<PersonSeason> PeopleSeasons { get; set; }
         public DbSet<Role> Roles { get; set;}
